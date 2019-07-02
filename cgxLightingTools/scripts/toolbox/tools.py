@@ -101,6 +101,22 @@ def storeLightsOffStatus():
         if mc.getAttr(light + ".visibility") == False:
             lightsOff.append(light)
 
+def cleanUpCams (self):
+    #All light node types
+    lightNodes = getLightNodesList()
+    #All scene lights
+    allLightsShapes = mc.ls(lights= True, type= lightNodes, long= True)
+    allLightsScene = []
+    for i in allLightsShapes:
+        iTrans = mc.listRelatives(i, parent= True, fullPath=True)
+        allLightsScene.append(iTrans[0])
+    #Selected scene lights
+    for each in allLightsScene:
+        shapes = mc.listRelatives(each, shapes=True, noIntermediate = True, fullPath=True)
+        for each in shapes:
+            if mc.nodeType(each) == "camera":
+                mc.delete(each)
+
 storeLightsOffStatus()
 
 def main():
