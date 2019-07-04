@@ -238,7 +238,7 @@ def resetGlobals():
     storeLightsOffStatus()
     getRenderEngines()
     getLightNodes()
-        
+
 
 initLogger(fileLog=True)
 storeLightsOffStatus()
@@ -247,8 +247,7 @@ getLightNodes()
 
 
 def main():
-    print getRenderEngines()
-    print getLightNodes()
+    pass
 
 
 if __name__ == '__main__' or 'eclipsePython' in __name__:
