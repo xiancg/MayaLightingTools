@@ -3,7 +3,7 @@ Created on Jun 29, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Reimplement isolate methods and all methods that rely on gettingLightNodes
+TODO: Write light creation library
 TODO: Build attributes dict from light nodes for lightsManager
 TODO: Refactor harcoded naming in specularConstrain
 '''
@@ -14,6 +14,7 @@ import os
 
 lightsOff = list()
 renderEngines = dict()
+lightNodesDict = dict()
 
 def initLogger(fileLog=False):
     global logger
@@ -69,7 +70,6 @@ def getLightNodes():
 
 
 def getLightNodesList():
-    lightNodesDict = getLightNodes()
     lightNodes = list()
     for each in lightNodesDict.itervalues():
         lightNodes += each
@@ -77,12 +77,12 @@ def getLightNodesList():
 
 
 def getDefaultLightNodes():
-    return getLightNodes()['default']
+    return lightNodesDict['default']
 
 
 def getRendererLightNodes(renderer='default'):
     if mc.pluginInfo(renderer, query=True, loaded=True) or renderer == 'default':
-        return getLightNodes()[renderer]
+        return lightNodesDict[renderer]
     else:
         logger.warning("No renderer named '{}' was found loaded.".format(renderer))
         return None
@@ -234,7 +234,7 @@ def specularConstrain (_fixed=True):
     logger.info('{} specular constrain setups created.'.format(i))
 
 
-def resetTools():
+def resetGlobals():
     storeLightsOffStatus()
     getRenderEngines()
     getLightNodes()
