@@ -7,66 +7,181 @@ Based upon the work of Cesar Saez https://www.cesarsaez.me
 '''
 import string
 
-rule = '{category}_{function}_{whatAffects}_{digits}_{type}'
-tokens = dict()
+_rules = {'_active': None}
+_tokens = dict()
+
+class Token(object):
+    def __init__(self, name):
+        super(Token, self).__init__()
+        self._name = name
+        self._default = None
+        self._options = dict()
+    
+    def addOption(self, key, value):
+        self._options[key] = value
+
+    def solve(self, name=None):
+        '''Solve for abbreviation given a certain name. Ex: center could return C'''
+        if name is None:
+            return self.default
+        return self._options.get(name)
+    
+    def parse(self, value):
+        '''Get metatada (origin) for given value in name. Ex: L could return left'''
+        for k, v in self._options.iteritems():
+            if v == value:
+                return k
+    
+    @property
+    def required(self):
+        return self.default is None
+    
+    @property
+    def name(self):
+        return self._name
+    
+    @name.setter
+    def name(self, n):
+        self._name = n
+    
+    @property
+    def default(self):
+        if self._default is None and len(self._options):
+            self._default = self._options.values()[0]
+        return self._default
+    
+    @default.setter
+    def default(self, d):
+        self._default = d
 
 
-def addToken(name,**kwargs):
-    if len(kwargs) == 0:
-        tokens[name] = None
+class Rule(object):
+    def __init__(self, name, fields):
+        super(Rule, self).__init__()
+        self.name = name
+        self._fields = list()
+        self.addFields(fields)
+    
+    def addFields(self, tokenNames):
+        self._fields.extend(tokenNames)
         return True
-    if kwargs.get('default'):
-        kwargs['_default'] = kwargs['default']
-        del kwargs['default']
-    tokens[name] = kwargs
+    
+    def solve(self, **values):
+        '''Build the name string with given values and return it'''
+        return self._pattern.format(**values)
+    
+    def parse(self, name):
+        '''Build and return dictionary with keys as tokens and values as given names'''
+        retval = dict()
+        splitName = name.split('_')
+        for i, f in enumerate(self.fields):
+            namePart = splitName[i]
+            token = _tokens[f]
+            if token.required:
+                retval[f] = namePart
+                continue
+            retval[f] = token.parse(namePart)
+        return retval
+
+    @property
+    def _pattern(self):
+        return '{' + '}_{'.join(self.fields) + '}'
+
+    @property
+    def fields(self):
+        return tuple(self._fields)
+
+    @property
+    def name(self):
+        return self._name
+    
+    @name.setter
+    def name(self, n):
+        self._name = n
+
+
+def addRule(name, *fields):
+    rule = Rule(name, fields)
+    _rules[name] = rule
+    if getActiveRule() is None:
+        setActiveRule(name)
     return True
 
 
-def removeToken(name):
-    if name in tokens.keys():
-        del tokens[name]
+def removeRule(name):
+    if hasRule(name):
+        del _rules[name]
         return True
     return False
 
 
+def hasRule(name):
+    return name in _rules.keys()
+
+
+def resetRules():
+    _rules.clear()
+    _rules['_active'] = None
+    return True
+
+
+def getActiveRule():
+    name = _rules['_active']
+    return _rules.get(name)
+
+
+def setActiveRule(name):
+    if hasRule(name):
+        _rules['_active'] = name
+        return True
+    return False
+
+
+def addToken(name,**kwargs):
+    token = Token(name)
+    for k, v in kwargs.iteritems():
+        if k == "default":
+            token.default = v
+            continue
+        token.addOption(k, v)
+    _tokens[name] = token
+    return token
+
+
+def removeToken(name):
+    if hasToken(name):
+        del _tokens[name]
+        return True
+    return False
+
+
+def hasToken(name):
+    return name in _tokens.keys()
+
+
 def resetTokens():
-    tokens.clear()
+    _tokens.clear()
     return True
 
 
 def parse(name):
-    retval = dict()
-    fields = [x[1] for x in string.Formatter().parse(rule)]
-    splitName = name.split('_')
-    for i, f in enumerate(fields):
-        namePart = splitName[i]
-        lookup = tokens[f]
-        if lookup is None: #required
-            retval[f] = namePart
-            continue
-        for key, value in lookup.iteritems():
-            if namePart == value and key != '_default':
-                retval[f] = key
-                break
-    return retval
-
+    rule = getActiveRule()
+    return rule.parse(name)
+    
 
 def solve(*args, **kwargs):
     values = dict()
-    fields = [x[1] for x in string.Formatter().parse(rule)]
+    rule = getActiveRule()
     i = 0
-    for f in fields:
-        lookup = tokens[f]
-        if lookup is None: #required
+    for f in rule.fields:
+        token = _tokens[f]
+        if token.required:
             if kwargs.get(f) is not None:
                 values[f] = kwargs[f]
                 continue
             values[f] = args[i]
             i += 1
             continue
-        if kwargs.get(f) in lookup.keys():
-            values[f] = lookup[kwargs.get(f, '_default')]
-        else:
-            values[f] = lookup['_default']
+        values[f] = token.solve(kwargs.get(f))
 
-    return rule.format(**values)
+    return rule.solve(**values)
