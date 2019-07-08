@@ -8,32 +8,30 @@ Based upon the work of Cesar Saez https://www.cesarsaez.me
 import string
 
 rule = '{category}_{function}_{whatAffects}_{digits}_{type}'
-tokens = {
-    'category': {'natural': 'natural',
-                 'practical': 'practical',
-                 'dramatic': 'dramatic',
-                 'volumetric': 'volumetric',
-                 '_default': 'natural'
-                 },
-    'function': {'key': 'key',
-                 'fill': 'fill',
-                 'ambient': 'ambient',
-                 'bounce': 'bounce',
-                 'rim': 'rim',
-                 'kick': 'kick',
-                 '_default': 'custom'
-                 },
-    'whatAffects': None,
-    'digits': None,
-    'type': {
-        'lighting': 'LGT',
-        'animation': 'ANI',
-        '_default': 'LGT'
-    }
-}
+tokens = dict()
 
-def add_token(*args,**kwargs):
-    pass
+
+def addToken(name,**kwargs):
+    if len(kwargs) == 0:
+        tokens[name] = None
+        return True
+    if kwargs.get('default'):
+        kwargs['_default'] = kwargs['default']
+        del kwargs['default']
+    tokens[name] = kwargs
+    return True
+
+
+def removeToken(name):
+    if name in tokens.keys():
+        del tokens[name]
+        return True
+    return False
+
+
+def resetTokens():
+    tokens.clear()
+    return True
 
 
 def parse(name):
