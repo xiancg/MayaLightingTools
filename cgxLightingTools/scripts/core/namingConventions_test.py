@@ -8,10 +8,6 @@ Based upon the work of Cesar Saez https://www.cesarsaez.me
 
 import unittest
 from cgxLightingTools.scripts.core import namingConventions as n
-import maya.cmds as mc
-
-# Digits deberian pasar como # o como el numero en si?
-
 
 class SolveCase(unittest.TestCase):
     def test_explicit(self):
@@ -46,11 +42,26 @@ class SolveCase(unittest.TestCase):
         self.assertEqual(solved, name)
 
 
-def ParseCase(unittest.TestCase):
+class ParseCase(unittest.TestCase):
     def test_parsing(self):
-        pass
+        name = 'dramatic_bounce_chars_001_LGT'
+        parsed = n.parse(name)
+        self.assertEqual(parsed['category'], 'dramatic')
+        self.assertEqual(parsed['function'], 'bounce')
+        self.assertEqual(parsed['whatAffects'], 'chars')
+        self.assertEqual(parsed['digits'], '001')
+        self.assertEqual(parsed['type'], 'lighting')
 
 
+class TokenCase(unittest.TestCase):
+    def test_add(self):
+        result = n.add_token('whatAffects')
+        self.assertTrue(result)
+
+        result = n.add_token('category', natural='natural', 
+                            practical='practical', dramatic='dramatic',
+                            volumetric='volumetric', default='natural')
+        self.assertTrue(result)
 
 if __name__ == '__main__':
     unittest.main()

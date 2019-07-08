@@ -32,6 +32,26 @@ tokens = {
     }
 }
 
+def add_token(*args,**kwargs):
+    pass
+
+
+def parse(name):
+    retval = dict()
+    fields = [x[1] for x in string.Formatter().parse(rule)]
+    splitName = name.split('_')
+    for i, f in enumerate(fields):
+        namePart = splitName[i]
+        lookup = tokens[f]
+        if lookup is None: #required
+            retval[f] = namePart
+            continue
+        for key, value in lookup.iteritems():
+            if namePart == value and key != '_default':
+                retval[f] = key
+                break
+    return retval
+
 
 def solve(*args, **kwargs):
     values = dict()
