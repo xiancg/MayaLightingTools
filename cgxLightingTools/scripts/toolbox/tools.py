@@ -4,6 +4,8 @@ Created on Jun 29, 2019
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Write light creation library
+TODO: Store lights off status could be renamed to VisibilitySnapshot, simpler
+TODO: Visibility snapshot could store buffers that could be called with shortcuts
 TODO: Build attributes dict from light nodes for lightsManager
 TODO: Refactor harcoded naming in specularConstrain
 '''
