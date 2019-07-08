@@ -10,7 +10,7 @@ import cgxLightingTools.scripts.toolbox.tools as tools
 
 class ArnoldFactory(LightsFactory):
     def __init__(self):
-        super(ArnoldFactory).__init__()
+        super(ArnoldFactory, self).__init__()
         self.lightNodeTypes = tools.getRendererLightNodes('mtoa')
         
     def createLight(self, _lightNodeType):

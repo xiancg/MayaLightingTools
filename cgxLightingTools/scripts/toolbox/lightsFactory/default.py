@@ -10,7 +10,7 @@ import cgxLightingTools.scripts.toolbox.tools as tools
 
 class MayaDefaultFactory(LightsFactory):
     def __init__(self):
-        super(MayaDefaultFactory).__init__()
+        super(MayaDefaultFactory, self).__init__()
         self.lightNodeTypes = tools.getDefaultLightNodes()
         
     def createLight(self, _lightNodeType):
