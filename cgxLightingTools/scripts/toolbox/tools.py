@@ -56,17 +56,17 @@ def getRenderEngines():
 
 def getLightNodes():
     lightNodes = mc.listNodeTypes('drawdb/light')
-    result = dict()
+    lightNodesDict.clear()
     for key, value in renderEngines.iteritems():
         dependNodes = mc.pluginInfo(key, query=True, dependNode=True)
         rendererLights = list(set(lightNodes).intersection(dependNodes))
-        result[key] = rendererLights
+        lightNodesDict[key] = rendererLights
     defaultLightNodes = list()
-    for lightsList in result.itervalues():
+    for lightsList in lightNodesDict.itervalues():
         defaultLightNodes += list(set(lightsList) ^ set(lightNodes))
-    result['default'] = defaultLightNodes
+    lightNodesDict['default'] = defaultLightNodes
 
-    return result
+    return lightNodesDict
 
 
 def getLightNodesList():
