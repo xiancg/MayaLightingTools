@@ -3,14 +3,39 @@ Created on July 4, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-Based upon the work of Cesar Saez https://www.cesarsaez.me
+Heavily based upon the work of Cesar Saez https://www.cesarsaez.me
 '''
-import string
+import copy
+import os 
+import json
 
+NAMING_REPO_ENV = "NAMING_REPO"
 _rules = {'_active': None}
 _tokens = dict()
 
-class Token(object):
+class Serializable(object):
+    def data(self):
+        retval = copy.deepcopy(self.__dict__)
+        retval["_Serializable_classname"] = type(self).__name__
+        retval["_Serializable_version"] = "1.0"
+        return retval
+
+    @classmethod
+    def fromData(cls, data):
+        if data.get("_Serializable_classname") != cls.__name__:
+            return None
+        del data["_Serializable_classname"]
+        if data.get("_Serializable_version") is not None:
+            del data["_Serializable_version"]
+
+        if cls.__name__ == 'Rule':
+            this = cls(None, [None])
+        else:
+            this = cls(None)
+        this.__dict__.update(data)
+        return this
+
+class Token(Serializable):
     def __init__(self, name):
         super(Token, self).__init__()
         self._name = name
@@ -55,7 +80,7 @@ class Token(object):
         self._default = d
 
 
-class Rule(object):
+class Rule(Serializable):
     def __init__(self, name, fields):
         super(Rule, self).__init__()
         self.name = name
@@ -105,7 +130,7 @@ def addRule(name, *fields):
     _rules[name] = rule
     if getActiveRule() is None:
         setActiveRule(name)
-    return True
+    return rule
 
 
 def removeRule(name):
@@ -137,6 +162,32 @@ def setActiveRule(name):
     return False
 
 
+def getRule(name):
+    return _rules.get(name)
+
+
+def saveRule(name, filepath):
+    rule = getRule(name)
+    if not rule:
+        return False
+    with open(filepath, "w") as fp:
+        json.dump(rule.data(), fp)
+    return True
+
+
+def loadRule(filepath):
+    if not os.path.isfile(filepath):
+        return False
+    try:
+        with open(filepath) as fp:
+            data = json.load(fp)
+    except:
+        return False
+    rule = Rule.fromData(data)
+    _rules[rule.name] = rule
+    return True
+
+
 def addToken(name,**kwargs):
     token = Token(name)
     for k, v in kwargs.iteritems():
@@ -163,11 +214,36 @@ def resetTokens():
     _tokens.clear()
     return True
 
+def getToken(name):
+    return _tokens.get(name)
+
+
+def saveToken(name, filepath):
+    token = getToken(name)
+    if not token:
+        return False
+    with open(filepath, "w") as fp:
+        json.dump(token.data(), fp)
+    return True
+
+
+def loadToken(filepath):
+    if not os.path.isfile(filepath):
+        return False
+    try:
+        with open(filepath) as fp:
+            data = json.load(fp)
+    except:
+        return False
+    token = Token.fromData(data)
+    _tokens[token.name] = token
+    return True
+
 
 def parse(name):
     rule = getActiveRule()
-    return rule.parse(name)
-    
+    return rule.parse(name)  
+
 
 def solve(*args, **kwargs):
     values = dict()
@@ -185,3 +261,51 @@ def solve(*args, **kwargs):
         values[f] = token.solve(kwargs.get(f))
 
     return rule.solve(**values)
+
+
+def getRepo():
+    env_repo = os.environ.get(NAMING_REPO_ENV)
+    local_repo = os.path.join(os.path.expanduser("~"), ".config", "naming")
+    return env_repo or local_repo
+
+
+def saveSession(repo=None):
+    repo = repo or getRepo()
+    if not os.path.exists(repo):
+        os.mkdir(repo)
+    # tokens and rules
+    for name, token in _tokens.iteritems():
+        filepath = os.path.join(repo, name + ".token")
+        saveToken(name, filepath)
+    for name, rule in _rules.iteritems():
+        if not isinstance(rule, Rule):
+            continue
+        filepath = os.path.join(repo, name + ".rule")
+        saveRule(name, filepath)
+    # extra configuration
+    active = getActiveRule()
+    config = {"setActiveRule": active.name if active else None}
+    filepath = os.path.join(repo, "naming.conf")
+    with open(filepath, "w") as fp:
+        json.dump(config, fp)
+    return True
+
+
+def loadSession(repo=None):
+    repo = repo or getRepo()
+    # tokens and rules
+    for dirpath, dirnames, filenames in os.walk(repo):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            if filename.endswith(".token"):
+                loadToken(filepath)
+            elif filename.endswith(".rule"):
+                loadRule(filepath)
+    # extra configuration
+    filepath = os.path.join(repo, "naming.conf")
+    if os.path.exists(filepath):
+        with open(filepath) as fp:
+            config = json.load(fp)
+        for k, v in config.iteritems():
+            globals()[k](v)
+    return True

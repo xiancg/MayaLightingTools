@@ -3,12 +3,12 @@ Created on July 4, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-Based upon the work of Cesar Saez https://www.cesarsaez.me
+Heavily based upon the work of Cesar Saez https://www.cesarsaez.me
 '''
 
 import unittest
 from cgxLightingTools.scripts.core import namingConventions as n
-
+import tempfile
 
 class SolveCase(unittest.TestCase):
     def setUp(self):
@@ -144,6 +144,87 @@ class RuleCase(unittest.TestCase):
         n.setActiveRule('test')
         result = n.getActiveRule()
         self.assertIsNotNone(result)
+
+
+class SerializationCase(unittest.TestCase):
+    def setUp(self):
+        n.resetRules()
+        n.resetTokens()
+
+    def test_tokens(self):
+        token1 = n.addToken('function', key='key', 
+                    fill='fill', ambient='ambient',
+                    bounce='bounce', rim='rim',
+                    kick='kick', default='custom')
+        token2 = n.Token.fromData(token1.data())
+        self.assertEqual(token1.data(),token2.data())
+    
+    def test_rules(self):
+        rule1 = n.addRule('lights', 'category', 'function', 'whatAffects', 'digits', 'type')
+        rule2 = n.Rule.fromData(rule1.data())
+        self.assertEqual(rule1.data(),rule2.data())
+    
+    def test_validation(self):
+        token = n.addToken('function', key='key', 
+                    fill='fill', ambient='ambient',
+                    bounce='bounce', rim='rim',
+                    kick='kick', default='custom')
+        rule = n.addRule('lights', 'category', 'function', 'whatAffects', 'digits', 'type')
+        self.assertIsNone(n.Rule.fromData(token.data()))
+        self.assertIsNone(n.Token.fromData(rule.data()))
+    
+    def test_save_load_rule(self):
+        n.addRule('test', 'category', 'function', 'whatAffects', 'digits', 'type')
+        filepath = tempfile.mktemp()
+        n.saveRule('test', filepath)
+
+        n.resetRules()
+        n.loadRule(filepath)
+        self.assertTrue(n.hasRule('test'))
+
+    def test_save_load_token(self):
+        n.addToken('test', key='key', 
+                    fill='fill', ambient='ambient',
+                    bounce='bounce', rim='rim',
+                    kick='kick', default='custom')
+        filepath = tempfile.mktemp()
+        n.saveToken('test', filepath)
+
+        n.resetTokens()
+        n.loadToken(filepath)
+        self.assertTrue(n.hasToken('test'))
+    
+    def test_save_load_session(self):
+        n.addToken('whatAffects')
+        n.addToken('digits')
+        n.addToken('category', natural='natural', 
+                    practical='practical', dramatic='dramatic',
+                    volumetric='volumetric', default='natural')
+        n.addToken('function', key='key', 
+                    fill='fill', ambient='ambient',
+                    bounce='bounce', rim='rim',
+                    kick='kick', default='custom')
+        n.addToken('type', lighting='LGT', 
+                    animation='ANI', default='LGT')
+        n.addRule('lights', 'category', 'function', 'whatAffects', 'digits', 'type')
+        n.addRule('test', 'category', 'function')
+        n.setActiveRule('lights')
+
+        repo = tempfile.mkdtemp()
+        n.saveSession(repo)
+
+        n.resetRules()
+        n.resetTokens()
+
+        n.loadSession(repo)
+        self.assertTrue(n.hasToken('whatAffects'))
+        self.assertTrue(n.hasToken('digits'))
+        self.assertTrue(n.hasToken('category'))
+        self.assertTrue(n.hasToken('function'))
+        self.assertTrue(n.hasToken('type'))
+        self.assertTrue(n.hasRule('lights'))
+        self.assertTrue(n.hasRule('test'))
+        self.assertEqual(n.getActiveRule().name, 'lights')
 
 
 if __name__ == '__main__':
