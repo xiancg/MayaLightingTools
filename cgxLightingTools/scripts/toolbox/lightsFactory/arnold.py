@@ -15,7 +15,8 @@ class ArnoldFactory(LightsFactory):
         
     def createLight(self, _lightNodeType):
         if _lightNodeType in self.lightNodeTypes():
-            setName(lightNode)
-            setDefaultAttributes(lightNode)
+            pass
+            # setName(lightNode)
+            # setDefaultAttributes(lightNode)
         else:
             pass #Warning

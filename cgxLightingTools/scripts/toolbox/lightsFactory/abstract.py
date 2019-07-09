@@ -4,15 +4,20 @@ Created on July 3, 2019
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Implement naming
+TODO: Implement arnold lights creation.
 TODO: Implement attributes. This will require a lot of work to do
 it automatically, use config file preset for now.
-TODO: Implement arnold lights creation. 
-TODO: Split renderers implementations to different modules
 '''
 import abc
-import cgxLightingTools.scripts.toolbox.tools as tools
-
-
+import os
+from cgxLightingTools.scripts.toolbox import tools
+import cgxLightingTools.scripts.core.namingConventions as naming
+naming.NAMING_REPO_ENV = os.path.join(
+                        os.path.dirname(os.path.abspath(naming.__file__)),
+                        'cfg')
+naming.loadSession()
+print naming.getActiveRule()
+'''
 class LightsFactory(object):
     __metaclass__ = abc.ABCMeta
     def __init__(self):
@@ -27,3 +32,10 @@ class LightsFactory(object):
     
     def buildName(self, lightNode):
         pass
+'''
+
+def main():
+    pass
+
+if __name__ == '__main__' or 'eclipsePython' in __name__:
+    main()
