@@ -14,7 +14,7 @@ class SolveCase(unittest.TestCase):
     def setUp(self):
         n.resetTokens()
         n.addToken('whatAffects')
-        n.addToken('digits')
+        n.addTokenNumber('digits')
         n.addToken('category', natural='natural', 
                     practical='practical', dramatic='dramatic',
                     volumetric='volumetric', default='natural')
@@ -32,32 +32,32 @@ class SolveCase(unittest.TestCase):
     def test_explicit(self):
         name = 'natural_ambient_chars_001_LGT'
         solved = n.solve(category='natural', function='ambient',
-                         whatAffects='chars', digits='001', type='lighting')
+                         whatAffects='chars', digits=1, type='lighting')
         self.assertEqual(solved, name)
 
     def test_noMatchForToken(self):
         name = 'natural_ambient_chars_001_LGT'
         solved = n.solve(category='natural', function='sarasa',
-                         whatAffects='chars', digits='001', type='lighting')
+                         whatAffects='chars', digits=1, type='lighting')
         self.assertNotEqual(name, solved)
 
     def test_defaults(self):
         name = 'natural_custom_chars_001_LGT'
         solved = n.solve(category='natural', whatAffects='chars',
-                         digits='001', type='lighting')
+                         digits=1, type='lighting')
         self.assertEqual(solved, name)
 
         name = 'natural_custom_chars_001_LGT'
-        solved = n.solve(whatAffects='chars',digits='001')
+        solved = n.solve(whatAffects='chars',digits=1)
         self.assertEqual(solved, name)
     
     def test_implicit(self):
         name = 'natural_custom_chars_001_ANI'
-        solved = n.solve('chars','001',type='animation')
+        solved = n.solve('chars',1,type='animation')
         self.assertEqual(solved, name)
 
         name = 'natural_custom_chars_001_LGT'
-        solved = n.solve('chars','001')
+        solved = n.solve('chars',1)
         self.assertEqual(solved, name)
 
 
@@ -65,7 +65,7 @@ class ParseCase(unittest.TestCase):
     def setUp(self):
         n.resetTokens()
         n.addToken('whatAffects')
-        n.addToken('digits')
+        n.addTokenNumber('digits')
         n.addToken('category', natural='natural', 
                     practical='practical', dramatic='dramatic',
                     volumetric='volumetric', default='natural')
@@ -86,7 +86,7 @@ class ParseCase(unittest.TestCase):
         self.assertEqual(parsed['category'], 'dramatic')
         self.assertEqual(parsed['function'], 'bounce')
         self.assertEqual(parsed['whatAffects'], 'chars')
-        self.assertEqual(parsed['digits'], '001')
+        self.assertEqual(parsed['digits'], 1)
         self.assertEqual(parsed['type'], 'lighting')
 
 
@@ -196,7 +196,7 @@ class SerializationCase(unittest.TestCase):
     
     def test_save_load_session(self):
         n.addToken('whatAffects')
-        n.addToken('digits')
+        n.addTokenNumber('digits')
         n.addToken('category', natural='natural', 
                     practical='practical', dramatic='dramatic',
                     volumetric='volumetric', default='natural')
@@ -225,6 +225,34 @@ class SerializationCase(unittest.TestCase):
         self.assertTrue(n.hasRule('lights'))
         self.assertTrue(n.hasRule('test'))
         self.assertEqual(n.getActiveRule().name, 'lights')
+
+
+class NumberTokenCase(unittest.TestCase):
+    def setUp(self):
+        n.resetTokens()
+        n.addToken('whatAffects')
+        n.addTokenNumber('number') 
+        n.addToken('category', natural='natural', 
+                    practical='practical', dramatic='dramatic',
+                    volumetric='volumetric', default='natural')
+        n.addToken('function', key='key', 
+                    fill='fill', ambient='ambient',
+                    bounce='bounce', rim='rim',
+                    kick='kick', default='custom')
+        n.addToken('type', lighting='LGT', default='LGT')
+        n.addRule('lights', 'category', 'function', 'whatAffects', 'number', 'type')
+        return super(NumberTokenCase, self).setUp()
+
+    def test_explicitSolve(self):
+        name = 'natural_ambient_chars_024_LGT'
+        solved = n.solve(category='natural', function='ambient',
+                        whatAffects='chars', number=24, type='lighting')
+        self.assertEqual(solved, name)
+    
+    def test_implicitSolve(self):
+        name = 'natural_custom_chars_032_LGT'
+        solved = n.solve('chars',32)
+        self.assertEqual(solved, name)
 
 
 if __name__ == '__main__':

@@ -80,6 +80,83 @@ class Token(Serializable):
         self._default = d
 
 
+class TokenNumber(Token):
+    def __init__(self, name):
+        super(TokenNumber, self).__init__(name)
+        
+    def solve(self, number):
+        '''Solve for number with given padding parameter.
+            Ex: 1 could return 001 with padding 3'''
+        numberStr = str(number).zfill(self.padding)
+        return '{}{}{}'.format(self.prefix, numberStr, self.suffix)
+    
+    def parse(self, value):
+        '''Get metatada (number) for given value in name. Ex: v0025 could return 25'''
+        if value.isdigit():
+            return int(value)
+        else:
+            prefixIndex = 0
+            for each in value[::1]:
+                if each.isdigit() and prefixIndex == 0:
+                    prefixIndex = -1
+                    break
+                if not each.isdigit():
+                    prefixIndex += 1
+                else:
+                    break
+            suffixIndex = 0
+            for each in value[::-1]:
+                if each.isdigit() and suffixIndex == 0:
+                    suffixIndex = -1
+                    break
+                if not each.isdigit():
+                    suffixIndex += 1
+                else:
+                    break
+            
+            if prefixIndex == -1 and suffixIndex >= 0:
+                return int(value[:-suffixIndex])
+            elif prefixIndex >= 0 and suffixIndex == -1:
+                return int(value[prefixIndex:])
+            elif prefixIndex >= 0 and suffixIndex >= 0:
+                return int(value[prefixIndex:-suffixIndex])
+    
+    @property
+    def padding(self):
+        return self._options['padding']
+    
+    @padding.setter
+    def padding(self, p):
+        if p <= 0:
+            p = 1
+        self._options['padding'] = int(p)
+
+    @property
+    def prefix(self):
+        return self._options['prefix']
+    
+    @prefix.setter
+    def prefix(self, p):
+        self._options['prefix'] = p
+
+    @property
+    def suffix(self):
+        return self._options['suffix']
+    
+    @suffix.setter
+    def suffix(self, s):
+        self._options['suffix'] = s
+    
+    @property
+    def default(self):
+        self._default = 1
+        return self._default
+    
+    @property
+    def required(self):
+        return True
+
+
 class Rule(Serializable):
     def __init__(self, name, fields):
         super(Rule, self).__init__()
@@ -235,9 +312,21 @@ def loadToken(filepath):
             data = json.load(fp)
     except:
         return False
-    token = Token.fromData(data)
+    if data.get("_Serializable_classname") == 'TokenNumber':
+        token = TokenNumber.fromData(data)
+    else:
+        token = Token.fromData(data)
     _tokens[token.name] = token
     return True
+
+
+def addTokenNumber(name, prefix='', padding=3, suffix=''):
+    token = TokenNumber(name)
+    token.addOption('prefix', prefix)
+    token.addOption('padding', padding)
+    token.addOption('suffix', suffix)
+    _tokens[name] = token
+    return token
 
 
 def parse(name):
@@ -251,6 +340,13 @@ def solve(*args, **kwargs):
     i = 0
     for f in rule.fields:
         token = _tokens[f]
+        if isinstance(token, TokenNumber):
+            if kwargs.get(f) is not None:
+                values[f] = token.solve(kwargs[f])
+                continue
+            values[f] = token.solve(args[i])
+            i += 1
+            continue
         if token.required:
             if kwargs.get(f) is not None:
                 values[f] = kwargs[f]
