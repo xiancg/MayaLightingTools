@@ -12,11 +12,10 @@ import abc
 import os
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.core.namingConventions as naming
-naming.NAMING_REPO_ENV = os.path.join(
-                        os.path.dirname(os.path.abspath(naming.__file__)),
-                        'cfg')
+repoPath = os.path.join(os.path.dirname(os.path.abspath(naming.__file__)),'cfg')
+os.environ['NAMING_REPO'] = repoPath
 naming.loadSession()
-print naming.getActiveRule()
+print naming.getActiveRule().name
 '''
 class LightsFactory(object):
     __metaclass__ = abc.ABCMeta
