@@ -106,3 +106,4 @@ venv.bak/
 .pydevproject
 .project
 *.code-workspace
+CGXLightingTools.env
