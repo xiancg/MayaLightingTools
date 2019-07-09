@@ -265,7 +265,7 @@ def solve(*args, **kwargs):
 
 def getRepo():
     env_repo = os.environ.get(NAMING_REPO_ENV)
-    local_repo = os.path.join(os.path.expanduser("~"), ".config", "naming")
+    local_repo = os.path.join(os.path.expanduser("~"), ".CGXTools", "naming")
     return env_repo or local_repo
 
 
@@ -307,5 +307,5 @@ def loadSession(repo=None):
         with open(filepath) as fp:
             config = json.load(fp)
         for k, v in config.iteritems():
-            globals()[k](v)
+            globals()[k](v) #execute setActiveRule and sets it
     return True
