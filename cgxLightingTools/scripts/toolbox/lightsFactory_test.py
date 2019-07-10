@@ -3,7 +3,6 @@ Created on July 9, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Implement padding in naming library
 '''
 import maya.standalone
 maya.standalone.initialize()
@@ -12,7 +11,7 @@ mc.loadPlugin('mtoa')
 
 import unittest
 from cgxLightingTools.scripts.toolbox.lightsFactory.abstract import LightsFactory
-
+from cgxLightingTools.scripts.toolbox.lightsFactory.arnold import ArnoldFactory
 
 class FactoryTest(unittest.TestCase):
     def test_createLight(self):
@@ -31,6 +30,24 @@ class FactoryTest(unittest.TestCase):
         lightCreated = factory.createLight('spotLight', lightName)
         self.assertTrue(lightCreated)
         name = 'dramatic_bounce_chars_018_LGT'
+        self.assertEqual(lightName, name)
+    
+    def test_createArnoldLight(self):
+        factory = ArnoldFactory()
+        lightName = factory.buildName('chars', number=125)
+        lightCreated = factory.createLight('aiAreaLight', lightName)
+        self.assertTrue(lightCreated)
+        name = 'natural_custom_chars_125_LGT'
+        self.assertEqual(lightName, name)
+    
+    def test_createMeshLight(self):
+        factory = ArnoldFactory()
+        cube = mc.polyCube()
+        mc.select(cube, replace=True)
+        lightName = factory.buildName('chars', number=7)
+        lightCreated = factory.createLight('aiMeshLight', lightName)
+        self.assertTrue(lightCreated)
+        name = 'natural_custom_chars_007_LGT'
         self.assertEqual(lightName, name)
 
 
