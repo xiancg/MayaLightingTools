@@ -10,7 +10,7 @@ import maya.cmds as mc
 mc.loadPlugin('mtoa')
 
 import unittest
-from cgxLightingTools.scripts.toolbox.lightsFactory.abstract import LightsFactory
+from cgxLightingTools.scripts.toolbox.lightsFactory.default import LightsFactory
 from cgxLightingTools.scripts.toolbox.lightsFactory.arnold import ArnoldFactory
 
 class FactoryTest(unittest.TestCase):
