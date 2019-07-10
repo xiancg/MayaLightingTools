@@ -1,0 +1,447 @@
+{ 
+    "default": { 
+		"dropoff": {
+			"uiControl": "floatslider", 
+			"default": 0.0, 
+			"maxValue": 100.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"spotLight"
+			], 
+			"display": "True"
+		}, 
+		"emitSpecular": {
+			"uiControl": "booleancombobox", 
+			"default": "True", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"False", 
+				"True"
+			], 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "False"
+		}, 
+		"decayRate": {
+			"uiControl": "combobox", 
+			"default": "No Decay", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"No Decay", 
+				"Linear", 
+				"Quadratic", 
+				"Cubic"
+			], 
+			"lightTypes": [
+				"pointLight", 
+				"areaLight", 
+				"spotLight"
+			], 
+			"display": "True"
+		}, 
+		"color": {
+			"uiControl": "colorswatch", 
+			"default": "#ffffff", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"emitDiffuse": {
+			"uiControl": "booleancombobox", 
+			"default": "True", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"False", 
+				"True"
+			], 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "False"
+		}, 
+		"visibility": {
+			"uiControl": "booleancombobox", 
+			"default": "True", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"False", 
+				"True"
+			], 
+			"lightTypes": [
+				"ambientLight", 
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"volumeLight", 
+				"VRayLightSphereShape", 
+				"VRayLightDomeShape", 
+				"VRayLightRectShape", 
+				"VRayLightIESShape", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"coneAngle": {
+			"uiControl": "floatslider", 
+			"default": 40.0, 
+			"maxValue": 180.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"spotLight"
+			], 
+			"display": "True"
+		}, 
+		"penumbraAngle": {
+			"uiControl": "floatslider", 
+			"default": 0.0, 
+			"maxValue": 180.0, 
+			"minValue": -180.0, 
+			"values": "None", 
+			"lightTypes": [
+				"spotLight"
+			], 
+			"display": "True"
+		}, 
+		"intensity": {
+			"uiControl": "floatslider", 
+			"default": 1, 
+			"maxValue": 1000000.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}
+    }, 
+    "mtoa": {
+		"aiAngle": {
+			"uiControl": "floatslider", 
+			"default": 0.0, 
+			"maxValue": 180.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight"
+			], 
+			"display": "False"
+		}, 
+		"aiShadowDensity": {
+			"uiControl": "floatslider", 
+			"default": 1.0, 
+			"maxValue": 1.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiSpecular": {
+			"uiControl": "floatslider", 
+			"default": 1.0, 
+			"maxValue": 100.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiColorTemperature": {
+			"uiControl": "floatslider", 
+			"default": 6500.0, 
+			"maxValue": 15000.0, 
+			"minValue": 1000.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "False"
+		}, 
+		"aiSss": {
+			"uiControl": "floatslider", 
+			"default": 1.0, 
+			"maxValue": 100.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiAffectVolumetrics": {
+			"uiControl": "booleancombobox", 
+			"default": "True", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"False", 
+				"True"
+			], 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiNormalize": {
+			"uiControl": "booleancombobox", 
+			"default": "True", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"False", 
+				"True"
+			], 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiDiffuse": {
+			"uiControl": "floatslider", 
+			"default": 1.0, 
+			"maxValue": 100.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiVolumeSamples": {
+			"uiControl": "intslider", 
+			"default": 2, 
+			"maxValue": 100, 
+			"minValue": 0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiDecayType": {
+			"uiControl": "combobox", 
+			"default": "quadratic", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"constant", 
+				"quadratic"
+			], 
+			"lightTypes": [
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight"
+			], 
+			"display": "False"
+		}, 
+		"aiSamples": {
+			"uiControl": "intslider", 
+			"default": 3, 
+			"maxValue": 100, 
+			"minValue": 0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiMaxBounces": {
+			"uiControl": "intslider", 
+			"default": 0, 
+			"maxValue": 999, 
+			"minValue": 0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiCastVolumetricShadows": {
+			"uiControl": "booleancombobox", 
+			"default": "True", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"False", 
+				"True"
+			], 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "False"
+		}, 
+		"aiIndirect": {
+			"uiControl": "floatslider", 
+			"default": 1.0, 
+			"maxValue": 100.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiRadius": {
+			"uiControl": "floatslider", 
+			"default": 0.0, 
+			"maxValue": 10000.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"pointLight", 
+				"spotLight"
+			], 
+			"display": "True"
+		}, 
+		"aiExposure": {
+			"uiControl": "floatslider", 
+			"default": 18.0, 
+			"maxValue": 10000.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}, 
+		"aiCastShadows": {
+			"uiControl": "booleancombobox", 
+			"default": "True", 
+			"maxValue": "None", 
+			"minValue": "None", 
+			"values": [
+				"False", 
+				"True"
+			], 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		}
+    }
+}
