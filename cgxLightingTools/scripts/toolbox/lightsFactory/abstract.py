@@ -3,11 +3,11 @@ Created on July 3, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Implement arnold lights creation.
-TODO: Implement attributes. This will require a lot of work to do
-it automatically, use config file preset for now.
+TODO: Implement attributes on default and arnold. This will require 
+a lot of work to do it automatically, use config file preset for now.
 '''
 import os
+import json
 import maya.cmds as mc
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.core.namingConventions as naming
@@ -20,6 +20,10 @@ class LightsFactory(object):
         os.environ['NAMING_REPO'] = repoPath
         naming.loadSession()
         self.naming = naming
+        lightAttrsPath = os.path.join(repoPath, 'lightAttrs.json')
+        with open(lightAttrsPath) as fp:
+            config = json.load(fp)
+        self._lightAttrs = config
     
     def createLight(self, lightNodeType, lightName):
         if lightNodeType == 'spotLight':
@@ -36,10 +40,24 @@ class LightsFactory(object):
             return False
         if shapeNode:
             self.setDefaultAttrs(shapeNode)
-        return True
+            return True
+        else: 
+            return False
     
     def setDefaultAttrs(self, lightNode):
-        pass
+        '''TODO: Old implementation. Need to change to programatic listing of attrs and attr types'''
+        for key in tools.getLightNodes().keys():
+            if self._lightAttrs.get(key):
+                for attrName, attrDict in self._lightAttrs[key].iteritems():
+                    value = attrDict["default"]
+                    if attrName in mc.listAttr(lightNode):#Check if attribute exists in the object
+                        if attrDict["uiControl"] == "floatslider" or attrDict["uiControl"] == "intslider":
+                            mc.setAttr(lightNode + "." + attrName, value)
+                        elif attrDict["uiControl"] == "combobox" or attrDict["uiControl"] == "booleancombobox":
+                            valueIndex = attrDict["values"].index(value)
+                            mc.setAttr(lightNode + "." + attrName, valueIndex)
+                        elif attrDict["uiControl"] == "colorswatch":
+                            mc.setAttr(lightNode + "." + attrName, 1, 1, 1, type= "double3")
     
     def buildName(self, *args, **kwargs):
         '''Recursive method to check if the light name
