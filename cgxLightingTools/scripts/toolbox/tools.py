@@ -3,16 +3,14 @@ Created on Jun 29, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Write light creation library
-TODO: Store lights off status could be renamed to VisibilitySnapshot, simpler
-TODO: Visibility snapshot could store buffers that could be called with shortcuts
-TODO: Build attributes dict from light nodes for lightsManager
+TODO: Visibility snapshots could be stored to be called with shortcuts
 TODO: Refactor harcoded naming in specularConstrain
 '''
 import maya.cmds as mc
 import logging
 import sys
 import os
+import copy
 
 lightsOff = list()
 renderEngines = dict()
@@ -134,14 +132,15 @@ def simpleIsolateLights():
                 mc.setAttr((light + ".visibility"), True)
 
 
-def storeLightsOffStatus():
+def lightsVisibilitySnapshot():
     allLightsScene = list()
     del lightsOff[:]
     allLightsScene = getLightsInScene()
     for light in allLightsScene:
         if mc.getAttr(light + ".visibility") == False:
             lightsOff.append(light)
-    logger.debug('Lights off status stored. {} lights off found.'.format(len(lightsOff)))
+    logger.debug('Lights visibility snapshot taken. {} lights off found.'.format(len(lightsOff)))
+    return copy.deepcopy(lightsOff)
 
 
 def cleanUpCams ():
@@ -237,13 +236,13 @@ def specularConstrain (_fixed=True):
 
 
 def resetGlobals():
-    storeLightsOffStatus()
+    lightsVisibilitySnapshot()
     getRenderEngines()
     getLightNodes()
 
 
 initLogger(fileLog=True)
-storeLightsOffStatus()
+lightsVisibilitySnapshot()
 getRenderEngines()
 getLightNodes()
 
