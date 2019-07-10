@@ -383,7 +383,7 @@ def saveSession(repo=None):
     config = {"setActiveRule": active.name if active else None}
     filepath = os.path.join(repo, "naming.conf")
     with open(filepath, "w") as fp:
-        json.dump(config, fp)
+        json.dump(config, fp, indent = 4)
     return True
 
 
