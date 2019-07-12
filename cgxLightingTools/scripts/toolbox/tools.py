@@ -3,6 +3,7 @@ Created on Jun 29, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Change dialogs in transformBake for something without the need of confirmation
 TODO: Visibility snapshots could be stored to be called with shortcuts
 TODO: Refactor harcoded naming in specularConstrain
 '''
@@ -11,6 +12,8 @@ import logging
 import sys
 import os
 import copy
+from PySide2 import QtWidgets
+from cgxLightingTools.scripts.gui.mayaWindow import getMayaWindow
 
 lightsOff = list()
 renderEngines = dict()
@@ -235,6 +238,71 @@ def specularConstrain (_fixed=True):
     logger.info('{} specular constrain setups created.'.format(i))
 
 
+def transformBake ():
+    allSel = mc.ls(sl=True)
+    if len(allSel) < 1:
+        msgBox = QtWidgets.QMessageBox(getMayaWindow())
+        msgBox.setWindowTitle("Warning!")
+        msgBox.setText("Please select at least one vertex or transform to bake.")
+        msgBox.exec_()
+        logger.info('Please select at least one vertex or transform to bake.')
+    else:
+        text, ok = QtWidgets.QInputDialog.getText(getMayaWindow(), 'Sample By', 'Each ### frames:')
+        sampleBy = 1
+        if ok:
+            sampleBy = float(text)
+            #Stop refresh
+            mc.refresh(suspend=True)
+            for item in allSel:
+                if ".vtx" in item:
+                    vtxExp = mc.filterExpand(item , selectionMask = 31 , expand = True)
+                    for vtx in vtxExp:
+                        #THIS DOESN'T WORK IF UVS ARE OVERLAPED
+                        cleanObjName = vtx[:vtx.index(".vtx")]
+                        thisLoc = mc.spaceLocator(name= vtx + "__LOC_bkd", p=(0, 0, 0))
+                        #Make constrain
+                        vtxUVMap = mc.polyListComponentConversion(vtx, fv=True,tuv=True)
+                        vtxUVs = mc.polyEditUV(vtxUVMap, query=True)
+                        thisPopC = mc.pointOnPolyConstraint(vtx, thisLoc, offset=(0,0,0), weight=1)
+                        thisPopCAttrs = mc.listAttr(thisPopC, ud=True)
+                        mc.setAttr(thisPopC[0] + "." + thisPopCAttrs[1], vtxUVs[0])
+                        mc.setAttr(thisPopC[0] + "." + thisPopCAttrs[2], vtxUVs[1])
+                        #Bake animation
+                        start = mc.playbackOptions(query= True, minTime = True)
+                        end = mc.playbackOptions(query= True, maxTime = True)
+                        mc.bakeResults(thisLoc, simulation= True, t=(int(start),int(end)), sampleBy= sampleBy, preserveOutsideKeys= True, sparseAnimCurveBake= False, removeBakedAttributeFromLayer= False, bakeOnOverrideLayer= False, minimizeRotation= True, at= ("tx","ty","tz","rx","ry","rz","sx","sy","sz"))
+                        #Delete constrain
+                        mc.delete(thisPopC[0])
+                else: 
+                    if mc.nodeType(item) == "transform":
+                        thisLoc = mc.spaceLocator(name= item + "__LOC_bkd", p=(0, 0, 0))
+                        #Make constrains
+                        pConstrain = mc.parentConstraint(item, thisLoc, maintainOffset = False)
+                        sConstrain = mc.scaleConstraint(item, thisLoc, maintainOffset = False)
+                        #Bake animation
+                        start = mc.playbackOptions(query= True, minTime = True)
+                        end = mc.playbackOptions(query= True, maxTime = True)
+                        mc.bakeResults(thisLoc, simulation= True, t=(int(start),int(end)), sampleBy= sampleBy, preserveOutsideKeys= True, sparseAnimCurveBake= False, removeBakedAttributeFromLayer= False, bakeOnOverrideLayer= False, minimizeRotation= True, at= ("tx","ty","tz","rx","ry","rz","sx","sy","sz"))
+                        #Delete constrain
+                        mc.delete(pConstrain,sConstrain)
+                    else:
+                        msgBox = QtWidgets.QMessageBox(getMayaWindow())
+                        msgBox.setWindowTitle("Warning!")
+                        msgBox.setText("Only Vertex or Transforms accepted.")
+                        msgBox.exec_()
+                        logger.info('Only Vertex or Transforms accepted.')
+            
+            #Restart refresh
+            mc.refresh(suspend=False)
+            
+            #Done Alert!!
+            msgBox = QtWidgets.QMessageBox(getMayaWindow())
+            msgBox.setWindowTitle("Done!")
+            msgBox.setText("Done baking transforms.")
+            msgBox.exec_()
+            logger.info('Done baking transforms.')
+
+
 def resetGlobals():
     lightsVisibilitySnapshot()
     getRenderEngines()
@@ -247,6 +315,9 @@ getRenderEngines()
 getLightNodes()
 
 
+# --------------------------------------------------------
+#  Main
+# --------------------------------------------------------
 def main():
     pass
 
