@@ -50,6 +50,8 @@ class FactoryTest(unittest.TestCase):
         name = 'natural_custom_chars_007_LGT'
         self.assertEqual(lightName, name)
 
-
+# --------------------------------------------------------
+#  Main
+# --------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()

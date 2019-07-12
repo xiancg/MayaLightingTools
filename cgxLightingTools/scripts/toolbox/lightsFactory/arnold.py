@@ -83,6 +83,9 @@ class ArnoldFactory(LightsFactory):
             return lightShape
 
 
+# --------------------------------------------------------
+#  Main
+# --------------------------------------------------------
 def main():
     pass
 

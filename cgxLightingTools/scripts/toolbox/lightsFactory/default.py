@@ -79,7 +79,9 @@ class LightsFactory(object):
             lightName = self.buildName(*args, **kwargs)
             return lightName
 
-
+# --------------------------------------------------------
+#  Main
+# --------------------------------------------------------
 def main():
     pass
 

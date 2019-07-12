@@ -73,5 +73,8 @@ class FunctionsTest(unittest.TestCase):
         self.assertFalse(mc.getAttr(self.light4Trans + '.visibility'))
 
 
+# --------------------------------------------------------
+#  Main
+# --------------------------------------------------------
 if __name__ == "__main__" or 'eclipsePython' in __name__:
     unittest.main()
