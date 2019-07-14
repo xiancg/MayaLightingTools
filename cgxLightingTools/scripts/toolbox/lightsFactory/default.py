@@ -32,8 +32,14 @@ class LightsFactory(object):
             shapeNode = mc.directionalLight(name=lightName)
         elif lightNodeType == 'pointLight':
             shapeNode = mc.pointLight(name=lightName)
+        elif lightNodeType == 'ambientLight':
+            shapeNode = mc.ambientLight(name=lightName)
+        elif lightNodeType == 'volumeLight':
+            shapeNode = mc.shadingNode('volumeLight', asLight=True)
+            transform = mc.listRelatives(shapeNode, parent=True)[0]
+            mc.rename(transform, lightName)
         elif lightNodeType == 'areaLight':
-            shapeNode = mc.createNode('areaLight')
+            shapeNode = mc.shadingNode('areaLight', asLight=True)
             transform = mc.listRelatives(shapeNode, parent=True)[0]
             mc.rename(transform, lightName)
         else:
