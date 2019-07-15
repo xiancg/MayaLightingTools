@@ -6,7 +6,7 @@ Created on July 4, 2019
 '''
 import maya.cmds as mc
 import mtoa.utils as mutils
-from cgxLightingTools.scripts.toolbox.lightsFactory.default import LightsFactory
+from cgxLightingTools.scripts.toolbox.lightsFactory.default_factory import LightsFactory
 import cgxLightingTools.scripts.toolbox.tools as tools
 
 

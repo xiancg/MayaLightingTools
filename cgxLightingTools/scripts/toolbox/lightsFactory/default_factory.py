@@ -50,6 +50,9 @@ class LightsFactory(object):
         else: 
             return False
     
+    def createButtons(self):
+        pass
+    
     def setDefaultAttrs(self, lightNode):
         '''TODO: Old implementation. Need to change to programatic listing of attrs and attr types'''
         for key in tools.getLightNodes().keys():
