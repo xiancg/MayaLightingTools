@@ -5,6 +5,7 @@ Created on July 4, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 Heavily based upon the work of Cesar Saez https://www.cesarsaez.me
 '''
+from __future__ import absolute_import
 import copy
 import os 
 import json

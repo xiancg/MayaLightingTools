@@ -7,11 +7,12 @@ TODO: Change dialogs in transformBake for something without the need of confirma
 TODO: Visibility snapshots could be stored to be called with shortcuts
 TODO: Refactor harcoded naming in specularConstrain
 '''
-import maya.cmds as mc
+from __future__ import absolute_import
 import logging
 import sys
 import os
 import copy
+import maya.cmds as mc
 from PySide2 import QtWidgets
 from cgxLightingTools.scripts.gui.mayaWindow import getMayaWindow
 

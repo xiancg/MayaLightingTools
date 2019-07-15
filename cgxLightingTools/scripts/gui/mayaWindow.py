@@ -5,7 +5,7 @@ Created on July 12, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 PySide defs- by Jason Parks and Nathan Horne
 '''
-
+from __future__ import absolute_import
 import maya.OpenMayaUI as mui
 from PySide2 import QtWidgets
 from shiboken2 import wrapInstance

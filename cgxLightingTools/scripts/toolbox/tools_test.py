@@ -4,6 +4,7 @@ Created on Jun 29, 2019
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
+from __future__ import absolute_import
 import maya.standalone
 maya.standalone.initialize()
 import maya.cmds as mc

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 import cgxLightingTools.scripts.core.namingConventions as n
 
