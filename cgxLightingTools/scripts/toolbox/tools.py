@@ -54,7 +54,7 @@ def getRenderEngines():
     if len(renderEngines.keys()) == 0:
         logger.critical('No render engines found.')
         return None
-    logger.info('Found these render engines: {}'.format(','.join(renderEngines.keys())))
+    logger.debug('Found these render engines: {}'.format(','.join(renderEngines.keys())))
     return renderEngines
 
 
