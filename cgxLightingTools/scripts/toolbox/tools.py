@@ -3,7 +3,6 @@ Created on Jun 29, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Change dialogs in transformBake for something without the need of confirmation
 TODO: Visibility snapshots could be stored to be called with shortcuts. All attributes could be stored
 TODO: Refactor harcoded naming in specularConstrain
 '''
