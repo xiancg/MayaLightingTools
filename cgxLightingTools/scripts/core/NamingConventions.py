@@ -72,18 +72,23 @@ class Token(Serializable):
     
     @property
     def default(self):
-        if self._default is None and len(self._options):
+        if self._default is None and len(self._options) >= 1:
             self._default = self._options.values()[0]
         return self._default
     
     @default.setter
     def default(self, d):
         self._default = d
+    
+    @property
+    def options(self):
+        return copy.deepcopy(self._options)
 
 
 class TokenNumber(Token):
     def __init__(self, name):
         super(TokenNumber, self).__init__(name)
+        self._isNumber = True
         
     def solve(self, number):
         '''Solve for number with given padding parameter.
