@@ -3,6 +3,9 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Connect buttons to light factories
+TODO: Add post creation methods to factories (to set light groups and other custom stuff)
+TODO: Add attributes snapshot functionality
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 '''
@@ -15,40 +18,17 @@ from PySide2 import QtWidgets, QtCore, QtGui
 import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
-import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
 
 # --------------------------------------------------------
 # Mini Tools window
 # --------------------------------------------------------
 class MiniTools_GUI(QtWidgets.QMainWindow):
     def __init__(self, parent=mWin.getMayaWindow()):
-        super(MiniTools_GUI, self).__init__(parent=parent)
+        super(MiniTools_GUI, self).__init__(parent)
         self._prefOrientation = self._loadPrefOrientation()
-        self._initFactories()
         self._setupUi()
         self._setConnections()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
-    
-    def _initFactories(self):
-        '''TODO: Traverse render engines and create factories accordingly.
-        Also list factories, compare and use what is available'''
-        renderers = tools.getRenderEngines()
-        self.defaultFactory = lightsFactory.default_factory.LightsFactory()
-        if renderers is not None:
-            if 'mtoa' in renderers.keys():
-                self.mtoaFactory = lightsFactory.mtoa_factory.ArnoldFactory()
-        '''
-        if renderers is not None:
-            rendererNames = renderers.keys()
-            rendererNames.append('default')
-            factoryPath = os.path.dirname(lightsFactory.__file__)
-            factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath])]
-            for factory in factories:
-                if factory in rendererNames:
-                    for name, obj in inspect.getmembers(foo):
-                        if inspect.isclass(obj):
-                            self.factories.append(obj.__init__())
-        '''
     
     def _setupUi(self):
         self.setObjectName('miniTools_MW')
@@ -365,6 +345,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.config_BTN.setMaximumSize(configBtnSize)
         self.config_BTN.setObjectName("config_BTN")
         self.config_BTN.setToolTip('Config Options')
+
+        #TODO: Rewrite lights manager and enable it here
+        self.lightsManager_BTN.setEnabled(False)
         
     def _loadHorizontal(self):
         horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -387,6 +370,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.simpleIsolate_BTN.clicked.connect(tools.simpleIsolateLights)
         self.specularConstrain_BTN.clicked.connect(tools.specularConstrain)
         self.transformBake_BTN.clicked.connect(self._transformBake)
+        # self.spotLight_BTN.clicked.connect()
 
         #ICONS
 
@@ -496,13 +480,13 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         resetVisSnapshotQ.triggered.connect(partial(tools.lightsVisibilitySnapshot))
 
 
-# --------------------------------------------------------------------------------------------
+# --------------------------------------------------------
 # Button reimplementation
-# --------------------------------------------------------------------------------------------
+# --------------------------------------------------------
 class MiniTools_BTN(QtWidgets.QPushButton):
-	# --------------------------------------------------------------------------------------------
+	# --------------------------------------------------------
 	# Signals
-	# --------------------------------------------------------------------------------------------
+	# --------------------------------------------------------
 	rightClick = QtCore.Signal(QtCore.QPoint, super)
 	def __init__(self, parent=None):
 		super(MiniTools_BTN, self).__init__(parent)
