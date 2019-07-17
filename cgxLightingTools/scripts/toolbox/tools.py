@@ -150,9 +150,9 @@ def lightsVisibilitySnapshot():
 def cleanUpCams ():
     allLightsScene = getLightsInScene()
     #Selected scene lights
+    i = 0
     for each in allLightsScene:
         shapes = mc.listRelatives(each, shapes=True, noIntermediate = True, fullPath=True)
-        i = 0
         for each in shapes:
             if mc.nodeType(each) == "camera":
                 i += 1
