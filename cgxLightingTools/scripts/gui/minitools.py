@@ -3,7 +3,8 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Set width and height sizing properties on show depending on preferences
+TODO: All alerts should be changed to something without the need for confirmation
+Check QGraphicsOpacityEffect and QPropertyAnimation
 '''
 from __future__ import absolute_import
 import os
