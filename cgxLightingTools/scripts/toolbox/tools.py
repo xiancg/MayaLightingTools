@@ -36,8 +36,11 @@ def initLogger(fileLog=False):
     if fileLog:
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
-        if not os.path.exists(finalDir):
-            os.mkdir(finalDir)
+        try:
+            if not os.path.exists(finalDir):
+                os.mkdir(finalDir)
+        except:
+            pass
         fileHandler = logging.FileHandler(os.path.join(finalDir, 'lgtTools.log'), mode='w')
         fileHandler.setLevel(logging.DEBUG)
         fileHandler.setFormatter(formatter)
