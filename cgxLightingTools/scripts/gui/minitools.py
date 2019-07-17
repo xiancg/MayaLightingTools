@@ -10,16 +10,18 @@ import os
 import json
 from functools import partial
 
-from PySide2 import QtWidgets, QtCore
+from PySide2 import QtWidgets, QtCore, QtGui
 import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
 
-
-class MiniToolsDialog(QtWidgets.QDialog):
+# --------------------------------------------------------
+# Mini Tools window
+# --------------------------------------------------------
+class MiniTools_GUI(QtWidgets.QMainWindow):
     def __init__(self, parent=mWin.getMayaWindow()):
-        super(MiniToolsDialog, self).__init__(parent=parent)
+        super(MiniTools_GUI, self).__init__(parent=parent)
         self._prefOrientation = self._loadPrefOrientation()
         self._initFactories()
         self._setupUi()
@@ -48,7 +50,7 @@ class MiniToolsDialog(QtWidgets.QDialog):
         '''
     
     def _setupUi(self):
-        self.setObjectName('miniTools_DIALOG')
+        self.setObjectName('miniTools_MW')
         self.setWindowTitle('Mini Tools')
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
@@ -75,10 +77,11 @@ class MiniToolsDialog(QtWidgets.QDialog):
             tools_GRIDLAY.addWidget(self.simpleIsolate_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lookThru_BTN, 0, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.aimLight_BTN, 0, 2, 1, 1, QtCore.Qt.AlignCenter)
-            tools_GRIDLAY.addWidget(self.lightsManager_BTN, 0, 3, 2, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.lightsManager_BTN, 0, 3, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.specularConstrain_BTN, 1, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.cleanUpCams_BTN, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 1, 2, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.transformBake_BTN, 1, 3, 1, 1, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 16
             spacerHeight = 20
@@ -131,7 +134,8 @@ class MiniToolsDialog(QtWidgets.QDialog):
             tools_GRIDLAY.addWidget(self.specularConstrain_BTN, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.cleanUpCams_BTN, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 2, 1, 1, 1, QtCore.Qt.AlignCenter)
-            tools_GRIDLAY.addWidget(self.lightsManager_BTN, 3, 0, 1, 2, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.transformBake_BTN, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.lightsManager_BTN, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 20
             spacerHeight = 16
@@ -177,6 +181,7 @@ class MiniToolsDialog(QtWidgets.QDialog):
         mainLayout.addWidget(self.config_BTN)
         mainLayout.setAlignment(self.config_BTN, QtCore.Qt.AlignCenter)
         self.setLayout(mainLayout)
+        self.setCentralWidget(self.centralwidget)
         
         QtCore.QMetaObject.connectSlotsByName(self)
     
@@ -191,13 +196,14 @@ class MiniToolsDialog(QtWidgets.QDialog):
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         # TOOLS
-        self.simpleIsolate_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.simpleIsolate_BTN = MiniTools_BTN(self.centralwidget)
         self.lookThru_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.aimLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.specularConstrain_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.specularConstrain_BTN = MiniTools_BTN(self.centralwidget)
         self.cleanUpCams_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.lightsManager_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.alignLight_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.transformBake_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.simpleIsolate_BTN.setSizePolicy(sizePolicy)
         self.simpleIsolate_BTN.setMinimumSize(toolsBtnSize)
         self.simpleIsolate_BTN.setMaximumSize(toolsBtnSize)
@@ -217,7 +223,7 @@ class MiniToolsDialog(QtWidgets.QDialog):
         self.specularConstrain_BTN.setMinimumSize(toolsBtnSize)
         self.specularConstrain_BTN.setMaximumSize(toolsBtnSize)
         self.specularConstrain_BTN.setObjectName("specularConstrain_BTN")
-        self.specularConstrain_BTN.setToolTip('Specular: Select vertex')
+        self.specularConstrain_BTN.setToolTip('Specular: Select vertex. Right click for more options.')
         self.cleanUpCams_BTN.setSizePolicy(sizePolicy)
         self.cleanUpCams_BTN.setMinimumSize(toolsBtnSize)
         self.cleanUpCams_BTN.setMaximumSize(toolsBtnSize)
@@ -233,6 +239,11 @@ class MiniToolsDialog(QtWidgets.QDialog):
         self.lightsManager_BTN.setMaximumSize(toolsBtnSize)
         self.lightsManager_BTN.setObjectName("lightsManager_BTN")
         self.lightsManager_BTN.setToolTip('Lights Manager')
+        self.transformBake_BTN.setSizePolicy(sizePolicy)
+        self.transformBake_BTN.setMinimumSize(toolsBtnSize)
+        self.transformBake_BTN.setMaximumSize(toolsBtnSize)
+        self.transformBake_BTN.setObjectName("transformBake_BTN")
+        self.transformBake_BTN.setToolTip('Transform bake. Objects or vertex.')
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = QtWidgets.QPushButton(self.centralwidget)
@@ -367,8 +378,24 @@ class MiniToolsDialog(QtWidgets.QDialog):
         return verticalLayout
     
     def _setConnections(self):
+        #BUTTONS
+        self.lookThru_BTN.clicked.connect(tools.lookThruLight)
+        self.cleanUpCams_BTN.clicked.connect(tools.cleanUpCams)
+        self.alignLight_BTN.clicked.connect(tools.alignLightToObject)
+        self.aimLight_BTN.clicked.connect(tools.aimLightToObject)
+        self.simpleIsolate_BTN.clicked.connect(tools.simpleIsolateLights)
+        self.specularConstrain_BTN.clicked.connect(tools.specularConstrain)
+        self.transformBake_BTN.clicked.connect(self._transformBake)
+
+        #ICONS
+
         #CONTEXT MENUS
-        self.config_BTN.clicked.connect(partial(self.configOptions, self.config_BTN.pos()))
+        self.specularConstrain_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.specularConstrain_BTN.rightClick.connect(self.specConstrainOptions)
+        self.simpleIsolate_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.simpleIsolate_BTN.rightClick.connect(self.isolateOptions)
+        cursor = QtGui.QCursor()
+        self.config_BTN.clicked.connect(partial(self.configOptions, cursor.pos()))
 
     def _savePrefOrientation(self, prefOrientation):
         userPath = os.path.expanduser("~")
@@ -399,9 +426,38 @@ class MiniToolsDialog(QtWidgets.QDialog):
             self._savePrefOrientation('horizontal')
             return 'horizontal'
     
-    # --------------------------------------------------------------------------------------------
-	# Methods for config button
-	# --------------------------------------------------------------------------------------------
+    def _transformBake(self):
+        allSel = mc.ls(sl=True)
+        if len(allSel) < 1:
+            msgBox = QtWidgets.QMessageBox(self)
+            msgBox.setWindowTitle("Warning!")
+            msgBox.setText("Please select at least one vertex or transform to bake.")
+            msgBox.exec_()
+            tools.logger.info('Please select at least one vertex or transform to bake.')
+        else:
+            inputDialog = QtWidgets.QInputDialog()
+            inputDialog.setInputMode(QtWidgets.QInputDialog.DoubleInput)
+            inputDialog.setDoubleDecimals(2)
+            inputDialog.setDoubleMinimum(0.01)
+            inputDialog.setDoubleValue(1.0)
+            value, ok = inputDialog.getDouble(self, 'Sample By', 'Each ### frames:')
+            if ok:
+                try:
+                    mc.refresh(suspend=True)
+                    tools.transformBake(allSel,value)
+                except:
+                    pass
+                finally:
+                    mc.refresh(suspend=False)
+        #Done!
+        msgBox = QtWidgets.QMessageBox(self)
+        msgBox.setWindowTitle("Done!")
+        msgBox.setText("Done baking transforms.")
+        msgBox.exec_()
+
+    # --------------------------------------------------------
+	# Method for config button
+	# --------------------------------------------------------
     def configOptions (self,pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.config_BTN)
@@ -413,6 +469,51 @@ class MiniToolsDialog(QtWidgets.QDialog):
         else:
             self._prefOrientation = 'horizontal'
         prefOrientationQ.triggered.connect(partial(self._savePrefOrientation, self._prefOrientation))
+    
+
+    # --------------------------------------------------------
+	# Method for spec constrain button
+	# --------------------------------------------------------
+    def specConstrainOptions (self, pos):
+        """Method that creates the popupmenu"""
+        menu = QtWidgets.QMenu(self.specularConstrain_BTN)
+        notFixedQ = menu.addAction("Not fixed specular (no rotation)")
+        menu.popup(self.specularConstrain_BTN.mapToGlobal(pos))
+
+        notFixedQ.triggered.connect(partial(tools.specularConstrain, False))
+    
+
+    # --------------------------------------------------------
+	# Method for isolate button
+	# --------------------------------------------------------
+    def isolateOptions (self, pos):
+        """Method that creates the popupmenu"""
+        menu = QtWidgets.QMenu(self.simpleIsolate_BTN)
+        resetVisSnapshotQ = menu.addAction("Reset visibility snapshot for this tool")
+        menu.popup(self.simpleIsolate_BTN.mapToGlobal(pos))
+
+        resetVisSnapshotQ.triggered.connect(partial(tools.lightsVisibilitySnapshot))
+
+
+# --------------------------------------------------------------------------------------------
+# Button reimplementation
+# --------------------------------------------------------------------------------------------
+class MiniTools_BTN(QtWidgets.QPushButton):
+	# --------------------------------------------------------------------------------------------
+	# Signals
+	# --------------------------------------------------------------------------------------------
+	rightClick = QtCore.Signal(QtCore.QPoint, super)
+	def __init__(self, parent=None):
+		super(MiniTools_BTN, self).__init__(parent)
+		self.parent = parent
+	
+	def mousePressEvent(self, event):
+		if event.type() == QtCore.QEvent.MouseButtonPress:
+			if event.button() == QtCore.Qt.RightButton:
+				cursor = QtGui.QCursor()
+				self.rightClick.emit(self.mapFromGlobal(cursor.pos()), self)
+			else:
+				super(MiniTools_BTN, self).mousePressEvent(event)
 
 
 # --------------------------------------------------------
@@ -422,13 +523,13 @@ def load():
     for qt in QtWidgets.QApplication.topLevelWidgets():
         try:
             qtname = qt.objectName()
-            if qtname in ['miniTools_DIALOG']:
+            if qtname in ['miniTools_MW']:
                 qt.close()
                 break
         except:
             pass
-
-    miniTools = MiniToolsDialog()
+    tools.resetGlobals()
+    miniTools = MiniTools_GUI()
     miniTools.show()
 
 
