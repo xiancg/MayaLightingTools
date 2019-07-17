@@ -382,6 +382,8 @@ class MiniToolsDialog(QtWidgets.QDialog):
         filepath = os.path.join(finalDir, "MiniTools_orientation.pref")
         with open(filepath, "w") as fp:
             json.dump(config, fp, indent = 4)
+        load()
+        self.close()
     
     def _loadPrefOrientation(self):
         userPath = os.path.expanduser("~")
@@ -404,7 +406,6 @@ class MiniToolsDialog(QtWidgets.QDialog):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.config_BTN)
         prefOrientationQ = menu.addAction("Toggle tools orientation")
-        prefOrientationQ.setToolTip('Please restart MiniTools to see changes.')
         menu.popup(self.config_BTN.mapToGlobal(pos))
 
         if self._prefOrientation == 'horizontal':
@@ -417,7 +418,7 @@ class MiniToolsDialog(QtWidgets.QDialog):
 # --------------------------------------------------------
 #  Main
 # --------------------------------------------------------
-def main():
+def load():
     for qt in QtWidgets.QApplication.topLevelWidgets():
         try:
             qtname = qt.objectName()
@@ -427,9 +428,9 @@ def main():
         except:
             pass
 
-    test = MiniToolsDialog()
-    test.show()
+    miniTools = MiniToolsDialog()
+    miniTools.show()
 
 
 if __name__ == '__main__' or 'eclipsePython' in __name__:
-    main()
+    load()
