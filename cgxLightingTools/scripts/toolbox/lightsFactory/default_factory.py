@@ -10,7 +10,7 @@ import os
 import json
 import maya.cmds as mc
 from cgxLightingTools.scripts.toolbox import tools
-import cgxLightingTools.scripts.core.namingConventions as naming
+import cgxLightingTools.scripts.core.NamingConventions as naming
 
 
 class LightsFactory(object):
