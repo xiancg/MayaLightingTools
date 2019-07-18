@@ -6,9 +6,9 @@ Created on July 10, 2019
 TODO: Add attributes snapshot functionality
 TODO: Add color change when a snapshot button has been created or is active
 TODO: Add clipping planes default values to config
-TODO: Add conform to naming tool
 TODO: Add duplicate light with inputs
-TODO: Weird position problem with config context menu
+TODO: Add conform to naming tool
+TODO: Fix weird position problem with config context menu
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
