@@ -37,13 +37,13 @@ class LightsFactory(object):
             shapeNode = mc.ambientLight(name=lightName)
         elif lightNodeType == 'volumeLight':
             initNode = mc.createNode('volumeLight')
-            transform = mc.listRelatives(initNode, parent=True)[0]
+            transform = mc.listRelatives(initNode, parent=True, fullPath=True)[0]
             result = mc.rename(transform, lightName)
             shapeNode = mc.listRelatives(result, shapes=True, 
                                         noIntermediate=True, type='light')[0]
         elif lightNodeType == 'areaLight':
             initNode = mc.createNode('areaLight')
-            transform = mc.listRelatives(initNode, parent=True)[0]
+            transform = mc.listRelatives(initNode, parent=True, fullPath=True)[0]
             result = mc.rename(transform, lightName)
             shapeNode = mc.listRelatives(result, shapes=True,
                                         noIntermediate=True, type='light')[0]
@@ -51,12 +51,27 @@ class LightsFactory(object):
             return False
         if shapeNode:
             self.setDefaultAttrs(shapeNode)
+            self.postLightCreation(shapeNode)
             return True
         else: 
             return False
-    
-    def createButtons(self):
-        pass
+
+    def postLightCreation(self, shapeNode):
+        '''Place here all custom stuff you want to do with the created light node'''
+        transform = mc.listRelatives(shapeNode, parent=True)[0]
+        try:
+            mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
+            aovNode = mc.createNode("aiAOV", name='RGBA_' + transform)
+            mc.setAttr(aovNode + ".name", 'RGBA_' + transform, type="string")
+            mc.setAttr(aovNode + ".type", 6)
+            mc.setAttr(aovNode + ".enabled", True)
+            mc.connectAttr("defaultArnoldFilter.message", aovNode + ".outputs[0].filter", force=True)
+            mc.connectAttr("defaultArnoldDriver.message", aovNode + ".outputs[0].driver", force=True)
+            mc.connectAttr(aovNode + ".message", "defaultArnoldRenderOptions.aovList",
+                            nextAvailable=True, force=True)
+            mc.select(shapeNode, replace=True)
+        except:
+            raise('Post light creation process failed.')
     
     def setDefaultAttrs(self, lightNode):
         '''TODO: Old implementation. Need to change to programatic listing of attrs and attr types'''
