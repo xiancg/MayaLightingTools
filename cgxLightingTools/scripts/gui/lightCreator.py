@@ -12,20 +12,25 @@ from cgxLightingTools.scripts.gui import dataViewModels as dvm
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 
 class LightCreator_GUI(QtWidgets.QDialog):
-    def __init__(self, parent= mWin.getMayaWindow()):
+    def __init__(self, lightNodeType, parent= mWin.getMayaWindow()):
         super(LightCreator_GUI, self).__init__(parent)
-        self._initFactories()
+        self._lightNodeType = lightNodeType
+        self.factories = self._initFactories()
         self._setupUi()
+        self._setConnections()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
     
     def _initFactories(self):
         '''TODO: Traverse render engines and create factories accordingly.
         Also list factories, compare and use what is available'''
         renderers = tools.getRenderEngines()
+        factories = list()
         self.defaultFactory = lightsFactory.default_factory.LightsFactory()
+        factories.append(self.defaultFactory)
         if renderers is not None:
             if 'mtoa' in renderers.keys():
                 self.mtoaFactory = lightsFactory.mtoa_factory.ArnoldFactory()
+                factories.append(self.mtoaFactory)
         '''
         if renderers is not None:
             rendererNames = renderers.keys()
@@ -38,6 +43,8 @@ class LightCreator_GUI(QtWidgets.QDialog):
                         if inspect.isclass(obj):
                             self.factories.append(obj.__init__())
         '''
+        return factories
+        
     
     def _setupUi(self):
         self.setObjectName('LightCreator_DIALOG')
@@ -66,17 +73,17 @@ class LightCreator_GUI(QtWidgets.QDialog):
 
         # Create controls for each token type and adjust window size accordingly
         activeRule = self.defaultFactory.naming.getActiveRule()
-        tokens = dict()
+        self.tokens = dict()
         i = 0
         if activeRule:
             for field in activeRule.fields:
                 if self.defaultFactory.naming.hasToken(field):
                     token = self.defaultFactory.naming.getToken(field)
-                    tokens[token.name] = {'obj':token, 'index':i}
-                    i += 2
-        self._setSize(112*len(tokens),91)
-        for key, value in tokens.iteritems():
-            tokenObj = tokens[key]['obj']
+                    self.tokens[token.name] = {'obj':token, 'index':i}
+                    i += 1
+        self._setSize(112*len(self.tokens),91)
+        for key, value in self.tokens.iteritems():
+            tokenObj = self.tokens[key]['obj']
             labelSize = QtCore.QSize(60, 13)
             label = QtWidgets.QLabel(self)
             label.setSizePolicy(sizePolicy)
@@ -92,8 +99,9 @@ class LightCreator_GUI(QtWidgets.QDialog):
                 ctrlSpin.setMinimumSize(ctrlSpinSize)
                 ctrlSpin.setMaximumSize(ctrlSpinSize)
                 ctrlSpin.setObjectName(tokenObj.name + '_SPINBOX')
-                tokens[key]['ctrl'] = ctrlSpin
-                tokens[key]['label'] = label
+                ctrlSpin.setValue(tokenObj.default)
+                self.tokens[key]['ctrl'] = ctrlSpin
+                self.tokens[key]['label'] = label
             else:
                 if tokenObj.required:
                     #Create line edit
@@ -103,11 +111,11 @@ class LightCreator_GUI(QtWidgets.QDialog):
                     ctrlLine.setMinimumSize(ctrlLineSize)
                     ctrlLine.setMaximumSize(ctrlLineSize)
                     ctrlLine.setObjectName(tokenObj.name + '_LINEEDIT')
-                    tokens[key]['ctrl'] = ctrlLine
+                    self.tokens[key]['ctrl'] = ctrlLine
                     labelSize = QtCore.QSize(110, 13)
                     label.setMinimumSize(labelSize)
                     label.setMaximumSize(labelSize)
-                    tokens[key]['label'] = label
+                    self.tokens[key]['label'] = label
                 else:
                     #Create combobox with options
                     ctrlComboSize = QtCore.QSize(111, 22)
@@ -116,29 +124,28 @@ class LightCreator_GUI(QtWidgets.QDialog):
                     ctrlCombo.setMinimumSize(ctrlComboSize)
                     ctrlCombo.setMaximumSize(ctrlComboSize)
                     ctrlCombo.setObjectName(tokenObj.name + '_COMBOBOX')
-                    model = dvm.ObjectsListModel(tokenObj.options.values(), ctrlCombo)
+                    model = dvm.ObjectsListModel(tokenObj.options.keys(), ctrlCombo)
                     ctrlCombo.setModel(model)
                     if tokenObj.default:
                         dataList = ctrlCombo.model().dataList
                         for x in range(len(dataList)):
                             if dataList[x] == tokenObj.default:
                                 ctrlCombo.setCurrentIndex(x)
-                    tokens[key]['ctrl'] = ctrlCombo
+                    self.tokens[key]['ctrl'] = ctrlCombo
                     labelSize = QtCore.QSize(110, 13)
                     label.setMinimumSize(labelSize)
                     label.setMaximumSize(labelSize)
-                    tokens[key]['label'] = label
-        for key, value in tokens.iteritems():
-            for item in tokens[key].keys():
-                tokenObj = tokens[key]['obj']
-                tokenCtrl = tokens[key]['ctrl']
-                tokenLabel = tokens[key]['label']
-                tokenIndex = tokens[key]['index']
+                    self.tokens[key]['label'] = label
+        for key, value in self.tokens.iteritems():
+            for item in self.tokens[key].keys():
+                tokenCtrl = self.tokens[key]['ctrl']
+                tokenLabel = self.tokens[key]['label']
+                tokenIndex = self.tokens[key]['index']
                 if item == 'label':
-                    main_GRIDLAY.addWidget(tokenLabel, 0, tokenIndex, 
+                    main_GRIDLAY.addWidget(tokenLabel, 0, tokenIndex*2, 
                                             1, 1, QtCore.Qt.AlignLeft)
                 elif item == 'ctrl':
-                    main_GRIDLAY.addWidget(tokenCtrl, 1, tokenIndex,
+                    main_GRIDLAY.addWidget(tokenCtrl, 1, tokenIndex*2,
                                             1, 1, QtCore.Qt.AlignCenter)
         for column in range(0, i, 2):
             main_GRIDLAY.setColumnMinimumWidth(column,1)
@@ -155,6 +162,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
         btns_GRIDLAY.setColumnStretch(3,spacing)
         vert_VERTLAY.addLayout(btns_GRIDLAY)
         self.setLayout(vert_VERTLAY)
+
         QtCore.QMetaObject.connectSlotsByName(self)
 
     
@@ -162,13 +170,41 @@ class LightCreator_GUI(QtWidgets.QDialog):
         self.resize(x, y)
         self.setMinimumSize(QtCore.QSize(x, y))
         self.setMaximumSize(QtCore.QSize(x, y))
+    
+    
+    def _setConnections(self):
+        self.create_BTN.clicked.connect(self._create)
+        self.cancel_BTN.clicked.connect(self._cancel)
+
+    
+    def _create(self):
+        for factory in self.factories:
+            if self._lightNodeType in factory.lightNodeTypes:
+                kwargs = dict()
+                for key, value in self.tokens.iteritems():
+                    tokenObj = self.tokens[key]['obj']
+                    tokenCtrl = self.tokens[key]['ctrl']
+                    if isinstance(tokenObj, self.defaultFactory.naming.TokenNumber):
+                        kwargs[tokenObj.name] = tokenCtrl.value()
+                    else:
+                        if tokenObj.required:
+                            kwargs[tokenObj.name] = tokenCtrl.text()
+                        else:
+                            kwargs[tokenObj.name] = tokenCtrl.currentText()
+                lightName = factory.buildName(**kwargs)
+                factory.createLight(self._lightNodeType, lightName)
+                break
+        self.done(1)
+    
+    def _cancel(self):
+        self.done(0)
 
 
 # --------------------------------------------------------
 #  Main
 # --------------------------------------------------------
 def main():
-    temp = LightCreator_GUI()
+    temp = LightCreator_GUI('spotLight')
     temp.show()
 
 
