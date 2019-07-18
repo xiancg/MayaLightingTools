@@ -15,7 +15,8 @@ import cgxLightingTools.scripts.core.namingConventions as naming
 
 class LightsFactory(object):
     def __init__(self):
-        self.lightNodeTypes = tools.getLightNodesList()
+        super(LightsFactory, self).__init__()
+        self.lightNodeTypes = tools.getDefaultLightNodes()
         repoPath = os.path.join(os.path.dirname(os.path.abspath(naming.__file__)),'cfg')
         os.environ['NAMING_REPO'] = repoPath
         naming.loadSession()
@@ -35,13 +36,17 @@ class LightsFactory(object):
         elif lightNodeType == 'ambientLight':
             shapeNode = mc.ambientLight(name=lightName)
         elif lightNodeType == 'volumeLight':
-            shapeNode = mc.shadingNode('volumeLight', asLight=True)
-            transform = mc.listRelatives(shapeNode, parent=True)[0]
-            mc.rename(transform, lightName)
+            initNode = mc.createNode('volumeLight')
+            transform = mc.listRelatives(initNode, parent=True)[0]
+            result = mc.rename(transform, lightName)
+            shapeNode = mc.listRelatives(result, shapes=True, 
+                                        noIntermediate=True, type='light')[0]
         elif lightNodeType == 'areaLight':
-            shapeNode = mc.shadingNode('areaLight', asLight=True)
-            transform = mc.listRelatives(shapeNode, parent=True)[0]
-            mc.rename(transform, lightName)
+            initNode = mc.createNode('areaLight')
+            transform = mc.listRelatives(initNode, parent=True)[0]
+            result = mc.rename(transform, lightName)
+            shapeNode = mc.listRelatives(result, shapes=True,
+                                        noIntermediate=True, type='light')[0]
         else:
             return False
         if shapeNode:
