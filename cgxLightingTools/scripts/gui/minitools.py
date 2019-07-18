@@ -3,12 +3,12 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Add icons to buttons
 TODO: Add attributes snapshot functionality
 TODO: Add color change when a snapshot button has been created or is active
 TODO: Add clipping planes default values to config
 TODO: Add conform to naming tool
 TODO: Add duplicate light with inputs
+TODO: Weird position problem with config context menu
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
@@ -23,6 +23,7 @@ import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
 from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
+from cgxLightingTools.scripts.gui import minitools_icons
 
 # --------------------------------------------------------
 # Mini Tools window
@@ -347,7 +348,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
 
         #CONFIG
         self.config_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.config_BTN.setSizePolicy(sizePolicy)
         self.config_BTN.setMaximumSize(configBtnSize)
+        self.config_BTN.setMinimumSize(configBtnSize)
         self.config_BTN.setObjectName("config_BTN")
         self.config_BTN.setToolTip('Config Options')
 
@@ -388,15 +391,64 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.aiLightPortal_BTN.clicked.connect(partial(self._createLight,'aiLightPortal'))
         self.aiPhysicalSky_BTN.clicked.connect(partial(self._createLight,'aiSky'))
 
-        # ICONS
+        # ICONS TOOLS
+        toolsIconSize = QtCore.QSize(32,32)
+        self.lookThru_BTN.setIcon(QtGui.QIcon(":/lookThru.png"))
+        self.lookThru_BTN.setIconSize(toolsIconSize)
+        self.cleanUpCams_BTN.setIcon(QtGui.QIcon(":/cleanUpCams.png"))
+        self.cleanUpCams_BTN.setIconSize(toolsIconSize)
+        self.aimLight_BTN.setIcon(QtGui.QIcon(":/aimLight.png"))
+        self.aimLight_BTN.setIconSize(toolsIconSize)
+        self.alignLight_BTN.setIcon(QtGui.QIcon(":/alignLight.png"))
+        self.alignLight_BTN.setIconSize(toolsIconSize)
+        self.simpleIsolate_BTN.setIcon(QtGui.QIcon(":/simpleIsolate.png"))
+        self.simpleIsolate_BTN.setIconSize(toolsIconSize)
+        self.specularConstrain_BTN.setIcon(QtGui.QIcon(":/specularConstrain.png"))
+        self.specularConstrain_BTN.setIconSize(toolsIconSize)
+        self.lightsManager_BTN.setIcon(QtGui.QIcon(":/lightsManager.png"))
+        self.lightsManager_BTN.setIconSize(toolsIconSize)
+        self.transformBake_BTN.setIcon(QtGui.QIcon(":/transformBake.png"))
+        self.transformBake_BTN.setIconSize(toolsIconSize)
+
+        # ICONS LIGHTS
+        lightsIconSize = QtCore.QSize(16,16)
+        self.spotLight_BTN.setIcon(QtGui.QIcon(":/create_spotLight.png"))
+        self.spotLight_BTN.setIconSize(lightsIconSize)
+        self.pointLight_BTN.setIcon(QtGui.QIcon(":/create_pointLight.png"))
+        self.pointLight_BTN.setIconSize(lightsIconSize)
+        self.areaLight_BTN.setIcon(QtGui.QIcon(":/create_areaLight.png"))
+        self.areaLight_BTN.setIconSize(lightsIconSize)
+        self.directionalLight_BTN.setIcon(QtGui.QIcon(":/create_directionalLight.png"))
+        self.directionalLight_BTN.setIconSize(lightsIconSize)
+        self.ambientLight_BTN.setIcon(QtGui.QIcon(":/create_ambientLight.png"))
+        self.ambientLight_BTN.setIconSize(lightsIconSize)
+        self.volumeLight_BTN.setIcon(QtGui.QIcon(":/create_volumeLight.png"))
+        self.volumeLight_BTN.setIconSize(lightsIconSize)
+        self.aiAreaLight_BTN.setIcon(QtGui.QIcon(":/create_aiAreaLight.png"))
+        self.aiAreaLight_BTN.setIconSize(lightsIconSize)
+        self.aiSkyDomeLight_BTN.setIcon(QtGui.QIcon(":/create_aiSkyDomeLight.png"))
+        self.aiSkyDomeLight_BTN.setIconSize(lightsIconSize)
+        self.aiMeshLight_BTN.setIcon(QtGui.QIcon(":/create_aiMeshLight.png"))
+        self.aiMeshLight_BTN.setIconSize(lightsIconSize)
+        self.aiPhotometricLight_BTN.setIcon(QtGui.QIcon(":/create_aiPhotometricLight.png"))
+        self.aiPhotometricLight_BTN.setIconSize(lightsIconSize)
+        self.aiLightPortal_BTN.setIcon(QtGui.QIcon(":/create_aiLightPortal.png"))
+        self.aiLightPortal_BTN.setIconSize(lightsIconSize)
+        self.aiPhysicalSky_BTN.setIcon(QtGui.QIcon(":/create_aiPhysicalSky.png"))
+        self.aiPhysicalSky_BTN.setIconSize(lightsIconSize)
+
+        # CONFIG ICON
+        configIconSize = QtCore.QSize(20,20)
+        self.config_BTN.setIcon(QtGui.QIcon(":/config.png"))
+        self.config_BTN.setIconSize(configIconSize)
 
         # CONTEXT MENUS
         self.specularConstrain_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.specularConstrain_BTN.rightClick.connect(self.specConstrainOptions)
         self.simpleIsolate_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.simpleIsolate_BTN.rightClick.connect(self.isolateOptions)
-        cursor = QtGui.QCursor()
-        self.config_BTN.clicked.connect(partial(self.configOptions, cursor.pos()))
+        self.config_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.config_BTN.clicked.connect(self.configOptions)
 
     def _savePrefOrientation(self, prefOrientation):
         userPath = os.path.expanduser("~")
@@ -465,11 +517,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     # --------------------------------------------------------
 	# Method for right-click menus
 	# --------------------------------------------------------
-    def configOptions (self,pos):
+    def configOptions (self):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.config_BTN)
         prefOrientationQ = menu.addAction("Toggle tools orientation")
-        menu.popup(self.config_BTN.mapToGlobal(pos))
+        offset = QtCore.QPoint(self.size().width(),self.size().height())
+        menu.popup(self.config_BTN.mapToGlobal(self.config_BTN.pos()-offset))
 
         if self._prefOrientation == 'horizontal':
             self._prefOrientation = 'vertical'
