@@ -3,10 +3,12 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Connect buttons to light factories
-TODO: Add post creation methods to factories (to set light groups and other custom stuff)
+TODO: Add icons to buttons
 TODO: Add attributes snapshot functionality
+TODO: Add color change when a snapshot button has been created or is active
 TODO: Add clipping planes default values to config
+TODO: Add conform to naming tool
+TODO: Add duplicate light with inputs
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
