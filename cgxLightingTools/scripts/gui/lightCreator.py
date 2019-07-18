@@ -5,6 +5,9 @@ Created on July 10, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
 from __future__ import absolute_import
+import os
+import pkgutil
+import inspect
 from PySide2 import QtCore, QtWidgets
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
@@ -20,30 +23,24 @@ class LightCreator_GUI(QtWidgets.QDialog):
         self._setConnections()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
     
+
     def _initFactories(self):
-        '''TODO: Traverse render engines and create factories accordingly.
-        Also list factories, compare and use what is available'''
+        defaultFactory = lightsFactory.default_factory.LightsFactory()
+        result = dict()
+        result['default'] = defaultFactory
         renderers = tools.getRenderEngines()
-        factories = list()
-        self.defaultFactory = lightsFactory.default_factory.LightsFactory()
-        factories.append(self.defaultFactory)
-        if renderers is not None:
-            if 'mtoa' in renderers.keys():
-                self.mtoaFactory = lightsFactory.mtoa_factory.ArnoldFactory()
-                factories.append(self.mtoaFactory)
-        '''
         if renderers is not None:
             rendererNames = renderers.keys()
-            rendererNames.append('default')
             factoryPath = os.path.dirname(lightsFactory.__file__)
             factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath])]
             for factory in factories:
-                if factory in rendererNames:
-                    for name, obj in inspect.getmembers(foo):
-                        if inspect.isclass(obj):
-                            self.factories.append(obj.__init__())
-        '''
-        return factories
+                if factory.rsplit('_')[0] in rendererNames:
+                    for name, obj in inspect.getmembers(eval('lightsFactory.{}'.format(factory))):
+                        if inspect.isclass(obj) and name != 'LightsFactory':
+                            factoryObj = eval('lightsFactory.{}.{}()'.format(factory, name))
+                            result[factory.split('_')[0]] = factoryObj
+                            break
+        return result
         
     
     def _setupUi(self):
@@ -72,13 +69,14 @@ class LightCreator_GUI(QtWidgets.QDialog):
         self.cancel_BTN.setObjectName("cancel_BTN")
 
         # Create controls for each token type and adjust window size accordingly
-        activeRule = self.defaultFactory.naming.getActiveRule()
+        defaultFactory = self.factories['default']
+        activeRule = defaultFactory.naming.getActiveRule()
         self.tokens = dict()
         i = 0
         if activeRule:
             for field in activeRule.fields:
-                if self.defaultFactory.naming.hasToken(field):
-                    token = self.defaultFactory.naming.getToken(field)
+                if defaultFactory.naming.hasToken(field):
+                    token = defaultFactory.naming.getToken(field)
                     self.tokens[token.name] = {'obj':token, 'index':i}
                     i += 1
         self._setSize(112*len(self.tokens),91)
@@ -91,7 +89,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
             label.setMaximumSize(labelSize)
             label.setObjectName(tokenObj.name + '_LABEL')
             label.setText(tokenObj.name.capitalize())
-            if isinstance(tokenObj, self.defaultFactory.naming.TokenNumber):
+            if isinstance(tokenObj, defaultFactory.naming.TokenNumber):
                 #Create spinbox
                 ctrlSpinSize = QtCore.QSize(61, 21)
                 ctrlSpin = QtWidgets.QSpinBox(self)
@@ -100,6 +98,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
                 ctrlSpin.setMaximumSize(ctrlSpinSize)
                 ctrlSpin.setObjectName(tokenObj.name + '_SPINBOX')
                 ctrlSpin.setValue(tokenObj.default)
+                ctrlSpin.setRange(0,1000000)
                 self.tokens[key]['ctrl'] = ctrlSpin
                 self.tokens[key]['label'] = label
             else:
@@ -171,20 +170,21 @@ class LightCreator_GUI(QtWidgets.QDialog):
         self.setMinimumSize(QtCore.QSize(x, y))
         self.setMaximumSize(QtCore.QSize(x, y))
     
-    
+
     def _setConnections(self):
         self.create_BTN.clicked.connect(self._create)
         self.cancel_BTN.clicked.connect(self._cancel)
 
     
     def _create(self):
-        for factory in self.factories:
+        result = False
+        for name, factory in self.factories.iteritems():
             if self._lightNodeType in factory.lightNodeTypes:
                 kwargs = dict()
                 for key, value in self.tokens.iteritems():
                     tokenObj = self.tokens[key]['obj']
                     tokenCtrl = self.tokens[key]['ctrl']
-                    if isinstance(tokenObj, self.defaultFactory.naming.TokenNumber):
+                    if isinstance(tokenObj, self.factories['default'].naming.TokenNumber):
                         kwargs[tokenObj.name] = tokenCtrl.value()
                     else:
                         if tokenObj.required:
@@ -192,9 +192,12 @@ class LightCreator_GUI(QtWidgets.QDialog):
                         else:
                             kwargs[tokenObj.name] = tokenCtrl.currentText()
                 lightName = factory.buildName(**kwargs)
-                factory.createLight(self._lightNodeType, lightName)
+                result = factory.createLight(self._lightNodeType, lightName)
                 break
-        self.done(1)
+        if result:
+            self.done(1)
+        else:
+            self.done(0)
     
     def _cancel(self):
         self.done(0)
