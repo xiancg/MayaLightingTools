@@ -176,6 +176,20 @@ class LightCreator_GUI(QtWidgets.QDialog):
         self.create_BTN.clicked.connect(self._create)
         self.cancel_BTN.clicked.connect(self._cancel)
 
+        self.installEventFilter(self)
+    
+
+    def eventFilter(self, widget, event):
+        if event.type() == QtCore.QEvent.KeyPress:
+            key = event.key()
+            if key == QtCore.Qt.Key_Escape:
+                self._cancel()
+                return True
+            elif key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter: 
+                self._create()
+                return True
+        return QtWidgets.QWidget.eventFilter(self, widget, event)
+
     
     def _create(self):
         result = False
