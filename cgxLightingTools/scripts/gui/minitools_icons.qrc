@@ -1,0 +1,25 @@
+<!DOCTYPE RCC><RCC version="1.0">
+	<qresource>
+		<file alias="lookThru.png">icons/lookThru.png</file>
+		<file alias="cleanUpCams.png">icons/cleanUpCams.png</file>
+		<file alias="alignLight.png">icons/alignLight.png</file>
+		<file alias="aimLight.png">icons/aimLight.png</file>
+		<file alias="simpleIsolate.png">icons/simpleIsolate.png</file>
+		<file alias="specularConstrain.png">icons/specularConstrain.png</file>
+		<file alias="transformBake.png">icons/transformBake.png</file>
+		<file alias="create_areaLight.png">icons/create_areaLight.png</file>
+		<file alias="create_directionalLight.png">icons/create_directionalLight.png</file>
+		<file alias="create_pointLight.png">icons/create_pointLight.png</file>
+		<file alias="create_spotLight.png">icons/create_spotLight.png</file>
+		<file alias="create_ambientLight.png">icons/create_ambientLight.png</file>
+		<file alias="create_volumeLight.png">icons/create_volumeLight.png</file>
+		<file alias="create_aiAreaLight.png">icons/create_aiAreaLight.png</file>
+		<file alias="create_aiMeshLight.png">icons/create_aiMeshLight.png</file>
+		<file alias="create_aiPhotometricLight.png">icons/create_aiPhotometricLight.png</file>
+		<file alias="create_aiSkyDomeLight.png">icons/create_aiSkyDomeLight.png</file>
+		<file alias="create_aiLightPortal.png">icons/create_aiLightPortal.png</file>
+		<file alias="create_aiPhysicalSky.png">icons/create_aiPhysicalSky.png</file>
+		<file alias="config.png">icons/config.png</file>
+	</qresource>
+</RCC>
+
