@@ -18,7 +18,7 @@ class ArnoldFactory(LightsFactory):
     def createLight(self, lightNodeType, lightName):
         if lightNodeType in self.lightNodeTypes and lightNodeType == 'aiMeshLight':
             shapeNode = self._createMeshLight(lightName)
-        elif lightNodeType in self.lightNodeTypes and lightNodeType == 'aiPhysicalSky':
+        elif lightNodeType in self.lightNodeTypes and lightNodeType == 'aiSky':
             skydome = mutils.createLocatorWithName('aiSkyDomeLight', lightName, asLight=True)
             shapeNode = mc.createNode('aiPhysicalSky', name= lightName + '_aiPS')
             mc.connectAttr(shapeNode + ".outColor", skydome[0] + ".color")
