@@ -6,8 +6,10 @@ Created on July 10, 2019
 TODO: Connect buttons to light factories
 TODO: Add post creation methods to factories (to set light groups and other custom stuff)
 TODO: Add attributes snapshot functionality
+TODO: Add clipping planes default values to config
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
+TODO: Rewrite lights manager and enable it here
 '''
 from __future__ import absolute_import
 import os
@@ -18,6 +20,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
+from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
 
 # --------------------------------------------------------
 # Mini Tools window
@@ -346,7 +349,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.config_BTN.setObjectName("config_BTN")
         self.config_BTN.setToolTip('Config Options')
 
-        #TODO: Rewrite lights manager and enable it here
         self.lightsManager_BTN.setEnabled(False)
         
     def _loadHorizontal(self):
@@ -362,7 +364,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         return verticalLayout
     
     def _setConnections(self):
-        #BUTTONS
+        # BUTTONS
         self.lookThru_BTN.clicked.connect(tools.lookThruLight)
         self.cleanUpCams_BTN.clicked.connect(tools.cleanUpCams)
         self.alignLight_BTN.clicked.connect(tools.alignLightToObject)
@@ -370,11 +372,23 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.simpleIsolate_BTN.clicked.connect(tools.simpleIsolateLights)
         self.specularConstrain_BTN.clicked.connect(tools.specularConstrain)
         self.transformBake_BTN.clicked.connect(self._transformBake)
-        # self.spotLight_BTN.clicked.connect()
+        # LIGHTS
+        self.spotLight_BTN.clicked.connect(partial(self._createLight,'spotLight'))
+        self.pointLight_BTN.clicked.connect(partial(self._createLight,'pointLight'))
+        self.areaLight_BTN.clicked.connect(partial(self._createLight,'areaLight'))
+        self.directionalLight_BTN.clicked.connect(partial(self._createLight,'directionalLight'))
+        self.ambientLight_BTN.clicked.connect(partial(self._createLight,'ambientLight'))
+        self.volumeLight_BTN.clicked.connect(partial(self._createLight,'volumeLight'))
+        self.aiAreaLight_BTN.clicked.connect(partial(self._createLight,'aiAreaLight'))
+        self.aiSkyDomeLight_BTN.clicked.connect(partial(self._createLight,'aiSkyDomeLight'))
+        self.aiMeshLight_BTN.clicked.connect(partial(self._createLight,'aiMeshLight'))
+        self.aiPhotometricLight_BTN.clicked.connect(partial(self._createLight,'aiPhotometricLight'))
+        self.aiLightPortal_BTN.clicked.connect(partial(self._createLight,'aiLightPortal'))
+        self.aiPhysicalSky_BTN.clicked.connect(partial(self._createLight,'aiSky'))
 
-        #ICONS
+        # ICONS
 
-        #CONTEXT MENUS
+        # CONTEXT MENUS
         self.specularConstrain_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.specularConstrain_BTN.rightClick.connect(self.specConstrainOptions)
         self.simpleIsolate_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -439,9 +453,15 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         msgBox.setWindowTitle("Done!")
         msgBox.setText("Done baking transforms.")
         msgBox.exec_()
+    
+    def _createLight(self, lightNodeType):
+        dialog = LightCreator_GUI(lightNodeType, self)
+        dialog.exec_()
+        if dialog == 1:
+            tools.resetGlobals()
 
     # --------------------------------------------------------
-	# Method for config button
+	# Method for right-click menus
 	# --------------------------------------------------------
     def configOptions (self,pos):
         """Method that creates the popupmenu"""
@@ -455,10 +475,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             self._prefOrientation = 'horizontal'
         prefOrientationQ.triggered.connect(partial(self._savePrefOrientation, self._prefOrientation))
     
-
-    # --------------------------------------------------------
-	# Method for spec constrain button
-	# --------------------------------------------------------
     def specConstrainOptions (self, pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.specularConstrain_BTN)
@@ -466,11 +482,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         menu.popup(self.specularConstrain_BTN.mapToGlobal(pos))
 
         notFixedQ.triggered.connect(partial(tools.specularConstrain, False))
-    
 
-    # --------------------------------------------------------
-	# Method for isolate button
-	# --------------------------------------------------------
     def isolateOptions (self, pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.simpleIsolate_BTN)
@@ -481,7 +493,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
 
 
 # --------------------------------------------------------
-# Button reimplementation
+# Button reimplementation to allow right click
 # --------------------------------------------------------
 class MiniTools_BTN(QtWidgets.QPushButton):
 	# --------------------------------------------------------
