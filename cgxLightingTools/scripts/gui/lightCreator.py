@@ -110,6 +110,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
                     ctrlLine.setMinimumSize(ctrlLineSize)
                     ctrlLine.setMaximumSize(ctrlLineSize)
                     ctrlLine.setObjectName(tokenObj.name + '_LINEEDIT')
+                    ctrlLine.setFocus(QtCore.Qt.PopupFocusReason)
                     self.tokens[key]['ctrl'] = ctrlLine
                     labelSize = QtCore.QSize(110, 13)
                     label.setMinimumSize(labelSize)
