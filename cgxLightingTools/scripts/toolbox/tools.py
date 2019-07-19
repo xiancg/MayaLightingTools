@@ -11,11 +11,19 @@ import logging
 import sys
 import os
 import copy
+import json
+import cgxLightingTools.scripts.core as core
 import maya.cmds as mc
 
 lightsOff = list()
 renderEngines = dict()
 lightNodesDict = dict()
+cfgPath = os.path.join(os.path.dirname(os.path.abspath(core.__file__)),'cfg')
+lightAttrsPath = os.path.join(cfgPath, 'lightAttrs.json')
+with open(lightAttrsPath) as fp:
+    config = json.load(fp)
+lightAttrs = config
+
 
 def initLogger(fileLog=False):
     global logger
@@ -137,7 +145,6 @@ def simpleIsolateLights():
 
 
 def lightsVisibilitySnapshot():
-    allLightsScene = list()
     del lightsOff[:]
     allLightsScene = getLightsInScene()
     for light in allLightsScene:
@@ -145,6 +152,67 @@ def lightsVisibilitySnapshot():
             lightsOff.append(light)
     logger.debug('Lights visibility snapshot taken. {} lights off found.'.format(len(lightsOff)))
     return copy.deepcopy(lightsOff)
+
+
+def lightsAttrsSnapshot():
+    allLightsScene = getLightsInScene()
+    snapshot = dict()
+    for light in allLightsScene:
+        finalAttrsDict = dict()
+        shapeNode = mc.listRelatives(light, shapes=True, noIntermediate=True,
+                                    fullPath=True, type='light')[0]
+        for key in getLightNodes().keys():
+            if lightAttrs.get(key):
+                for attrName, attrDict in lightAttrs[key].iteritems():
+                    objAttr = shapeNode + "." + attrName
+                    if attrName in mc.listAttr(shapeNode) and not mc.connectionInfo(objAttr, isDestination=True):
+                        if attrDict["uiControl"] in ['floatslider', 'intslider','combobox', 'booleancombobox']:
+                            value = mc.getAttr(objAttr)
+                            finalAttrsDict[attrName] = {'value':value,'uiControl':attrDict["uiControl"]}
+                        elif attrDict["uiControl"] == "colorswatch":
+                            value = list(mc.getAttr(objAttr)[0])
+                            finalAttrsDict[attrName] = {'value':value,'uiControl':attrDict["uiControl"]}
+        snapshot[light] = finalAttrsDict
+    return snapshot
+
+def loadLightsAttrsSnapshot(snapshot):
+    allLightsScene = getLightsInScene()
+    try:
+        for light, finalAttrsDict in snapshot.iteritems():
+            if light in allLightsScene:
+                shapeNode = mc.listRelatives(light, shapes=True, noIntermediate=True,
+                                            fullPath=True, type='light')[0]
+                for attrName, attrDict in finalAttrsDict.iteritems():
+                    objAttr = shapeNode + "." + attrName
+                    if attrName in mc.listAttr(shapeNode) and not mc.connectionInfo(objAttr, isDestination=True):
+                        if attrDict["uiControl"] in ["floatslider","intslider"]:
+                            mc.setAttr(objAttr, attrDict['value'])
+                        elif attrDict["uiControl"] in ["combobox","booleancombobox"]:
+                            valueIndex = attrDict["values"].index(attrDict['value'])
+                            mc.setAttr(objAttr, valueIndex)
+                        elif attrDict["uiControl"] == "colorswatch":
+                            mc.setAttr(objAttr, attrDict['value'][0],
+                                        attrDict['value'][1], attrDict['value'][2],
+                                        type= "double3")
+    except:
+        return False
+    return True
+
+def setDefaultAttrs(lightNode):
+    '''TODO: Old implementation. Need to change to programatic listing of attrs and attr types'''
+    for key in getLightNodes().keys():
+        if lightAttrs.get(key):
+            for attrName, attrDict in lightAttrs[key].iteritems():
+                value = attrDict["default"]
+                if attrName in mc.listAttr(lightNode):#Check if attribute exists in the object
+                    if attrDict["uiControl"] == "floatslider" or attrDict["uiControl"] == "intslider":
+                        mc.setAttr(lightNode + "." + attrName, value)
+                    elif attrDict["uiControl"] == "combobox" or attrDict["uiControl"] == "booleancombobox":
+                        valueIndex = attrDict["values"].index(value)
+                        mc.setAttr(lightNode + "." + attrName, valueIndex)
+                    elif attrDict["uiControl"] == "colorswatch":
+                        mc.setAttr(lightNode + "." + attrName, 1, 1, 1, type= "double3")
+                    
 
 
 def cleanUpCams ():

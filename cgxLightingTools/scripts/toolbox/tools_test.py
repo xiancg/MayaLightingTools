@@ -59,7 +59,7 @@ class FunctionsTest(unittest.TestCase):
 
         mc.setAttr(self.light4Trans + '.visibility', 0)
         mc.setAttr(self.light5Trans + '.visibility', 0)
-        tools.storeLightsOffStatus()
+        tools.lightsVisibilitySnapshot()
 
     def test_simpleIsolateLights(self):
         mc.select(self.light1Trans,replace=True)
@@ -72,6 +72,26 @@ class FunctionsTest(unittest.TestCase):
         self.assertTrue(mc.getAttr(self.light1Trans + '.visibility'))
         self.assertTrue(mc.getAttr(self.light2Trans + '.visibility'))
         self.assertFalse(mc.getAttr(self.light4Trans + '.visibility'))
+    
+    def test_lightAttrsSnapshot(self):
+        result = tools.lightsAttrsSnapshot()
+        lightNames = [self.light1Trans, self.light2Trans,
+                    self.light3Trans, self.light4Trans, self.light5Trans]
+        self.assertEqual(len(lightNames), len(result.keys()))
+    
+    def test_loadLightAttrsSnapshot(self):
+        snapshot = tools.lightsAttrsSnapshot()
+        mc.setAttr(self.light3Trans + '.visibility', 0)
+        mc.setAttr(self.light4Trans + '.visibility', 1)
+        mc.setAttr(self.light5Trans + '.visibility', 1)
+        result = tools.loadLightsAttrsSnapshot(snapshot)
+        attr3 = mc.getAttr(self.light3Trans + '.visibility')
+        attr4 = mc.getAttr(self.light4Trans + '.visibility')
+        attr5 = mc.getAttr(self.light5Trans + '.visibility')
+        self.assertTrue(result)
+        self.assertTrue(attr3)
+        self.assertFalse(attr4)
+        self.assertFalse(attr5)
 
 
 # --------------------------------------------------------
