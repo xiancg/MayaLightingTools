@@ -3,7 +3,6 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Fix bug in postLightCreation
 TODO: Add duplicate light with inputs
 TODO: Add clipping planes default values to config
 TODO: Add conform to naming tool
