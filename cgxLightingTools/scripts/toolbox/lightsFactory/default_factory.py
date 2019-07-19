@@ -50,7 +50,7 @@ class LightsFactory(object):
         else:
             return False
         if shapeNode:
-            self.setDefaultAttrs(shapeNode)
+            tools.setDefaultAttrs(shapeNode)
             self.postLightCreation(shapeNode)
             return True
         else: 
@@ -72,21 +72,6 @@ class LightsFactory(object):
             mc.select(shapeNode, replace=True)
         except:
             raise('Post light creation process failed.')
-    
-    def setDefaultAttrs(self, lightNode):
-        '''TODO: Old implementation. Need to change to programatic listing of attrs and attr types'''
-        for key in tools.getLightNodes().keys():
-            if self._lightAttrs.get(key):
-                for attrName, attrDict in self._lightAttrs[key].iteritems():
-                    value = attrDict["default"]
-                    if attrName in mc.listAttr(lightNode):#Check if attribute exists in the object
-                        if attrDict["uiControl"] == "floatslider" or attrDict["uiControl"] == "intslider":
-                            mc.setAttr(lightNode + "." + attrName, value)
-                        elif attrDict["uiControl"] == "combobox" or attrDict["uiControl"] == "booleancombobox":
-                            valueIndex = attrDict["values"].index(value)
-                            mc.setAttr(lightNode + "." + attrName, valueIndex)
-                        elif attrDict["uiControl"] == "colorswatch":
-                            mc.setAttr(lightNode + "." + attrName, 1, 1, 1, type= "double3")
     
     def buildName(self, *args, **kwargs):
         '''Recursive method to check if the light name

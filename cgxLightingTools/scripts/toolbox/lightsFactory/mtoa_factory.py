@@ -29,7 +29,7 @@ class ArnoldFactory(LightsFactory):
         else:
             return False
         if shapeNode:
-            self.setDefaultAttrs(shapeNode)
+            tools.setDefaultAttrs(shapeNode)
             self.postLightCreation(shapeNode)
             return True
         else: 
