@@ -71,7 +71,7 @@ class LightsFactory(object):
                             nextAvailable=True, force=True)
             mc.select(shapeNode, replace=True)
         except:
-            raise('Post light creation process failed.')
+            raise BaseException('Post light creation process failed.')
     
     def buildName(self, *args, **kwargs):
         '''Recursive method to check if the light name

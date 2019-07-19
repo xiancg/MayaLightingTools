@@ -3,10 +3,9 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Add attributes snapshot functionality
-TODO: Add color change when a snapshot button has been created or is active
-TODO: Add clipping planes default values to config
+TODO: Fix bug in postLightCreation
 TODO: Add duplicate light with inputs
+TODO: Add clipping planes default values to config
 TODO: Add conform to naming tool
 TODO: Fix weird position problem with config context menu
 TODO: All alerts should be changed to something without the need for confirmation
@@ -233,12 +232,16 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.transformBake_BTN.setToolTip('Transform bake. Objects or vertex.')
 
         # LIGHT VIS SNAPSHOTS
-        self.visSnapshot01_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.visSnapshot02_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.visSnapshot03_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.visSnapshot04_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.visSnapshot05_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.visSnapshot06_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.visSnapshot01_BTN = MiniTools_BTN(self.centralwidget)
+        self.visSnapshot02_BTN = MiniTools_BTN(self.centralwidget)
+        self.visSnapshot03_BTN = MiniTools_BTN(self.centralwidget)
+        self.visSnapshot04_BTN = MiniTools_BTN(self.centralwidget)
+        self.visSnapshot05_BTN = MiniTools_BTN(self.centralwidget)
+        self.visSnapshot06_BTN = MiniTools_BTN(self.centralwidget)
+        self.visSnapBtns = [self.visSnapshot01_BTN, self.visSnapshot02_BTN, self.visSnapshot03_BTN,
+                            self.visSnapshot04_BTN, self.visSnapshot05_BTN, self.visSnapshot06_BTN]
+        for btn in self.visSnapBtns:
+            btn.setStyleSheet("background-color: grey")
         self.visSnapshot01_BTN.setObjectName("visSnapshot01_BTN")
         self.visSnapshot01_BTN.setSizePolicy(sizePolicy)
         self.visSnapshot01_BTN.setMinimumSize(visBtnSize)
@@ -377,6 +380,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.simpleIsolate_BTN.clicked.connect(tools.simpleIsolateLights)
         self.specularConstrain_BTN.clicked.connect(tools.specularConstrain)
         self.transformBake_BTN.clicked.connect(self._transformBake)
+        self.visSnapshot01_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot01_BTN))
+        self.visSnapshot02_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot02_BTN))
+        self.visSnapshot03_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot03_BTN))
+        self.visSnapshot04_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot04_BTN))
+        self.visSnapshot05_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot05_BTN))
+        self.visSnapshot06_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot06_BTN))
         # LIGHTS
         self.spotLight_BTN.clicked.connect(partial(self._createLight,'spotLight'))
         self.pointLight_BTN.clicked.connect(partial(self._createLight,'pointLight'))
@@ -390,7 +399,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.aiPhotometricLight_BTN.clicked.connect(partial(self._createLight,'aiPhotometricLight'))
         self.aiLightPortal_BTN.clicked.connect(partial(self._createLight,'aiLightPortal'))
         self.aiPhysicalSky_BTN.clicked.connect(partial(self._createLight,'aiSky'))
-
         # ICONS TOOLS
         toolsIconSize = QtCore.QSize(32,32)
         self.lookThru_BTN.setIcon(QtGui.QIcon(":/lookThru.png"))
@@ -409,7 +417,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.lightsManager_BTN.setIconSize(toolsIconSize)
         self.transformBake_BTN.setIcon(QtGui.QIcon(":/transformBake.png"))
         self.transformBake_BTN.setIconSize(toolsIconSize)
-
         # ICONS LIGHTS
         lightsIconSize = QtCore.QSize(16,16)
         self.spotLight_BTN.setIcon(QtGui.QIcon(":/create_spotLight.png"))
@@ -449,6 +456,18 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.simpleIsolate_BTN.rightClick.connect(self.isolateOptions)
         self.config_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.config_BTN.clicked.connect(self.configOptions)
+        self.visSnapshot01_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.visSnapshot01_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
+        self.visSnapshot02_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.visSnapshot02_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
+        self.visSnapshot03_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.visSnapshot03_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
+        self.visSnapshot04_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.visSnapshot04_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
+        self.visSnapshot05_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.visSnapshot05_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
+        self.visSnapshot06_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.visSnapshot06_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
 
     def _savePrefOrientation(self, prefOrientation):
         userPath = os.path.expanduser("~")
@@ -514,6 +533,33 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if dialog == 1:
             tools.resetGlobals()
 
+    def _lightAttrsSnapshot(self, btn):
+        if not btn.hasSnap:
+            btn.snap = tools.lightsAttrsSnapshot()
+            btn.hasSnap = True
+            btn.setStyleSheet("background-color: orange")
+        else:
+            tools.loadLightsAttrsSnapshot(btn.snap)
+            btn.setStyleSheet("background-color: green")
+            for each in self.visSnapBtns:
+                if each.objectName() != btn.objectName():
+                    if each.hasSnap:
+                        each.setStyleSheet("background-color: orange")
+                    else:
+                        each.setStyleSheet("background-color: grey")
+
+    def _clearAttrsSnapshot(self, btn):
+        btn.snap.clear()
+        btn.hasSnap = False
+        btn.setStyleSheet("background-color: grey")
+    
+    def _clearAllSnapshots(self):
+        msgBox = QtWidgets.QMessageBox()
+        result = msgBox.question(self, "Warning!", "Are you sure you want to clear all attribute snapshots?")
+        if result:
+            for btn in self.visSnapBtns:
+                self._clearAttrsSnapshot(btn)
+
     # --------------------------------------------------------
 	# Method for right-click menus
 	# --------------------------------------------------------
@@ -546,26 +592,39 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
 
         resetVisSnapshotQ.triggered.connect(partial(tools.lightsVisibilitySnapshot))
 
+    def lightAttrsSnapshotOptions (self, pos, btn):
+        """Method that creates the popupmenu"""
+        menu = QtWidgets.QMenu(btn)
+        menu.setStyleSheet("background-color: grey")
+        clearSnapshotQ = menu.addAction("Clear snapshot")
+        clearAllSnapshotQ = menu.addAction("Clear all snapshots")
+        menu.popup(btn.mapToGlobal(pos))
+
+        clearSnapshotQ.triggered.connect(partial(self._clearAttrsSnapshot, btn))
+        clearAllSnapshotQ.triggered.connect(self._clearAllSnapshots)
+
 
 # --------------------------------------------------------
 # Button reimplementation to allow right click
 # --------------------------------------------------------
 class MiniTools_BTN(QtWidgets.QPushButton):
-	# --------------------------------------------------------
-	# Signals
-	# --------------------------------------------------------
-	rightClick = QtCore.Signal(QtCore.QPoint, super)
-	def __init__(self, parent=None):
-		super(MiniTools_BTN, self).__init__(parent)
-		self.parent = parent
-	
-	def mousePressEvent(self, event):
-		if event.type() == QtCore.QEvent.MouseButtonPress:
-			if event.button() == QtCore.Qt.RightButton:
-				cursor = QtGui.QCursor()
-				self.rightClick.emit(self.mapFromGlobal(cursor.pos()), self)
-			else:
-				super(MiniTools_BTN, self).mousePressEvent(event)
+    # --------------------------------------------------------
+    # Signals
+    # --------------------------------------------------------
+    rightClick = QtCore.Signal(QtCore.QPoint, super)
+    def __init__(self, parent=None):
+        super(MiniTools_BTN, self).__init__(parent)
+        self.snap = dict()
+        self.hasSnap = False
+        self.parent = parent
+        
+    def mousePressEvent(self, event):
+        if event.type() == QtCore.QEvent.MouseButtonPress:
+            if event.button() == QtCore.Qt.RightButton:
+                cursor = QtGui.QCursor()
+                self.rightClick.emit(self.mapFromGlobal(cursor.pos()), self)
+            else:
+                super(MiniTools_BTN, self).mousePressEvent(event)
 
 
 # --------------------------------------------------------

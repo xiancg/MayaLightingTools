@@ -176,10 +176,9 @@ def lightsAttrsSnapshot():
     return snapshot
 
 def loadLightsAttrsSnapshot(snapshot):
-    allLightsScene = getLightsInScene()
     try:
         for light, finalAttrsDict in snapshot.iteritems():
-            if light in allLightsScene:
+            if mc.objExists(light):
                 shapeNode = mc.listRelatives(light, shapes=True, noIntermediate=True,
                                             fullPath=True, type='light')[0]
                 for attrName, attrDict in finalAttrsDict.iteritems():
@@ -188,8 +187,7 @@ def loadLightsAttrsSnapshot(snapshot):
                         if attrDict["uiControl"] in ["floatslider","intslider"]:
                             mc.setAttr(objAttr, attrDict['value'])
                         elif attrDict["uiControl"] in ["combobox","booleancombobox"]:
-                            valueIndex = attrDict["values"].index(attrDict['value'])
-                            mc.setAttr(objAttr, valueIndex)
+                            mc.setAttr(objAttr, int(attrDict['value']))
                         elif attrDict["uiControl"] == "colorswatch":
                             mc.setAttr(objAttr, attrDict['value'][0],
                                         attrDict['value'][1], attrDict['value'][2],
@@ -213,8 +211,6 @@ def setDefaultAttrs(lightNode):
                     elif attrDict["uiControl"] == "colorswatch":
                         mc.setAttr(lightNode + "." + attrName, 1, 1, 1, type= "double3")
                     
-
-
 def cleanUpCams ():
     allLightsScene = getLightsInScene()
     #Selected scene lights
