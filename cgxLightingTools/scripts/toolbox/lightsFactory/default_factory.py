@@ -59,19 +59,19 @@ class LightsFactory(object):
     def postLightCreation(self, shapeNode):
         '''Place here all custom stuff you want to do with the created light node'''
         transform = mc.listRelatives(shapeNode, parent=True)[0]
+        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
+        aovNode = mc.createNode("aiAOV", name='RGBA_' + transform)
+        mc.setAttr(aovNode + ".name", 'RGBA_' + transform, type="string")
+        mc.setAttr(aovNode + ".type", 6)
+        mc.setAttr(aovNode + ".enabled", True)
         try:
-            mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
-            aovNode = mc.createNode("aiAOV", name='RGBA_' + transform)
-            mc.setAttr(aovNode + ".name", 'RGBA_' + transform, type="string")
-            mc.setAttr(aovNode + ".type", 6)
-            mc.setAttr(aovNode + ".enabled", True)
             mc.connectAttr("defaultArnoldFilter.message", aovNode + ".outputs[0].filter", force=True)
             mc.connectAttr("defaultArnoldDriver.message", aovNode + ".outputs[0].driver", force=True)
             mc.connectAttr(aovNode + ".message", "defaultArnoldRenderOptions.aovList",
                             nextAvailable=True, force=True)
-            mc.select(shapeNode, replace=True)
-        except:
-            raise BaseException('Post light creation process failed.')
+        except RuntimeError:
+            raise RuntimeError('Could not make connections from AOV to default filter, driver and aovList')
+        mc.select(shapeNode, replace=True)
     
     def buildName(self, *args, **kwargs):
         '''Recursive method to check if the light name
