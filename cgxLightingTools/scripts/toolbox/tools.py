@@ -3,7 +3,6 @@ Created on Jun 29, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Visibility snapshots could be stored to be called with shortcuts. All attributes could be stored
 TODO: Refactor harcoded naming in specularConstrain
 '''
 from __future__ import absolute_import
@@ -18,9 +17,9 @@ import maya.cmds as mc
 lightsOff = list()
 renderEngines = dict()
 lightNodesDict = dict()
-cfgPath = os.path.join(os.path.dirname(os.path.abspath(core.__file__)),'cfg')
-lightAttrsPath = os.path.join(cfgPath, 'lightAttrs.json')
-with open(lightAttrsPath) as fp:
+_cfgPath = os.path.join(os.path.dirname(os.path.abspath(core.__file__)),'cfg')
+_lightAttrsPath = os.path.join(_cfgPath, 'lightAttrs.json')
+with open(_lightAttrsPath) as fp:
     config = json.load(fp)
 lightAttrs = config
 
