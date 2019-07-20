@@ -4,6 +4,7 @@ Created on July 4, 2019
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 Heavily based upon the work of Cesar Saez https://www.cesarsaez.me
+TODO: Add separator functionality
 '''
 from __future__ import absolute_import
 import copy
@@ -84,6 +85,10 @@ class Token(Serializable):
     def options(self):
         return copy.deepcopy(self._options)
 
+    @property
+    def isNumber(self):
+        return False
+
 
 class TokenNumber(Token):
     def __init__(self, name):
@@ -161,6 +166,10 @@ class TokenNumber(Token):
     @property
     def required(self):
         return True
+    
+    @property
+    def isNumber(self):
+        return True
 
 
 class Rule(Serializable):
@@ -186,7 +195,10 @@ class Rule(Serializable):
             namePart = splitName[i]
             token = _tokens[f]
             if token.required:
-                retval[f] = namePart
+                if token.isNumber:
+                    retval[f] = token.parse(namePart)
+                else:
+                    retval[f] = namePart
                 continue
             retval[f] = token.parse(namePart)
         return retval
