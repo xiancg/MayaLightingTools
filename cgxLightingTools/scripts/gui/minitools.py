@@ -17,6 +17,8 @@ TODO: Rewrite lights manager and enable it here
 from __future__ import absolute_import
 import os
 import json
+import pkgutil
+import inspect
 from functools import partial
 
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -24,6 +26,7 @@ import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
 from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
+import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
 from cgxLightingTools.scripts.gui import minitools_icons
 
 # --------------------------------------------------------
@@ -33,6 +36,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     def __init__(self, parent=mWin.getMayaWindow()):
         super(MiniTools_GUI, self).__init__(parent)
         self._prefOrientation = self._loadPrefOrientation()
+        self.factories = self._initFactories()
         self._setupUi()
         self._setConnections()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
@@ -499,6 +503,24 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             self._savePrefOrientation('horizontal')
             return 'horizontal'
     
+    def _initFactories(self):
+        defaultFactory = lightsFactory.default_factory.LightsFactory()
+        result = dict()
+        result['default'] = defaultFactory
+        renderers = tools.getRenderEngines()
+        if renderers is not None:
+            rendererNames = renderers.keys()
+            factoryPath = os.path.dirname(lightsFactory.__file__)
+            factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath])]
+            for factory in factories:
+                if factory.rsplit('_')[0] in rendererNames:
+                    for name, obj in inspect.getmembers(eval('lightsFactory.{}'.format(factory))):
+                        if inspect.isclass(obj) and name != 'LightsFactory':
+                            factoryObj = eval('lightsFactory.{}.{}()'.format(factory, name))
+                            result[factory.split('_')[0]] = factoryObj
+                            break
+        return result
+    
     def _transformBake(self):
         allSel = mc.ls(sl=True)
         if len(allSel) < 1:
@@ -529,10 +551,23 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         msgBox.exec_()
     
     def _createLight(self, lightNodeType):
-        dialog = LightCreator_GUI(lightNodeType, self)
+        dialog = LightCreator_GUI(lightNodeType, self.factories, self)
         dialog.exec_()
         if dialog == 1:
             tools.resetGlobals()
+        
+    def _duplicateLight(self, withInputs=False, copies=1):
+        for each in mc.ls(sl=True):
+            if mc.nodeType(each) == 'transform':
+                objShape = mc.listRelatives(each, shapes=True, noIntermediate=True, fullPath=True)[0]
+                objTransform = each
+            else:
+                objShape = each
+                objTransform = mc.listRelatives(each, parent=True)[0]
+            for name, factory in self.factories.iteritems():
+                if mc.nodeType(objShape) in factory.lightNodeTypes:
+                    for i in range(copies):
+                        factory.duplicateLight(objTransform, withInputs)
 
     # --------------------------------------------------------
 	# Method for right-click menus
