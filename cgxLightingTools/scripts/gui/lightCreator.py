@@ -199,7 +199,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
                 for key, value in self.tokens.iteritems():
                     tokenObj = self.tokens[key]['obj']
                     tokenCtrl = self.tokens[key]['ctrl']
-                    if isinstance(tokenObj, self.factories['default'].naming.TokenNumber):
+                    if tokenObj.isNumber:
                         kwargs[tokenObj.name] = tokenCtrl.value()
                     else:
                         if tokenObj.required:
