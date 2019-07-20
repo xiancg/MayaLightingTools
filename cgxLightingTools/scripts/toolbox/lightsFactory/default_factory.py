@@ -68,7 +68,6 @@ class LightsFactory(object):
         shapeNode = str()
         if mc.nodeType(objShape) in tools.getLightNodesList():
             parsedName = self.naming.parse(objTransform)
-            print parsedName
             lightName = self.buildName(**parsedName)
             if withInputs:
                 transformNode = mc.duplicate(objTransform, name= lightName, ic= True)[0]

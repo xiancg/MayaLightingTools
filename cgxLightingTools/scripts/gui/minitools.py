@@ -47,14 +47,14 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         if self._prefOrientation == 'horizontal':
-            self.resize(412, 90)
-            self.setMinimumSize(QtCore.QSize(412,90))
+            self.resize(432, 90)
+            self.setMinimumSize(QtCore.QSize(432,90))
             self.setMaximumSize(QtCore.QSize(10000, 90))
             mainLayout = self._loadHorizontal()
         else:
-            self.resize(90, 360)
-            self.setMinimumSize(QtCore.QSize(90,360))
-            self.setMaximumSize(QtCore.QSize(90, 10000))
+            self.resize(100, 380)
+            self.setMinimumSize(QtCore.QSize(100,380))
+            self.setMaximumSize(QtCore.QSize(100, 10000))
             mainLayout = self._loadVertical()
         tools_GRIDLAY = QtWidgets.QGridLayout()
         tools_GRIDLAY.setObjectName("tools_GRIDLAY")
@@ -70,6 +70,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.lookThru_BTN, 0, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.aimLight_BTN, 0, 2, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lightsManager_BTN, 0, 3, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 4, 1, 2, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.specularConstrain_BTN, 1, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.cleanUpCams_BTN, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 1, 2, 1, 1, QtCore.Qt.AlignCenter)
@@ -128,6 +129,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 2, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.transformBake_BTN, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lightsManager_BTN, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 4, 0, 2, 1, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 20
             spacerHeight = 16
@@ -195,6 +197,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.lightsManager_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.alignLight_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.transformBake_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.duplicateLight_BTN = MiniTools_BTN(self.centralwidget)
         self.simpleIsolate_BTN.setSizePolicy(sizePolicy)
         self.simpleIsolate_BTN.setMinimumSize(toolsBtnSize)
         self.simpleIsolate_BTN.setMaximumSize(toolsBtnSize)
@@ -235,6 +238,11 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.transformBake_BTN.setMaximumSize(toolsBtnSize)
         self.transformBake_BTN.setObjectName("transformBake_BTN")
         self.transformBake_BTN.setToolTip('Transform bake. Objects or vertex.')
+        self.duplicateLight_BTN.setSizePolicy(sizePolicy)
+        self.duplicateLight_BTN.setMinimumSize(toolsBtnSize)
+        self.duplicateLight_BTN.setMaximumSize(toolsBtnSize)
+        self.duplicateLight_BTN.setObjectName("duplicateLight_BTN")
+        self.duplicateLight_BTN.setToolTip('Duplicate lights. Right click for more options.')
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = MiniTools_BTN(self.centralwidget)
@@ -361,7 +369,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.config_BTN.setMinimumSize(configBtnSize)
         self.config_BTN.setObjectName("config_BTN")
         self.config_BTN.setToolTip('Config Options')
-
+        
+        #Enable this when lights manager gets reworked
         self.lightsManager_BTN.setEnabled(False)
         
     def _loadHorizontal(self):
@@ -385,6 +394,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.simpleIsolate_BTN.clicked.connect(tools.simpleIsolateLights)
         self.specularConstrain_BTN.clicked.connect(tools.specularConstrain)
         self.transformBake_BTN.clicked.connect(self._transformBake)
+        self.duplicateLight_BTN.clicked.connect(self._duplicateLight)
         self.visSnapshot01_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot01_BTN))
         self.visSnapshot02_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot02_BTN))
         self.visSnapshot03_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot03_BTN))
@@ -459,6 +469,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.specularConstrain_BTN.rightClick.connect(self.specConstrainOptions)
         self.simpleIsolate_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.simpleIsolate_BTN.rightClick.connect(self.isolateOptions)
+        self.duplicateLight_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.duplicateLight_BTN.rightClick.connect(self.duplicateLightOptions)
         self.config_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.config_BTN.clicked.connect(self.configOptions)
         self.visSnapshot01_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -534,8 +546,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             inputDialog.setInputMode(QtWidgets.QInputDialog.DoubleInput)
             inputDialog.setDoubleDecimals(2)
             inputDialog.setDoubleMinimum(0.01)
-            inputDialog.setDoubleValue(1.0)
-            value, ok = inputDialog.getDouble(self, 'Sample By', 'Each ### frames:')
+            value, ok = inputDialog.getDouble(self, 'Sample By', 'Each ### frames:', 1.0)
             if ok:
                 try:
                     mc.refresh(suspend=True)
@@ -556,18 +567,23 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if dialog == 1:
             tools.resetGlobals()
         
-    def _duplicateLight(self, withInputs=False, copies=1):
-        for each in mc.ls(sl=True):
-            if mc.nodeType(each) == 'transform':
-                objShape = mc.listRelatives(each, shapes=True, noIntermediate=True, fullPath=True)[0]
-                objTransform = each
-            else:
-                objShape = each
-                objTransform = mc.listRelatives(each, parent=True)[0]
-            for name, factory in self.factories.iteritems():
-                if mc.nodeType(objShape) in factory.lightNodeTypes:
-                    for i in range(copies):
-                        factory.duplicateLight(objTransform, withInputs)
+    def _duplicateLight(self, withInputs=False):
+        inputDialog = QtWidgets.QInputDialog()
+        inputDialog.setInputMode(QtWidgets.QInputDialog.IntInput)
+        inputDialog.setIntMinimum(1)
+        copies, ok = inputDialog.getInt(self, 'Copies', 'How many copies?', 1)
+        if ok:
+            for each in mc.ls(sl=True):
+                if mc.nodeType(each) == 'transform':
+                    objShape = mc.listRelatives(each, shapes=True, noIntermediate=True, fullPath=True)[0]
+                    objTransform = each
+                else:
+                    objShape = each
+                    objTransform = mc.listRelatives(each, parent=True)[0]
+                for name, factory in self.factories.iteritems():
+                    if mc.nodeType(objShape) in factory.lightNodeTypes:
+                        for i in range(copies):
+                            factory.duplicateLight(objTransform, withInputs)
 
     # --------------------------------------------------------
 	# Method for right-click menus
@@ -600,6 +616,14 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         menu.popup(self.simpleIsolate_BTN.mapToGlobal(pos))
 
         resetVisSnapshotQ.triggered.connect(partial(tools.lightsVisibilitySnapshot))
+    
+    def duplicateLightOptions (self, pos):
+        """Method that creates the popupmenu"""
+        menu = QtWidgets.QMenu(self.duplicateLight_BTN)
+        duplicateWithInputsQ = menu.addAction("Duplicate with input connections")
+        menu.popup(self.duplicateLight_BTN.mapToGlobal(pos))
+
+        duplicateWithInputsQ.triggered.connect(partial(self._duplicateLight, True))
 
     def lightAttrsSnapshotOptions (self, pos, btn):
         """Method that creates the popupmenu"""
