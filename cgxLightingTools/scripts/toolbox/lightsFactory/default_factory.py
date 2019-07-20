@@ -48,13 +48,40 @@ class LightsFactory(object):
             shapeNode = mc.listRelatives(result, shapes=True,
                                         noIntermediate=True, type='light')[0]
         else:
-            return False
+            return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
             self.postLightCreation(shapeNode)
-            return True
+            transformNode = mc.listRelatives(shapeNode, parent=True)[0]
+            return transformNode, shapeNode
         else: 
-            return False
+            return None
+    
+    def duplicateLight(self, lightNode, withInputs=False):
+        if mc.nodeType(lightNode) == 'transform':
+            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+            objTransform = lightNode
+        else:
+            objShape = lightNode
+            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        transformNode = str()
+        shapeNode = str()
+        if mc.nodeType(objShape) in tools.getLightNodesList():
+            parsedName = self.naming.parse(objTransform)
+            print parsedName
+            lightName = self.buildName(**parsedName)
+            if withInputs:
+                transformNode = mc.duplicate(objTransform, name= lightName, ic= True)[0]
+            else:
+                transformNode = mc.duplicate(objTransform, name= lightName)[0]
+            shapeNode = mc.listRelatives(transformNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+        else:
+            tools.logger.info('Only lights accepted. {} is {}'.format(lightNode, mc.nodeType(lightNode)))
+            return None
+        
+        self.postLightCreation(shapeNode)
+
+        return transformNode, shapeNode
 
     def postLightCreation(self, shapeNode):
         '''Place here all custom stuff you want to do with the created light node'''
@@ -71,7 +98,8 @@ class LightsFactory(object):
                             nextAvailable=True, force=True)
         except RuntimeError:
             raise RuntimeError('Could not make connections from AOV to default filter, driver and aovList')
-        mc.select(shapeNode, replace=True)
+        finally:
+            mc.select(shapeNode, replace=True)
     
     def buildName(self, *args, **kwargs):
         '''Recursive method to check if the light name

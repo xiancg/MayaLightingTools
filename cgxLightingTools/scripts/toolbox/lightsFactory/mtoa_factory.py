@@ -27,13 +27,14 @@ class ArnoldFactory(LightsFactory):
         elif lightNodeType in self.lightNodeTypes and lightNodeType != 'aiLightPortal':
             shapeNode, transform = mutils.createLocatorWithName(lightNodeType, lightName, asLight=True)
         else:
-            return False
+            return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
             self.postLightCreation(shapeNode)
-            return True
+            transformNode = mc.listRelatives(shapeNode, parent=True)[0]
+            return transformNode, shapeNode
         else: 
-            return False
+            return None
     
     def _createMeshLight(self, lightName, legacy=False, centerPivot=True):
         '''Copied from mtoa.utils. Modified to return transform and shapeNode and receive name input'''
