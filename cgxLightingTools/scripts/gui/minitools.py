@@ -4,8 +4,11 @@ Created on July 10, 2019
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Add duplicate light with inputs
+TODO: Add right click option to create multiple lights (a multiplier)
 TODO: Add clipping planes default values to config
 TODO: Add conform to naming tool
+TODO: Add separators to naming library
+TODO: Create GUI for naming library
 TODO: Fix weird position problem with config context menu
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
@@ -171,7 +174,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
     
     def _createButtons(self):
-        '''TODO: Should the light creation buttons be responsibility of factories?'''
         toolsBtnSize = QtCore.QSize(32, 32)
         visBtnSize = QtCore.QSize(14, 14)
         lightsBtnSize = QtCore.QSize(16, 16)
@@ -379,12 +381,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.simpleIsolate_BTN.clicked.connect(tools.simpleIsolateLights)
         self.specularConstrain_BTN.clicked.connect(tools.specularConstrain)
         self.transformBake_BTN.clicked.connect(self._transformBake)
-        self.visSnapshot01_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot01_BTN))
-        self.visSnapshot02_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot02_BTN))
-        self.visSnapshot03_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot03_BTN))
-        self.visSnapshot04_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot04_BTN))
-        self.visSnapshot05_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot05_BTN))
-        self.visSnapshot06_BTN.clicked.connect(partial(self._lightAttrsSnapshot,self.visSnapshot06_BTN))
+        self.visSnapshot01_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot01_BTN))
+        self.visSnapshot02_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot02_BTN))
+        self.visSnapshot03_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot03_BTN))
+        self.visSnapshot04_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot04_BTN))
+        self.visSnapshot05_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot05_BTN))
+        self.visSnapshot06_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot06_BTN))
         # LIGHTS
         self.spotLight_BTN.clicked.connect(partial(self._createLight,'spotLight'))
         self.pointLight_BTN.clicked.connect(partial(self._createLight,'pointLight'))
@@ -532,33 +534,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if dialog == 1:
             tools.resetGlobals()
 
-    def _lightAttrsSnapshot(self, btn):
-        if not btn.hasSnap:
-            btn.snap = tools.lightsAttrsSnapshot()
-            btn.hasSnap = True
-            btn.setStyleSheet("background-color: orange")
-        else:
-            tools.loadLightsAttrsSnapshot(btn.snap)
-            btn.setStyleSheet("background-color: green")
-            for each in self.visSnapBtns:
-                if each.objectName() != btn.objectName():
-                    if each.hasSnap:
-                        each.setStyleSheet("background-color: orange")
-                    else:
-                        each.setStyleSheet("background-color: grey")
-
-    def _clearAttrsSnapshot(self, btn):
-        btn.snap.clear()
-        btn.hasSnap = False
-        btn.setStyleSheet("background-color: grey")
-    
-    def _clearAllSnapshots(self):
-        msgBox = QtWidgets.QMessageBox()
-        result = msgBox.question(self, "Warning!", "Are you sure you want to clear all attribute snapshots?")
-        if result:
-            for btn in self.visSnapBtns:
-                self._clearAttrsSnapshot(btn)
-
     # --------------------------------------------------------
 	# Method for right-click menus
 	# --------------------------------------------------------
@@ -599,8 +574,35 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         clearAllSnapshotQ = menu.addAction("Clear all snapshots")
         menu.popup(btn.mapToGlobal(pos))
 
-        clearSnapshotQ.triggered.connect(partial(self._clearAttrsSnapshot, btn))
-        clearAllSnapshotQ.triggered.connect(self._clearAllSnapshots)
+        clearSnapshotQ.triggered.connect(partial(self._lightAttrsSnapshotOpt, btn))
+        clearAllSnapshotQ.triggered.connect(self._clearAllSnapshotsOpt)
+    
+    def _lightAttrsSnapshotOpt(self, btn):
+        if not btn.hasSnap:
+            btn.snap = tools.lightsAttrsSnapshot()
+            btn.hasSnap = True
+            btn.setStyleSheet("background-color: orange")
+        else:
+            tools.loadLightsAttrsSnapshot(btn.snap)
+            btn.setStyleSheet("background-color: green")
+            for each in self.visSnapBtns:
+                if each.objectName() != btn.objectName():
+                    if each.hasSnap:
+                        each.setStyleSheet("background-color: orange")
+                    else:
+                        each.setStyleSheet("background-color: grey")
+
+    def _clearAttrsSnapshotOpt(self, btn):
+        btn.snap.clear()
+        btn.hasSnap = False
+        btn.setStyleSheet("background-color: grey")
+    
+    def _clearAllSnapshotsOpt(self):
+        msgBox = QtWidgets.QMessageBox()
+        result = msgBox.question(self, "Warning!", "Are you sure you want to clear all attribute snapshots?")
+        if result:
+            for btn in self.visSnapBtns:
+                self._clearAttrsSnapshotOpt(btn)
 
 
 # --------------------------------------------------------
