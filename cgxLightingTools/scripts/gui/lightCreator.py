@@ -227,7 +227,7 @@ class LightRenamer_GUI(LightCreator_GUI):
     
     def _initUi(self):
         self.create_BTN.setText('Rename')
-        tokensParse = self._parseOldNameByTokens(self._lightNode)
+        tokensParse = self.factories['default'].parseOldNameByTokens(self._lightNode)
         if tokensParse is not None:
             for key, value in self.tokens.iteritems():
                 tokenObj = self.tokens[key]['obj']
@@ -256,6 +256,7 @@ class LightRenamer_GUI(LightCreator_GUI):
                     tokenCtrl.setText(oldNameStr)
         
     def _parseOldNameParts(self, lightNode):
+        '''TODO: This could be moved to the factories so the tools enforce good naming when duplicating'''
         if mc.nodeType(lightNode) == 'transform':
             objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
             objTransform = lightNode
@@ -278,22 +279,6 @@ class LightRenamer_GUI(LightCreator_GUI):
                     return longestPart, number
             else:
                 return objTransform, 1
-    
-    def _parseOldNameByTokens(self, lightNode):
-        if mc.nodeType(lightNode) == 'transform':
-            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
-            objTransform = lightNode
-        else:
-            objShape = lightNode
-            objTransform = mc.listRelatives(lightNode, parent=True)[0]
-        nameSplit = objTransform.split('_')
-        result = None
-        if len(nameSplit) == len(self.tokens):
-            for name, factory in self.factories.iteritems():
-                if self._lightNodeType in factory.lightNodeTypes:
-                    result = factory.naming.parse(objTransform)
-                    break
-        return result
     
     def _rename(self):
         result = False

@@ -67,12 +67,18 @@ class LightsFactory(object):
         transformNode = str()
         shapeNode = str()
         if mc.nodeType(objShape) in tools.getLightNodesList():
-            parsedName = self.naming.parse(objTransform)
-            lightName = self.buildName(**parsedName)
-            if withInputs:
-                transformNode = mc.duplicate(objTransform, name= lightName, ic= True)[0]
+            parsedName = self.parseOldNameByTokens(objTransform)
+            if parsedName is not None:
+                lightName = self.buildName(**parsedName)
+                if withInputs:
+                    transformNode = mc.duplicate(objTransform, name= lightName, ic= True)[0]
+                else:
+                    transformNode = mc.duplicate(objTransform, name= lightName)[0]
             else:
-                transformNode = mc.duplicate(objTransform, name= lightName)[0]
+                if withInputs:
+                    transformNode = mc.duplicate(objTransform, ic= True)[0]
+                else:
+                    transformNode = mc.duplicate(objTransform)[0]
             shapeNode = mc.listRelatives(transformNode, shapes=True, noIntermediate=True, fullPath=True)[0]
         else:
             tools.logger.info('Only lights accepted. {} is {}'.format(lightNode, mc.nodeType(lightNode)))
@@ -94,6 +100,21 @@ class LightsFactory(object):
         result = mc.rename(objTransform, finalLightName)
         
         return result
+    
+    def parseOldNameByTokens(self, lightNode):
+        if mc.nodeType(lightNode) == 'transform':
+            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+            objTransform = lightNode
+        else:
+            objShape = lightNode
+            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        nameSplit = objTransform.split('_')
+        result = None
+        if len(nameSplit) == len(self.naming.getActiveRule().fields):
+            if mc.nodeType(objShape) in self.lightNodeTypes:
+                result = self.naming.parse(objTransform)
+
+        return result
 
     def postLightCreation(self, shapeNode):
         '''Place here all custom stuff you want to do with the created light node'''
@@ -109,7 +130,7 @@ class LightsFactory(object):
             mc.connectAttr(aovNode + ".message", "defaultArnoldRenderOptions.aovList",
                             nextAvailable=True, force=True)
         except RuntimeError:
-            raise RuntimeError('Could not make connections from AOV to default filter, driver and aovList')
+            raise RuntimeError('Could not make connections from AOV to default filter, driver and aovList for {}'.format(aovNode))
         finally:
             mc.select(shapeNode, replace=True)
     
