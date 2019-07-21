@@ -5,6 +5,10 @@ Created on July 20, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
 from __future__ import absolute_import
+
+import os
+import json
+
 from PySide2 import QtCore, QtWidgets
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 
@@ -13,6 +17,7 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
         super(LookThruDefaults_GUI, self).__init__(parent)
         self._setupUi()
         self._setConnections()
+        self._initCtrls()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
     def _setupUi(self):
@@ -45,7 +50,6 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
 
         QtCore.QMetaObject.connectSlotsByName(self)
         
-    
     def _createButtons(self):
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
                                             QtWidgets.QSizePolicy.Fixed)
@@ -98,24 +102,83 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
         self.winWidth_SPINBOX.setMinimumSize(spinBoxSize)
         self.winWidth_SPINBOX.setMaximumSize(spinBoxSize)
         self.winWidth_SPINBOX.setObjectName('winWidth_SPINBOX')
+        self.winWidth_SPINBOX.setMaximum(2000)
+        self.winWidth_SPINBOX.setMinimum(100)
         self.winHeight_SPINBOX.setSizePolicy(sizePolicy)
         self.winHeight_SPINBOX.setMinimumSize(spinBoxSize)
         self.winHeight_SPINBOX.setMaximumSize(spinBoxSize)
         self.winHeight_SPINBOX.setObjectName('winHeight_SPINBOX')
+        self.winHeight_SPINBOX.setMaximum(2000)
+        self.winHeight_SPINBOX.setMinimum(100)
         self.nearClip_DBLSPINBOX.setSizePolicy(sizePolicy)
         self.nearClip_DBLSPINBOX.setMinimumSize(spinBoxSize)
         self.nearClip_DBLSPINBOX.setMaximumSize(spinBoxSize)
         self.nearClip_DBLSPINBOX.setObjectName('nearClip_DBLSPINBOX')
+        self.nearClip_DBLSPINBOX.setMinimum(0.00001)
+        self.nearClip_DBLSPINBOX.setMaximum(100000000)
         self.farClip_DBLSPINBOX.setSizePolicy(sizePolicy)
         self.farClip_DBLSPINBOX.setMinimumSize(spinBoxSize)
         self.farClip_DBLSPINBOX.setMaximumSize(spinBoxSize)
         self.farClip_DBLSPINBOX.setObjectName('farClip_DBLSPINBOX')
-
-       
-
+        self.farClip_DBLSPINBOX.setMinimum(0.00001)
+        self.farClip_DBLSPINBOX.setMaximum(100000000)
 
     def _setConnections(self):
-        pass
+        self.save_BTN.clicked.connect(self._save)
+        self.cancel_BTN.clicked.connect(self._cancel)
+    
+    def _save(self):
+        userPath = os.path.expanduser("~")
+        finalDir = os.path.join(userPath, ".CGXTools")
+        try:
+            if not os.path.exists(finalDir):
+                os.mkdir(finalDir)
+        except:
+            pass
+        filepath = os.path.join(finalDir, "MiniTools.pref")
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+                config['lookThru_nearClip'] = self.nearClip_DBLSPINBOX.value()
+                config['lookThru_farClip'] = self.farClip_DBLSPINBOX.value()
+                config['lookThru_winWidth'] = self.winWidth_SPINBOX.value()
+                config['lookThru_winHeight'] = self.winHeight_SPINBOX.value()
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+        else:
+            config = {'lookThru_nearClip':self.nearClip_DBLSPINBOX.value(),
+                    'lookThru_farClip':self.farClip_DBLSPINBOX.value(),
+                    'lookThru_winWidth':self.winWidth_SPINBOX.value(),
+                    'lookThru_winHeight':self.winHeight_SPINBOX.value()}
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+        
+        self.done(1)
+    
+    def _initCtrls(self):
+        userPath = os.path.expanduser("~")
+        finalDir = os.path.join(userPath, ".CGXTools")
+        filepath = os.path.join(finalDir, "MiniTools.pref")
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+        valuesList = [config.get('lookThru_nearClip'),config.get('lookThru_farClip'),
+                    config.get('lookThru_winWidth'),config.get('lookThru_winHeight')]
+        if None not in valuesList:
+            self.nearClip_DBLSPINBOX.setValue(config.get('lookThru_nearClip'))
+            self.farClip_DBLSPINBOX.setValue(config.get('lookThru_farClip'))
+            self.winWidth_SPINBOX.setValue(config.get('lookThru_winWidth'))
+            self.winHeight_SPINBOX.setValue(config.get('lookThru_winHeight'))
+        else:
+            self.nearClip_DBLSPINBOX.setValue(1.0)
+            self.farClip_DBLSPINBOX.setValue(1000000)
+            self.winWidth_SPINBOX.setValue(629)
+            self.winHeight_SPINBOX.setValue(404)
+    
+    def _cancel(self):
+        self.done(0)
 
 
 # --------------------------------------------------------

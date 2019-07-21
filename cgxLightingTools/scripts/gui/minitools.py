@@ -3,8 +3,6 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Add duplicate light with inputs
-TODO: Add right click option to create multiple lights (a multiplier)
 TODO: Add clipping planes default values to config
 TODO: Add conform to naming tool
 TODO: Add separators to naming library
@@ -26,6 +24,7 @@ import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
 from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
+from cgxLightingTools.scripts.gui.lookThruDefaults import LookThruDefaults_GUI
 import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
 from cgxLightingTools.scripts.gui import minitools_icons
 
@@ -494,17 +493,26 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                 os.mkdir(finalDir)
         except:
             pass
-        config = {'orientation': prefOrientation}
-        filepath = os.path.join(finalDir, "MiniTools_orientation.pref")
-        with open(filepath, "w") as fp:
-            json.dump(config, fp, indent = 4)
+        filepath = os.path.join(finalDir, "MiniTools.pref")
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+                config['orientation'] = prefOrientation
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+        else:
+            config = {'orientation': prefOrientation}
+            with open(filepath, "w") as fp:
+                json.dump(config, fp, indent = 4)
+        # Open a new instance with the new orientation
         load()
         self.close()
     
     def _loadPrefOrientation(self):
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
-        filepath = os.path.join(finalDir, "MiniTools_orientation.pref")
+        filepath = os.path.join(finalDir, "MiniTools.pref")
         config = dict()
         if os.path.exists(filepath):
             with open(filepath) as fp:
@@ -512,9 +520,54 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if config.get('orientation') is not None and config.get('orientation') in ['horizontal','vertical']:
             return config.get('orientation')
         else:
-            self._savePrefOrientation('horizontal')
+            config = {'orientation': 'horizontal'}
+            with open(filepath, "w") as fp:
+                json.dump(config, fp, indent = 4)
             return 'horizontal'
     
+    def _saveLookThruPrefs(self, winWidth, winHeight, nearClip, farClip):
+        userPath = os.path.expanduser("~")
+        finalDir = os.path.join(userPath, ".CGXTools")
+        try:
+            if not os.path.exists(finalDir):
+                os.mkdir(finalDir)
+        except:
+            pass
+        filepath = os.path.join(finalDir, "MiniTools.pref")
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+                config['lookThru_nearClip'] = nearClip
+                config['lookThru_farClip'] = farClip
+                config['lookThru_winWidth'] = winWidth
+                config['lookThru_winHeight'] = winHeight
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+        else:
+            config = {'lookThru_nearClip':nearClip,'lookThru_farClip':farClip,
+                    'lookThru_winWidth':winWidth,'lookThru_winHeight':winHeight}
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+    
+    def _loadLookThruPrefs(self):
+        userPath = os.path.expanduser("~")
+        finalDir = os.path.join(userPath, ".CGXTools")
+        filepath = os.path.join(finalDir, "MiniTools.pref")
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+        valuesList = [config.get('lookThru_nearClip'),config.get('lookThru_farClip'),
+                    config.get('lookThru_winWidth'),config.get('lookThru_winHeight')]
+        if None not in valuesList:
+            return config
+        else:
+            self._saveLookThruPrefs(629, 404, 1.0, 1000000)
+            config = {'lookThru_nearClip':1.0, 'lookThru_farClip':1000000,
+                    'lookThru_winWidth': 629, 'lookThru_winHeight':404}
+            return config
+
     def _initFactories(self):
         defaultFactory = lightsFactory.default_factory.LightsFactory()
         result = dict()
@@ -566,6 +619,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         dialog.exec_()
         if dialog == 1:
             tools.resetGlobals()
+    
+    def _lookThruDefaults(self):
+        dialog = LookThruDefaults_GUI(self)
+        dialog.exec_()
+        if dialog == 1:
+            tools.resetGlobals()
         
     def _duplicateLight(self, withInputs=False):
         inputDialog = QtWidgets.QInputDialog()
@@ -592,6 +651,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.config_BTN)
         prefOrientationQ = menu.addAction("Toggle tools orientation")
+        prefLookThruQ = menu.addAction("Look thru preferences")
         offset = QtCore.QPoint(self.size().width(),self.size().height())
         menu.popup(self.config_BTN.mapToGlobal(self.config_BTN.pos()-offset))
 
@@ -600,6 +660,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         else:
             self._prefOrientation = 'horizontal'
         prefOrientationQ.triggered.connect(partial(self._savePrefOrientation, self._prefOrientation))
+        prefLookThruQ.triggered.connect(self._lookThruDefaults)
     
     def specConstrainOptions (self, pos):
         """Method that creates the popupmenu"""
