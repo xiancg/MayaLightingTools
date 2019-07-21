@@ -10,5 +10,7 @@ Ex: C:\Users\xxxx\Documents\maya\scripts\cgxLightingTools
 MAYA_MODULE_PATH=C:\Users\xxxx\Documents\maya\scripts\cgxLightingTools;
 
 # Launching:
+```python
 import cgxLightingTools.launch as lgtTools
 lgtTools.launch()
+```
