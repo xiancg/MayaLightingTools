@@ -3,7 +3,7 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Add conform to naming tool
+TODO: Duplicate lights doesnt work with incorrectly named lights
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
 TODO: Fix weird position problem with config context menu
@@ -23,6 +23,7 @@ import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
 from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
+from cgxLightingTools.scripts.gui.lightCreator import LightRenamer_GUI
 from cgxLightingTools.scripts.gui.lookThruDefaults import LookThruDefaults_GUI
 import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
 from cgxLightingTools.scripts.gui import minitools_icons
@@ -73,6 +74,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.cleanUpCams_BTN, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 1, 2, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.transformBake_BTN, 1, 3, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.renameLight_BTN, 1, 4, 1, 1, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 16
             spacerHeight = 20
@@ -127,7 +129,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 2, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.transformBake_BTN, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lightsManager_BTN, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
-            tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 4, 0, 2, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.renameLight_BTN, 4, 1, 1, 1, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 20
             spacerHeight = 16
@@ -196,6 +199,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.alignLight_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.transformBake_BTN = QtWidgets.QPushButton(self.centralwidget)
         self.duplicateLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.renameLight_BTN = MiniTools_BTN(self.centralwidget)
         self.simpleIsolate_BTN.setSizePolicy(sizePolicy)
         self.simpleIsolate_BTN.setMinimumSize(toolsBtnSize)
         self.simpleIsolate_BTN.setMaximumSize(toolsBtnSize)
@@ -241,6 +245,11 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.duplicateLight_BTN.setMaximumSize(toolsBtnSize)
         self.duplicateLight_BTN.setObjectName("duplicateLight_BTN")
         self.duplicateLight_BTN.setToolTip('Duplicate lights. Right click for more options.')
+        self.renameLight_BTN.setSizePolicy(sizePolicy)
+        self.renameLight_BTN.setMinimumSize(toolsBtnSize)
+        self.renameLight_BTN.setMaximumSize(toolsBtnSize)
+        self.renameLight_BTN.setObjectName("renameLight_BTN")
+        self.renameLight_BTN.setToolTip('Rename selected light.')
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = MiniTools_BTN(self.centralwidget)
@@ -393,6 +402,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.specularConstrain_BTN.clicked.connect(tools.specularConstrain)
         self.transformBake_BTN.clicked.connect(self._transformBake)
         self.duplicateLight_BTN.clicked.connect(self._duplicateLight)
+        self.renameLight_BTN.clicked.connect(self._renameLight)
         self.visSnapshot01_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot01_BTN))
         self.visSnapshot02_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot02_BTN))
         self.visSnapshot03_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot03_BTN))
@@ -619,6 +629,27 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if dialog == 1:
             tools.resetGlobals()
     
+    def _renameLight(self):
+        allSel = mc.ls(sl=True)
+        if len(allSel) > 1:
+            msgBox = QtWidgets.QMessageBox(self)
+            msgBox.setWindowTitle("Warning!")
+            msgBox.setText("Please select one light only.")
+            msgBox.exec_()
+            tools.logger.info('Please select one light only.')
+        else:
+            lightNode = allSel[0]
+            if mc.nodeType(lightNode) == 'transform':
+                objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+                objTransform = lightNode
+            else:
+                objShape = lightNode
+                objTransform = mc.listRelatives(lightNode, parent=True)[0]
+            dialog = LightRenamer_GUI(objShape, self.factories, self)
+            dialog.exec_()
+            if dialog == 1:
+                tools.resetGlobals()
+    
     def _lookThruDefaults(self):
         dialog = LookThruDefaults_GUI(self)
         dialog.exec_()
@@ -660,7 +691,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             self._prefOrientation = 'horizontal'
         prefOrientationQ.triggered.connect(partial(self._savePrefOrientation, self._prefOrientation))
         prefLookThruQ.triggered.connect(self._lookThruDefaults)
-    
+
     def specConstrainOptions (self, pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.specularConstrain_BTN)

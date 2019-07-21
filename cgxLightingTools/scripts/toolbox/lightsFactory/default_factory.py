@@ -81,6 +81,19 @@ class LightsFactory(object):
         self.postLightCreation(shapeNode)
 
         return transformNode, shapeNode
+    
+    def renameLight(self, lightNode, lightName):
+        if mc.nodeType(lightNode) == 'transform':
+            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+            objTransform = lightNode
+        else:
+            objShape = lightNode
+            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        parsedName = self.naming.parse(lightName)
+        finalLightName = self.buildName(**parsedName)
+        result = mc.rename(objTransform, finalLightName)
+        
+        return result
 
     def postLightCreation(self, shapeNode):
         '''Place here all custom stuff you want to do with the created light node'''

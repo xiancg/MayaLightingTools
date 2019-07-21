@@ -6,6 +6,7 @@ Created on July 10, 2019
 '''
 from __future__ import absolute_import
 import os
+import maya.cmds as mc
 from PySide2 import QtCore, QtWidgets
 from cgxLightingTools.scripts.toolbox import tools
 
@@ -109,6 +110,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
                         for x in range(len(dataList)):
                             if dataList[x] == tokenObj.default:
                                 ctrlCombo.setCurrentIndex(x)
+                                break
                     self.tokens[key]['ctrl'] = ctrlCombo
                     labelSize = QtCore.QSize(110, 13)
                     label.setMinimumSize(labelSize)
@@ -196,12 +198,131 @@ class LightCreator_GUI(QtWidgets.QDialog):
         self.done(0)
 
 
+class LightRenamer_GUI(LightCreator_GUI):
+    def __init__(self, lightNode, factories, parent=mWin.getMayaWindow()):
+        super(LightRenamer_GUI, self).__init__(mc.nodeType(lightNode), factories, parent=parent)
+        self._lightNode = lightNode
+        self._initUi()
+        self._setConnections()
+    
+    def _setConnections(self):
+        try:
+            self.create_BTN.clicked.disconnect()
+        except:
+            pass
+        self.create_BTN.clicked.connect(self._rename)
+
+        self.installEventFilter(self)
+    
+    def eventFilter(self, widget, event):
+        if event.type() == QtCore.QEvent.KeyPress:
+            key = event.key()
+            if key == QtCore.Qt.Key_Escape:
+                self._cancel()
+                return True
+            elif key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter: 
+                self._rename()
+                return True
+        return QtWidgets.QWidget.eventFilter(self, widget, event)
+    
+    def _initUi(self):
+        self.create_BTN.setText('Rename')
+        tokensParse = self._parseOldNameByTokens(self._lightNode)
+        if tokensParse is not None:
+            for key, value in self.tokens.iteritems():
+                tokenObj = self.tokens[key]['obj']
+                tokenCtrl = self.tokens[key]['ctrl']
+                if tokenObj.name in tokensParse.keys():
+                    if tokenObj.isNumber:
+                        tokenCtrl.setValue(tokensParse[tokenObj.name])
+                    else:
+                        if tokenObj.required:
+                            tokenCtrl.setText(tokensParse[tokenObj.name])
+                        else:
+                            dataList = tokenCtrl.model().dataList
+                            for x in range(len(dataList)):
+                                if dataList[x] == tokensParse[tokenObj.name]:
+                                    tokenCtrl.setCurrentIndex(x)
+                                    break
+        else:
+            oldNameStr, oldNameNum = self._parseOldNameParts(self._lightNode)
+            kwargs = dict()
+            for key, value in self.tokens.iteritems():
+                tokenObj = self.tokens[key]['obj']
+                tokenCtrl = self.tokens[key]['ctrl']
+                if tokenObj.isNumber:
+                    tokenCtrl.setValue(oldNameNum)
+                elif tokenObj.required:
+                    tokenCtrl.setText(oldNameStr)
+        
+    def _parseOldNameParts(self, lightNode):
+        if mc.nodeType(lightNode) == 'transform':
+            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+            objTransform = lightNode
+        else:
+            objShape = lightNode
+            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        if mc.nodeType(objShape) in tools.getLightNodesList():
+            if '_' in objTransform:
+                nameSplit = objTransform.split('_')
+                number = 1
+                longestPart = str()
+                for part in nameSplit:
+                    if part.isdigit():
+                        number = int(part)
+                        continue
+                    else:
+                        if len(part) > len(longestPart):
+                            longestPart = part
+                else:
+                    return longestPart, number
+            else:
+                return objTransform, 1
+    
+    def _parseOldNameByTokens(self, lightNode):
+        if mc.nodeType(lightNode) == 'transform':
+            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+            objTransform = lightNode
+        else:
+            objShape = lightNode
+            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        nameSplit = objTransform.split('_')
+        result = None
+        if len(nameSplit) == len(self.tokens):
+            for name, factory in self.factories.iteritems():
+                if self._lightNodeType in factory.lightNodeTypes:
+                    result = factory.naming.parse(objTransform)
+                    break
+        return result
+    
+    def _rename(self):
+        result = False
+        for name, factory in self.factories.iteritems():
+            if self._lightNodeType in factory.lightNodeTypes:
+                kwargs = dict()
+                for key, value in self.tokens.iteritems():
+                    tokenObj = self.tokens[key]['obj']
+                    tokenCtrl = self.tokens[key]['ctrl']
+                    if tokenObj.isNumber:
+                        kwargs[tokenObj.name] = tokenCtrl.value()
+                    else:
+                        if tokenObj.required:
+                            kwargs[tokenObj.name] = tokenCtrl.text()
+                        else:
+                            kwargs[tokenObj.name] = tokenCtrl.currentText()
+                lightName = factory.buildName(**kwargs)
+                result = factory.renameLight(self._lightNode, lightName)
+                break
+        if result:
+            self.done(1)
+        else:
+            self.done(0)
+
 # --------------------------------------------------------
 #  Main
 # --------------------------------------------------------
 def main():
-    temp = LightCreator_GUI('spotLight')
-    temp.show()
+    pass
 
 
 if __name__ == '__main__' or 'eclipsePython' in __name__:
