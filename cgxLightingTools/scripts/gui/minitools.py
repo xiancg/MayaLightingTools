@@ -5,7 +5,6 @@ Created on July 10, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
-TODO: Fix weird position problem with config context menu
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
@@ -244,11 +243,13 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.duplicateLight_BTN.setMaximumSize(toolsBtnSize)
         self.duplicateLight_BTN.setObjectName("duplicateLight_BTN")
         self.duplicateLight_BTN.setToolTip('Duplicate lights. Right click for more options.')
+        self.duplicateLight_BTN.setText('Duplicate')
         self.renameLight_BTN.setSizePolicy(sizePolicy)
         self.renameLight_BTN.setMinimumSize(toolsBtnSize)
         self.renameLight_BTN.setMaximumSize(toolsBtnSize)
         self.renameLight_BTN.setObjectName("renameLight_BTN")
         self.renameLight_BTN.setToolTip('Rename selected light.')
+        self.renameLight_BTN.setText('Rename')
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = MiniTools_BTN(self.centralwidget)
@@ -478,7 +479,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.simpleIsolate_BTN.rightClick.connect(self.isolateOptions)
         self.duplicateLight_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.duplicateLight_BTN.rightClick.connect(self.duplicateLightOptions)
-        self.config_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.config_BTN.clicked.connect(self.configOptions)
         self.visSnapshot01_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.visSnapshot01_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
@@ -681,15 +681,14 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         menu = QtWidgets.QMenu(self.config_BTN)
         prefOrientationQ = menu.addAction("Toggle tools orientation")
         prefLookThruQ = menu.addAction("Look thru preferences")
-        offset = QtCore.QPoint(self.size().width(),self.size().height())
-        menu.popup(self.config_BTN.mapToGlobal(self.config_BTN.pos()-offset))
-
+        self.config_BTN.setMenu(menu)
         if self._prefOrientation == 'horizontal':
             self._prefOrientation = 'vertical'
         else:
             self._prefOrientation = 'horizontal'
         prefOrientationQ.triggered.connect(partial(self._savePrefOrientation, self._prefOrientation))
         prefLookThruQ.triggered.connect(self._lookThruDefaults)
+        self.config_BTN.showMenu()
 
     def specConstrainOptions (self, pos):
         """Method that creates the popupmenu"""
