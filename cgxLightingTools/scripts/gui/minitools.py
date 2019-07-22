@@ -68,7 +68,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.lookThru_BTN, 0, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.aimLight_BTN, 0, 2, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lightsManager_BTN, 0, 3, 1, 1, QtCore.Qt.AlignCenter)
-            tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 4, 1, 2, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 4, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.specularConstrain_BTN, 1, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.cleanUpCams_BTN, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 1, 2, 1, 1, QtCore.Qt.AlignCenter)
