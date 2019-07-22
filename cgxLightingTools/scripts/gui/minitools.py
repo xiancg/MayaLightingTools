@@ -243,13 +243,15 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.duplicateLight_BTN.setMaximumSize(toolsBtnSize)
         self.duplicateLight_BTN.setObjectName("duplicateLight_BTN")
         self.duplicateLight_BTN.setToolTip('Duplicate lights. Right click for more options.')
-        self.duplicateLight_BTN.setText('Duplicate')
+        self.duplicateLight_BTN.setText('Dupli\ncate')
+        self.duplicateLight_BTN.setStyleSheet("font-size: 10px;")
         self.renameLight_BTN.setSizePolicy(sizePolicy)
         self.renameLight_BTN.setMinimumSize(toolsBtnSize)
         self.renameLight_BTN.setMaximumSize(toolsBtnSize)
         self.renameLight_BTN.setObjectName("renameLight_BTN")
         self.renameLight_BTN.setToolTip('Rename selected light.')
-        self.renameLight_BTN.setText('Rename')
+        self.renameLight_BTN.setText('Re\nname')
+        self.renameLight_BTN.setStyleSheet("font-size: 10px;")
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = MiniTools_BTN(self.centralwidget)
