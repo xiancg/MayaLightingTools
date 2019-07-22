@@ -7,6 +7,7 @@
 		<file alias="simpleIsolate.png">icons/simpleIsolate.png</file>
 		<file alias="specularConstrain.png">icons/specularConstrain.png</file>
 		<file alias="transformBake.png">icons/transformBake.png</file>
+		<file alias="lightsManager.png">icons/lightsManager.png</file>
 		<file alias="create_areaLight.png">icons/create_areaLight.png</file>
 		<file alias="create_directionalLight.png">icons/create_directionalLight.png</file>
 		<file alias="create_pointLight.png">icons/create_pointLight.png</file>
