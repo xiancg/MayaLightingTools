@@ -325,7 +325,7 @@
 		}, 
 		"aiSamples": {
 			"uiControl": "intslider", 
-			"default": 3, 
+			"default": 6, 
 			"maxValue": 100, 
 			"minValue": 0, 
 			"values": "None", 
@@ -342,7 +342,7 @@
 		}, 
 		"aiMaxBounces": {
 			"uiControl": "intslider", 
-			"default": 0, 
+			"default": 2, 
 			"maxValue": 999, 
 			"minValue": 0, 
 			"values": "None", 
@@ -393,7 +393,37 @@
 				"aiPhotometricLight"
 			], 
 			"display": "True"
-		}, 
+		},
+		"camera": {
+			"uiControl": "floatslider", 
+			"default": 0, 
+			"maxValue": 1.0, 
+			"minValue": 0.0, 
+			"values": "None", 
+			"lightTypes": [
+				"directionalLight", 
+				"pointLight", 
+				"areaLight", 
+				"spotLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight", 
+				"aiPhotometricLight"
+			], 
+			"display": "True"
+		},
+		"aiResolution": {
+			"uiControl": "intslider", 
+			"default": 8, 
+			"maxValue": 8192, 
+			"minValue": 64, 
+			"values": "None", 
+			"lightTypes": [ 
+				"areaLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight"
+			], 
+			"display": "True"
+		},
 		"aiRadius": {
 			"uiControl": "floatslider", 
 			"default": 0.0, 
