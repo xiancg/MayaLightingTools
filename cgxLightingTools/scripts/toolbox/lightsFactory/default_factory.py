@@ -57,7 +57,7 @@ class LightsFactory(object):
         else: 
             return None
     
-    def duplicateLight(self, lightNode, withInputs=False):
+    def duplicateLight(self, lightNode, withInputs=False, withNodes=False):
         if mc.nodeType(lightNode) == 'transform':
             objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
             objTransform = lightNode
@@ -70,13 +70,17 @@ class LightsFactory(object):
             parsedName = self.parseOldNameByTokens(objTransform)
             if parsedName is not None:
                 lightName = self.buildName(**parsedName)
-                if withInputs:
+                if withInputs and not withNodes:
                     transformNode = mc.duplicate(objTransform, name= lightName, ic= True)[0]
+                elif withInputs and withNodes:
+                    transformNode = mc.duplicate(objTransform, name= lightName, ic= True, un=True)[0]
                 else:
                     transformNode = mc.duplicate(objTransform, name= lightName)[0]
             else:
-                if withInputs:
+                if withInputs and not withNodes:
                     transformNode = mc.duplicate(objTransform, ic= True)[0]
+                elif withInputs and withNodes:
+                    transformNode = mc.duplicate(objTransform, ic= True, un=True)[0]
                 else:
                     transformNode = mc.duplicate(objTransform)[0]
             shapeNode = mc.listRelatives(transformNode, shapes=True, noIntermediate=True, fullPath=True)[0]

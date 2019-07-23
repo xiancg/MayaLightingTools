@@ -3,6 +3,7 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Create light attrs GUI
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
 TODO: All alerts should be changed to something without the need for confirmation
@@ -657,7 +658,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if dialog == 1:
             tools.resetGlobals()
         
-    def _duplicateLight(self, withInputs=False):
+    def _duplicateLight(self, withInputs=False, withNodes= False):
         inputDialog = QtWidgets.QInputDialog()
         inputDialog.setInputMode(QtWidgets.QInputDialog.IntInput)
         inputDialog.setIntMinimum(1)
@@ -673,7 +674,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                 for name, factory in self.factories.iteritems():
                     if mc.nodeType(objShape) in factory.lightNodeTypes:
                         for i in range(copies):
-                            factory.duplicateLight(objTransform, withInputs)
+                            factory.duplicateLight(objTransform, withInputs, withNodes)
 
     # --------------------------------------------------------
 	# Method for right-click menus
@@ -711,10 +712,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     def duplicateLightOptions (self, pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.duplicateLight_BTN)
-        duplicateWithInputsQ = menu.addAction("Duplicate with input connections")
+        duplicateWithInputsQ = menu.addAction("Duplicate with inputs")
+        duplicateWithAllQ = menu.addAction("Duplicate with inputs and nodes")
         menu.popup(self.duplicateLight_BTN.mapToGlobal(pos))
 
         duplicateWithInputsQ.triggered.connect(partial(self._duplicateLight, True))
+        duplicateWithAllQ.triggered.connect(partial(self._duplicateLight, True, True))
 
     def lightAttrsSnapshotOptions (self, pos, btn):
         """Method that creates the popupmenu"""
