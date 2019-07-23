@@ -7,13 +7,13 @@ os.environ['NAMING_REPO'] = repoPath
 
 n.addToken('whatAffects')
 n.addTokenNumber('number')
-n.addToken('category', natural='natural', 
-            practical='practical', dramatic='dramatic',
-            volumetric='volumetric', default='natural')
+n.addToken('category', natural='nat', 
+            practical='pra', dramatic='dra',
+            volumetric='vol', default='nat')
 n.addToken('function', key='key', 
-            fill='fill', ambient='ambient',
-            bounce='bounce', rim='rim',
-            kick='kick', default='custom')
+            fill='fil', ambient='amb',
+            bounce='bnc', rim='rim',
+            kick='kik', custom='cst', default='cst')
 n.addToken('type', lighting='LGT', default='LGT')
 n.addRule('lights', 'category', 'function', 'whatAffects', 'number', 'type')
 
