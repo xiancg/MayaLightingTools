@@ -5,6 +5,7 @@ Created on July 3, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Implement attributes on default and arnold. This will require 
 a lot of work to do it automatically, use config file preset for now.
+TODO: Remove post methods from here and move them to a separate library
 '''
 import os
 import json
@@ -124,8 +125,8 @@ class LightsFactory(object):
         '''Place here all custom stuff you want to do with the created light node'''
         transform = mc.listRelatives(shapeNode, parent=True)[0]
         mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
-        aovNode = mc.createNode("aiAOV", name='RGBA_' + transform)
-        mc.setAttr(aovNode + ".name", 'RGBA_' + transform, type="string")
+        aovNode = mc.createNode("aiAOV", name='RGBA_LG_' + transform)
+        mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transform, type="string")
         mc.setAttr(aovNode + ".type", 6)
         mc.setAttr(aovNode + ".enabled", True)
         try:
