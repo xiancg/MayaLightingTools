@@ -3,6 +3,9 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Remove post methods from factory, to their own module
+TODO: Add post-rename and post-duplicate methods
+TODO: Add delete and post-delete method?
 TODO: Change light attrs implementation
 TODO: Create light attrs GUI
 TODO: Add separators to naming library
