@@ -14,6 +14,6 @@ n.addToken('function', key='key',
             fill='fil', ambient='amb',
             bounce='bnc', rim='rim',
             kick='kik', custom='cst', default='cst')
-n.addRule('lights', 'category', 'function', 'whatAffects', 'number')
+n.addRule('lights', 'category', 'function', 'number', 'whatAffects')
 
 n.saveSession()

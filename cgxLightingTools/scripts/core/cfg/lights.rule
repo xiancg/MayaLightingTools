@@ -1,1 +1,1 @@
-{"_Serializable_classname": "Rule", "_fields": ["category", "function", "whatAffects", "number"], "_Serializable_version": "1.0", "_name": "lights"}
+{"_Serializable_classname": "Rule", "_fields": ["category", "function", "number", "whatAffects"], "_Serializable_version": "1.0", "_name": "lights"}
