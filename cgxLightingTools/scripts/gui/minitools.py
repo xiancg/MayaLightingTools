@@ -3,9 +3,11 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Add rename post modifications looking for AOVs and light group
+TODO: Add delete options with post methods
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
-TODO: Add delete and post-delete method?
+TODO: Move rename, duplicate and delete closer to the creation buttons and set icons
 TODO: Change light attrs implementation
 TODO: Create light attrs GUI
 TODO: All alerts should be changed to something without the need for confirmation
