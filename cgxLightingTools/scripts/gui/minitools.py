@@ -3,13 +3,11 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Remove post methods from factory, to their own module
-TODO: Add post-rename and post-duplicate methods
+TODO: Add separators to naming library
+TODO: Create GUI for naming library
 TODO: Add delete and post-delete method?
 TODO: Change light attrs implementation
 TODO: Create light attrs GUI
-TODO: Add separators to naming library
-TODO: Create GUI for naming library
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
@@ -27,6 +25,7 @@ import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
 from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
 from cgxLightingTools.scripts.gui.lightCreator import LightRenamer_GUI
+from cgxLightingTools.scripts.gui.lightDuplicator import LightDuplicator_GUI
 from cgxLightingTools.scripts.gui.lookThruDefaults import LookThruDefaults_GUI
 import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
 from cgxLightingTools.scripts.gui import minitools_icons
@@ -631,7 +630,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     
     def _createLight(self, lightNodeType):
         dialog = LightCreator_GUI(lightNodeType, self.factories, self)
-        dialog.exec_()
+        dialog.show()
         if dialog == 1:
             tools.resetGlobals()
     
@@ -652,33 +651,21 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                 objShape = lightNode
                 objTransform = mc.listRelatives(lightNode, parent=True)[0]
             dialog = LightRenamer_GUI(objShape, self.factories, self)
-            dialog.exec_()
+            dialog.show()
             if dialog == 1:
                 tools.resetGlobals()
     
+    def _duplicateLight(self, withInputs=False, withNodes= False):
+        dialog = LightDuplicator_GUI(withInputs, withNodes, self.factories, self)
+        dialog.exec_()
+        if dialog == 1:
+            tools.resetGlobals()
+
     def _lookThruDefaults(self):
         dialog = LookThruDefaults_GUI(self)
         dialog.exec_()
         if dialog == 1:
             tools.resetGlobals()
-        
-    def _duplicateLight(self, withInputs=False, withNodes= False):
-        inputDialog = QtWidgets.QInputDialog()
-        inputDialog.setInputMode(QtWidgets.QInputDialog.IntInput)
-        inputDialog.setIntMinimum(1)
-        copies, ok = inputDialog.getInt(self, 'Copies', 'How many copies?', 1)
-        if ok:
-            for each in mc.ls(sl=True):
-                if mc.nodeType(each) == 'transform':
-                    objShape = mc.listRelatives(each, shapes=True, noIntermediate=True, fullPath=True)[0]
-                    objTransform = each
-                else:
-                    objShape = each
-                    objTransform = mc.listRelatives(each, parent=True)[0]
-                for name, factory in self.factories.iteritems():
-                    if mc.nodeType(objShape) in factory.lightNodeTypes:
-                        for i in range(copies):
-                            factory.duplicateLight(objTransform, withInputs, withNodes)
 
     # --------------------------------------------------------
 	# Method for right-click menus
