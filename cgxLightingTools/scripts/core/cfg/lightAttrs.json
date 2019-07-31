@@ -413,12 +413,26 @@
 		},
 		"aiResolution": {
 			"uiControl": "intslider", 
-			"default": 8, 
+			"default": 2048, 
 			"maxValue": 8192, 
 			"minValue": 64, 
 			"values": "None", 
 			"lightTypes": [ 
 				"areaLight", 
+				"aiAreaLight", 
+				"aiSkyDomeLight"
+			], 
+			"display": "True"
+		},
+		"aiTransmission": {
+			"uiControl": "intslider", 
+			"default": 1, 
+			"maxValue": 1, 
+			"minValue": 0, 
+			"values": "None", 
+			"lightTypes": [ 
+				"areaLight",
+				"pointLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight"
 			], 
