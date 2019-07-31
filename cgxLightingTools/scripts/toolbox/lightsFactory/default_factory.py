@@ -12,6 +12,7 @@ import json
 import maya.cmds as mc
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.core.namingConventions as naming
+from cgxLightingTools.scripts.toolbox.lightsFactory import post_functions
 
 
 class LightsFactory(object):
@@ -27,7 +28,7 @@ class LightsFactory(object):
             config = json.load(fp)
         self._lightAttrs = config
     
-    def createLight(self, lightNodeType, lightName):
+    def createLight(self, lightNodeType, lightName, *args, **kwargs):
         if lightNodeType == 'spotLight':
             shapeNode = mc.spotLight(name=lightName)
         elif lightNodeType == 'directionalLight':
@@ -52,13 +53,13 @@ class LightsFactory(object):
             return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
-            self.postLightCreation(shapeNode)
+            post_functions.postLightCreation(shapeNode, *args, **kwargs)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
             return transformNode, shapeNode
         else: 
             return None
     
-    def duplicateLight(self, lightNode, withInputs=False, withNodes=False):
+    def duplicateLight(self, lightNode, withInputs=False, withNodes=False, *args, **kwargs):
         if mc.nodeType(lightNode) == 'transform':
             objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
             objTransform = lightNode
@@ -89,11 +90,11 @@ class LightsFactory(object):
             tools.logger.info('Only lights accepted. {} is {}'.format(lightNode, mc.nodeType(lightNode)))
             return None
         
-        self.postLightCreation(shapeNode)
+        post_functions.postLightDuplicate(shapeNode, *args, **kwargs)
 
         return transformNode, shapeNode
     
-    def renameLight(self, lightNode, lightName):
+    def renameLight(self, lightNode, lightName, *args, **kwargs):
         if mc.nodeType(lightNode) == 'transform':
             objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
             objTransform = lightNode
@@ -103,6 +104,9 @@ class LightsFactory(object):
         parsedName = self.naming.parse(lightName)
         finalLightName = self.buildName(**parsedName)
         result = mc.rename(objTransform, finalLightName)
+        shapeNode = mc.listRelatives(result, shapes=True, noIntermediate=True, fullPath=True)[0]
+
+        post_functions.postLightRename(shapeNode, *args, **kwargs)
         
         return result
     
@@ -120,24 +124,6 @@ class LightsFactory(object):
                 result = self.naming.parse(objTransform)
 
         return result
-
-    def postLightCreation(self, shapeNode):
-        '''Place here all custom stuff you want to do with the created light node'''
-        transform = mc.listRelatives(shapeNode, parent=True)[0]
-        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
-        aovNode = mc.createNode("aiAOV", name='RGBA_LG_' + transform)
-        mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transform, type="string")
-        mc.setAttr(aovNode + ".type", 6)
-        mc.setAttr(aovNode + ".enabled", True)
-        try:
-            mc.connectAttr("defaultArnoldFilter.message", aovNode + ".outputs[0].filter", force=True)
-            mc.connectAttr("defaultArnoldDriver.message", aovNode + ".outputs[0].driver", force=True)
-            mc.connectAttr(aovNode + ".message", "defaultArnoldRenderOptions.aovList",
-                            nextAvailable=True, force=True)
-        except RuntimeError:
-            raise RuntimeError('Could not make connections from AOV to default filter, driver and aovList for {}'.format(aovNode))
-        finally:
-            mc.select(shapeNode, replace=True)
     
     def buildName(self, *args, **kwargs):
         '''Recursive method to check if the light name

@@ -7,6 +7,7 @@ Created on July 4, 2019
 import maya.cmds as mc
 import mtoa.utils as mutils
 from cgxLightingTools.scripts.toolbox.lightsFactory.default_factory import LightsFactory
+from cgxLightingTools.scripts.toolbox.lightsFactory import post_functions
 import cgxLightingTools.scripts.toolbox.tools as tools
 
 
@@ -15,7 +16,7 @@ class ArnoldFactory(LightsFactory):
         super(ArnoldFactory, self).__init__()
         self.lightNodeTypes = tools.getRendererLightNodes('mtoa')
         
-    def createLight(self, lightNodeType, lightName):
+    def createLight(self, lightNodeType, lightName, *args, **kwargs):
         if lightNodeType in self.lightNodeTypes and lightNodeType == 'aiMeshLight':
             shapeNode = self._createMeshLight(lightName)
         elif lightNodeType in self.lightNodeTypes and lightNodeType == 'aiSky':
@@ -30,7 +31,7 @@ class ArnoldFactory(LightsFactory):
             return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
-            self.postLightCreation(shapeNode)
+            post_functions.postLightCreation(shapeNode, *args, **kwargs)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
             return transformNode, shapeNode
         else: 
