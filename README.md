@@ -1,5 +1,6 @@
 # LightingTools
-Collection of tools for lighting artists in Maya
+Collection of tools for lighting artists in Maya (WIP)
+Tested so far with Maya 2018.6- mtoa 3.2.0.2
 
 # Installation:
 1. Copy and paste the contents of the downloaded files to your favorite scripts folder.
