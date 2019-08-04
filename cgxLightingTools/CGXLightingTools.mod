@@ -1,4 +1,4 @@
-+ CGXLightingTools any M:/CGXLightingTools/cgxLightingTools
++ CGXLightingTools any ./
 [r] scripts: scripts
 icons: icons
 PYTHONPATH +:= ../
