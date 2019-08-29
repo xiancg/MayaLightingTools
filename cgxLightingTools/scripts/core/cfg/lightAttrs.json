@@ -62,7 +62,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -108,7 +109,8 @@
 				"VRayLightIESShape", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -147,7 +149,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}
@@ -177,7 +180,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -194,7 +198,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -211,7 +216,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "False"
 		}, 
@@ -228,7 +234,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -268,7 +275,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -285,7 +293,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -302,7 +311,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -336,7 +346,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -353,7 +364,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -373,7 +385,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "False"
 		}, 
@@ -390,7 +403,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		},
@@ -463,7 +477,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}, 
@@ -483,7 +498,8 @@
 				"spotLight", 
 				"aiAreaLight", 
 				"aiSkyDomeLight", 
-				"aiPhotometricLight"
+				"aiPhotometricLight",
+				"aiMeshLight"
 			], 
 			"display": "True"
 		}
