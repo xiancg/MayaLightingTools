@@ -6,6 +6,7 @@ Created on July 4, 2019
 '''
 import maya.cmds as mc
 import mtoa.utils as mutils
+import mtoa.core as mcore
 from cgxLightingTools.scripts.toolbox.lightsFactory.default_factory import LightsFactory
 from cgxLightingTools.scripts.toolbox.lightsFactory import post_functions
 import cgxLightingTools.scripts.toolbox.tools as tools
@@ -15,6 +16,8 @@ class ArnoldFactory(LightsFactory):
     def __init__(self):
         super(ArnoldFactory, self).__init__()
         self.lightNodeTypes = tools.getRendererLightNodes('mtoa')
+        # Creates default mtoa nodes if they don't exist already
+        mcore.createOptions()
         
     def createLight(self, lightNodeType, lightName, *args, **kwargs):
         if lightNodeType in self.lightNodeTypes and lightNodeType == 'aiMeshLight':
