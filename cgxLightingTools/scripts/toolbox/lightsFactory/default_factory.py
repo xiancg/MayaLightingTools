@@ -5,7 +5,6 @@ Created on July 3, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Implement attributes on default and arnold. This will require 
 a lot of work to do it automatically, use config file preset for now.
-TODO: Remove post methods from here and move them to a separate library
 '''
 import os
 import json
