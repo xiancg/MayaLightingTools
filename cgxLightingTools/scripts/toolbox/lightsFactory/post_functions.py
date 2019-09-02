@@ -39,7 +39,15 @@ def postLightDuplicate(shapeNode, *args, **kwargs):
 
 def postLightRename(shapeNode, *args, **kwargs):
     '''Place here all custom stuff you want to do with the renamed light node'''
-    pass
+    transform = mc.listRelatives(shapeNode, parent=True)[0]
+    oldLightGroup = mc.getAttr(shapeNode + '.aiAov')
+    oldAOV = 'aiAOV_RGBA_' + oldLightGroup
+    print oldAOV, mc.objExists(oldAOV)
+    mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
+    if mc.objExists(oldAOV):
+        aovNode = mc.rename(oldAOV, 'RGBA_LG_' + transform)
+        mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transform, type="string")
+    mc.select(shapeNode, replace=True)
 
 def postLightDelete(shapeNode, *args, **kwargs):
     '''Place here all custom stuff you want to do with the deleted light node'''
