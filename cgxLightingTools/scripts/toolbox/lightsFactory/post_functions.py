@@ -8,11 +8,9 @@ NOTE: DO NOT delete any function, even if you're not using it
 
 from __future__ import absolute_import
 
-#PLACE YOUR IMPORTS HERE
+#PLACE YOUR IMPORTS AFTER THIS LINE
 import maya.cmds as mc
-from mtoa.core import createOptions
 import mtoa.aovs as aovs
-
 
 def postLightCreation(shapeNode, *args, **kwargs):
     '''Place here all custom stuff you want to do with the created light node'''
@@ -42,7 +40,6 @@ def postLightRename(shapeNode, *args, **kwargs):
     transform = mc.listRelatives(shapeNode, parent=True)[0]
     oldLightGroup = mc.getAttr(shapeNode + '.aiAov')
     oldAOV = 'aiAOV_RGBA_' + oldLightGroup
-    print oldAOV, mc.objExists(oldAOV)
     mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
     if mc.objExists(oldAOV):
         aovNode = mc.rename(oldAOV, 'RGBA_LG_' + transform)
