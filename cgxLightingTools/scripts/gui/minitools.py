@@ -6,6 +6,7 @@ Created on July 10, 2019
 TODO: Add getActiveRenderer to tools mc.getAttr('defaultRenderGlobals.ren')
 TODO: For post_functions, create factories with a post_functions object passed depending
 on which render engine was found active
+TODO: Implement basic metric to get usage statistics
 TODO: Add delete options with post methods
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
