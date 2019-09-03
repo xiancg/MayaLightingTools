@@ -65,6 +65,14 @@ def getRenderEngines():
     return renderEngines
 
 
+def getCurrentRenderPlugin():
+    currentRenderer = mc.getAttr('defaultRenderGlobals.currentRenderer')
+    for plugin, renderers in getRenderEngines().iteritems():
+        for each in renderers:
+            if currentRenderer.lower() == str(each).lower():
+                return plugin
+
+
 def getLightNodes():
     lightNodes = mc.listNodeTypes('drawdb/light')
     lightNodesDict.clear()
@@ -174,6 +182,7 @@ def lightsAttrsSnapshot():
         snapshot[light] = finalAttrsDict
     return snapshot
 
+
 def loadLightsAttrsSnapshot(snapshot):
     try:
         for light, finalAttrsDict in snapshot.iteritems():
@@ -195,6 +204,7 @@ def loadLightsAttrsSnapshot(snapshot):
         return False
     return True
 
+
 def setDefaultAttrs(lightNode):
     '''TODO: Old implementation. Need to change to programatic listing of attrs and attr types'''
     for key in getLightNodes().keys():
@@ -210,6 +220,7 @@ def setDefaultAttrs(lightNode):
                     elif attrDict["uiControl"] == "colorswatch":
                         mc.setAttr(lightNode + "." + attrName, 1, 1, 1, type= "double3")
                     
+
 def cleanUpCams ():
     allLightsScene = getLightsInScene()
     #Selected scene lights
