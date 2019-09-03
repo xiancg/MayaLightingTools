@@ -26,6 +26,7 @@ class LightsFactory(object):
         with open(lightAttrsPath) as fp:
             config = json.load(fp)
         self._lightAttrs = config
+        self.post_fn = self._initPostFunctions()
     
     def createLight(self, lightNodeType, lightName, *args, **kwargs):
         if lightNodeType == 'spotLight':
@@ -52,7 +53,7 @@ class LightsFactory(object):
             return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
-            post_functions.postLightCreation(shapeNode, *args, **kwargs)
+            self.post_fn.postLightCreation(shapeNode, *args, **kwargs)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
             return transformNode, shapeNode
         else: 
@@ -89,7 +90,7 @@ class LightsFactory(object):
             tools.logger.info('Only lights accepted. {} is {}'.format(lightNode, mc.nodeType(lightNode)))
             return None
         
-        post_functions.postLightDuplicate(shapeNode, *args, **kwargs)
+        self.post_fn.postLightDuplicate(shapeNode, *args, **kwargs)
 
         return transformNode, shapeNode
     
@@ -105,7 +106,7 @@ class LightsFactory(object):
         result = mc.rename(objTransform, finalLightName)
         shapeNode = mc.listRelatives(result, shapes=True, noIntermediate=True, fullPath=True)[0]
 
-        post_functions.postLightRename(shapeNode, *args, **kwargs)
+        self.post_fn.postLightRename(shapeNode, *args, **kwargs)
         
         return result
     
@@ -143,6 +144,12 @@ class LightsFactory(object):
 
             lightName = self.buildName(*args, **kwargs)
             return lightName
+    
+    def _initPostFunctions(self):
+        currentRenderer = tools.getCurrentRenderPlugin()
+        # factoryPath = os.path.dirname(lightsFactory.__file__)
+        # postFunc = [name for _, name, _ in pkgutil.iter_modules([factoryPath]) if name.endswith('factory')]
+        return post_functions.PostFunctions_mtoa()
 
 # --------------------------------------------------------
 #  Main

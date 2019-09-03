@@ -34,7 +34,7 @@ class ArnoldFactory(LightsFactory):
             return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
-            post_functions.postLightCreation(shapeNode, *args, **kwargs)
+            self.post_fn.postLightCreation(shapeNode, *args, **kwargs)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
             return transformNode, shapeNode
         else: 

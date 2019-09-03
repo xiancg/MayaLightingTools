@@ -594,7 +594,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if renderers is not None:
             rendererNames = renderers.keys()
             factoryPath = os.path.dirname(lightsFactory.__file__)
-            factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath])]
+            factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath]) if name.endswith('factory')]
             for factory in factories:
                 if factory.rsplit('_')[0] in rendererNames:
                     for name, obj in inspect.getmembers(eval('lightsFactory.{}'.format(factory))):
