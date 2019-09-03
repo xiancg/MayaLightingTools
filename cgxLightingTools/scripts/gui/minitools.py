@@ -3,6 +3,9 @@ Created on July 10, 2019
 
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Add getActiveRenderer to tools mc.getAttr('defaultRenderGlobals.ren')
+TODO: For post_functions, create factories with a post_functions object passed depending
+on which render engine was found active
 TODO: Add delete options with post methods
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
@@ -586,8 +589,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
 
     def _initFactories(self):
         defaultFactory = lightsFactory.default_factory.LightsFactory()
-        result = dict()
-        result['default'] = defaultFactory
+        result = {'default':defaultFactory}
         renderers = tools.getRenderEngines()
         if renderers is not None:
             rendererNames = renderers.keys()
