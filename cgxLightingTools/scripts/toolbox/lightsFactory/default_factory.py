@@ -8,10 +8,12 @@ a lot of work to do it automatically, use config file preset for now.
 '''
 import os
 import json
+import pkgutil
+import inspect
 import maya.cmds as mc
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.core.namingConventions as naming
-from cgxLightingTools.scripts.toolbox.lightsFactory import post_functions
+import cgxLightingTools.scripts.toolbox.lightsFactory.post_functions as post_functions
 
 
 class LightsFactory(object):
@@ -147,9 +149,21 @@ class LightsFactory(object):
     
     def _initPostFunctions(self):
         currentRenderer = tools.getCurrentRenderPlugin()
-        # factoryPath = os.path.dirname(lightsFactory.__file__)
-        # postFunc = [name for _, name, _ in pkgutil.iter_modules([factoryPath]) if name.endswith('factory')]
-        return post_functions.PostFunctions_mtoa()
+        renderers = tools.getRenderEngines()
+        if renderers is not None:
+            rendererNames = renderers.keys()
+            postFuncPath = os.path.dirname(post_functions.__file__)
+            print postFuncPath
+            postFuncs = [name for _, name, _ in pkgutil.iter_modules([postFuncPath]) if name.endswith('post_functions')]
+            print postFuncs
+            for postFunc in postFuncs:
+                if postFunc.rsplit('_')[0] in rendererNames and postFunc.rsplit('_')[0] == currentRenderer:
+                    print inspect.getmembers(eval('post_functions.{}'.format(postFunc)))
+                    for name, obj in inspect.getmembers(eval('post_functions.{}'.format(postFunc))):
+                        if inspect.isclass(obj) and name.startswith('PostFunctions'):
+                            print 'post_functions.{}.{}()'.format(postFunc, name)
+                            postFuncObj = eval('post_functions.{}.{}()'.format(postFunc, name))
+                            return postFuncObj
 
 # --------------------------------------------------------
 #  Main
