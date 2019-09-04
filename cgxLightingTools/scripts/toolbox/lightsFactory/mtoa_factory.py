@@ -8,7 +8,6 @@ import maya.cmds as mc
 import mtoa.utils as mutils
 import mtoa.core as mcore
 from cgxLightingTools.scripts.toolbox.lightsFactory.default_factory import LightsFactory
-from cgxLightingTools.scripts.toolbox.lightsFactory import post_functions
 import cgxLightingTools.scripts.toolbox.tools as tools
 
 

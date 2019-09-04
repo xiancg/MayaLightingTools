@@ -13,7 +13,7 @@ import inspect
 import maya.cmds as mc
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.core.namingConventions as naming
-import cgxLightingTools.scripts.toolbox.lightsFactory.post_functions as post_functions
+import cgxLightingTools.scripts.toolbox.post_functions as post_functions
 
 
 class LightsFactory(object):
@@ -164,6 +164,9 @@ class LightsFactory(object):
                             print 'post_functions.{}.{}()'.format(postFunc, name)
                             postFuncObj = eval('post_functions.{}.{}()'.format(postFunc, name))
                             return postFuncObj
+            # Returns default post functions if no match for current renderer found
+            postFuncObj = post_functions.default_post_functions.PostFunctions_default()
+            return postFuncObj
 
 # --------------------------------------------------------
 #  Main

@@ -6,9 +6,8 @@ from __future__ import absolute_import
 
 import maya.cmds as mc
 import mtoa.aovs as aovs
-from cgxLightingTools.scripts.toolbox.lightsFactory.post_functions.default_post_functions import PostFunctions_default
 
-class PostFunctions_mtoa(PostFunctions_default):
+class PostFunctions_mtoa(object):
     def __init__(self):
         super(PostFunctions_mtoa, self).__init__()
 
@@ -45,3 +44,7 @@ class PostFunctions_mtoa(PostFunctions_default):
             aovNode = mc.rename(oldAOV, 'RGBA_LG_' + transform)
             mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transform, type="string")
         mc.select(shapeNode, replace=True)
+
+    def postLightDelete(self, shapeNode, *args, **kwargs):
+        '''Place here all custom stuff you want to do with the deleted light node'''
+        pass
