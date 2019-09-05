@@ -4,6 +4,7 @@
 TODO: Implement basic metric to get usage statistics
 TODO: Add delete options with post methods
 TODO: Add separators to naming library
+TODO: Options to create lights aligned with selection with some default offset
 TODO: Create GUI for naming library
 TODO: Implement new stylesheet
 TODO: Move rename, duplicate and delete closer to the creation buttons and set icons
