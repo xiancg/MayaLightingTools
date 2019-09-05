@@ -22,11 +22,10 @@ _lightAttrsPath = os.path.join(_cfgPath, 'lightAttrs.json')
 with open(_lightAttrsPath) as fp:
     config = json.load(fp)
 lightAttrs = config
+logger = logging.getLogger(name='lgtToolsLog')
 
 
 def initLogger(fileLog=False):
-    global logger
-    logger = logging.getLogger(name='lgtToolsLog')
     logger.setLevel(logging.DEBUG)
     #Formatter
     formatter = logging.Formatter(

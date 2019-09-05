@@ -1,9 +1,6 @@
 '''
-Created on July 10, 2019
-
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Make non default post funcs inherit from default
 TODO: Implement basic metric to get usage statistics
 TODO: Add delete options with post methods
 TODO: Add separators to naming library
