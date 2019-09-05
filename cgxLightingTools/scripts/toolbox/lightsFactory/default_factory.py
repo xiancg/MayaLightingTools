@@ -153,15 +153,11 @@ class LightsFactory(object):
         if renderers is not None:
             rendererNames = renderers.keys()
             postFuncPath = os.path.dirname(post_functions.__file__)
-            print postFuncPath
             postFuncs = [name for _, name, _ in pkgutil.iter_modules([postFuncPath]) if name.endswith('post_functions')]
-            print postFuncs
             for postFunc in postFuncs:
                 if postFunc.rsplit('_')[0] in rendererNames and postFunc.rsplit('_')[0] == currentRenderer:
-                    print inspect.getmembers(eval('post_functions.{}'.format(postFunc)))
                     for name, obj in inspect.getmembers(eval('post_functions.{}'.format(postFunc))):
-                        if inspect.isclass(obj) and name.startswith('PostFunctions'):
-                            print 'post_functions.{}.{}()'.format(postFunc, name)
+                        if inspect.isclass(obj) and name == ('PostFunctions_{}'.format(currentRenderer)):
                             postFuncObj = eval('post_functions.{}.{}()'.format(postFunc, name))
                             return postFuncObj
             # Returns default post functions if no match for current renderer found
