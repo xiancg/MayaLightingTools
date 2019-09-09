@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import os 
 import json
 
-_stats = loadStats()
+_stats = dict()
 
 def collect(tool):
     if tool in _stats.keys():
@@ -16,13 +16,13 @@ def collect(tool):
     else:
         _stats[tool] = 1
 
-def saveStats():
+def save():
     repo = os.path.join(os.path.expanduser("~"), ".CGXTools")
     filepath = os.path.join(repo, "lightingTools.stats")
     with open(filepath, "w") as fp:
         json.dump(_stats, fp, indent = 4)
 
-def loadStats():
+def load():
     repo = os.path.join(os.path.expanduser("~"), ".CGXTools")
     filepath = os.path.join(repo, "lightingTools.stats")
     if os.path.exists(filepath):

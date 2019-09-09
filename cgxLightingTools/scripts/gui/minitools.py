@@ -1,7 +1,8 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Implement basic metric to get usage statistics
+TODO: Make sure stats collection only happens if the option is active (read config)
+TODO: Add Debug mode to config options
 TODO: Add delete options with post methods
 TODO: Add separators to naming library
 TODO: Options to create lights aligned with selection with some default offset
@@ -25,6 +26,8 @@ from PySide2 import QtWidgets, QtCore, QtGui
 import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
+from cgxLightingTools.scripts.core import stats
+from cgxLightingTools.scripts.gui.minitools_button import MiniTools_BTN
 from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
 from cgxLightingTools.scripts.gui.lightCreator import LightRenamer_GUI
 from cgxLightingTools.scripts.gui.lightDuplicator import LightDuplicator_GUI
@@ -42,6 +45,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.factories = self._initFactories()
         self._setupUi()
         self._setConnections()
+        self._loadStatsPrefs()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
     
     def _setupUi(self):
@@ -195,13 +199,13 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         # TOOLS
         self.simpleIsolate_BTN = MiniTools_BTN(self.centralwidget)
-        self.lookThru_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.aimLight_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.lookThru_BTN = MiniTools_BTN(self.centralwidget)
+        self.aimLight_BTN = MiniTools_BTN(self.centralwidget)
         self.specularConstrain_BTN = MiniTools_BTN(self.centralwidget)
-        self.cleanUpCams_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.lightsManager_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.alignLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.transformBake_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.cleanUpCams_BTN = MiniTools_BTN(self.centralwidget)
+        self.lightsManager_BTN = MiniTools_BTN(self.centralwidget)
+        self.alignLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.transformBake_BTN = MiniTools_BTN(self.centralwidget)
         self.duplicateLight_BTN = MiniTools_BTN(self.centralwidget)
         self.renameLight_BTN = MiniTools_BTN(self.centralwidget)
         self.simpleIsolate_BTN.setSizePolicy(sizePolicy)
@@ -302,12 +306,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot06_BTN.setText("6")
 
         # DEFAULT LIGHTS
-        self.spotLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.pointLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.areaLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.directionalLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.ambientLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.volumeLight_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.spotLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.pointLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.areaLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.directionalLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.ambientLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.volumeLight_BTN = MiniTools_BTN(self.centralwidget)
         self.spotLight_BTN.setSizePolicy(sizePolicy)
         self.spotLight_BTN.setMinimumSize(lightsBtnSize)
         self.spotLight_BTN.setMaximumSize(lightsBtnSize)
@@ -340,12 +344,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.volumeLight_BTN.setToolTip('Volume light')
 
         # MTOA LIGHTS
-        self.aiAreaLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.aiSkyDomeLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.aiMeshLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.aiPhotometricLight_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.aiLightPortal_BTN = QtWidgets.QPushButton(self.centralwidget)
-        self.aiPhysicalSky_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.aiAreaLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.aiSkyDomeLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.aiMeshLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.aiPhotometricLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.aiLightPortal_BTN = MiniTools_BTN(self.centralwidget)
+        self.aiPhysicalSky_BTN = MiniTools_BTN(self.centralwidget)
         self.aiAreaLight_BTN.setSizePolicy(sizePolicy)
         self.aiAreaLight_BTN.setMinimumSize(lightsBtnSize)
         self.aiAreaLight_BTN.setMaximumSize(lightsBtnSize)
@@ -378,7 +382,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.aiPhysicalSky_BTN.setToolTip('aiPhysicalSky')
 
         #CONFIG
-        self.config_BTN = QtWidgets.QPushButton(self.centralwidget)
+        self.config_BTN = MiniTools_BTN(self.centralwidget)
         self.config_BTN.setSizePolicy(sizePolicy)
         self.config_BTN.setMaximumSize(configBtnSize)
         self.config_BTN.setMinimumSize(configBtnSize)
@@ -584,6 +588,42 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                     'lookThru_winWidth': 629, 'lookThru_winHeight':404}
             return config
 
+    def _saveStatsPrefs(self, statsBool):
+        userPath = os.path.expanduser("~")
+        finalDir = os.path.join(userPath, ".CGXTools")
+        try:
+            if not os.path.exists(finalDir):
+                os.mkdir(finalDir)
+        except:
+            pass
+        filepath = os.path.join(finalDir, "MiniTools.pref")
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+                config['stats'] = statsBool
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+        else:
+            config = {'stats':statsBool}
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+
+    def _loadStatsPrefs(self):
+        userPath = os.path.expanduser("~")
+        finalDir = os.path.join(userPath, ".CGXTools")
+        filepath = os.path.join(finalDir, "MiniTools.pref")
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+        if config.get('stats'):
+            stats.load()
+            return config.get('stats')
+        else:
+            self._saveStatsPrefs(False)
+            return False
+
     def _initFactories(self):
         defaultFactory = lightsFactory.default_factory.LightsFactory()
         result = {'default':defaultFactory}
@@ -667,6 +707,10 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         dialog.exec_()
         if dialog == 1:
             tools.resetGlobals()
+    
+    def closeEvent(self, event):
+        stats.save()
+        QtWidgets.QMainWindow.closeEvent(self, event)
 
     # --------------------------------------------------------
 	# Method for right-click menus
@@ -676,6 +720,15 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         menu = QtWidgets.QMenu(self.config_BTN)
         prefOrientationQ = menu.addAction("Toggle tools orientation")
         prefLookThruQ = menu.addAction("Look thru preferences")
+        menu.addSeparator()
+        usageStatsQ = menu.addAction("Help collecting usage statistics")
+        usageStatsQ.setCheckable(True)
+        usageStatsQ.setObjectName("config_stats")
+        if self._loadStatsPrefs():
+            usageStatsQ.setChecked(True)
+        debugModeQ = menu.addAction("Debug Mode")
+        debugModeQ.setCheckable(True)
+        debugModeQ.setObjectName("config_debugMode")
         self.config_BTN.setMenu(menu)
         if self._prefOrientation == 'horizontal':
             self._prefOrientation = 'vertical'
@@ -683,6 +736,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             self._prefOrientation = 'horizontal'
         prefOrientationQ.triggered.connect(partial(self._savePrefOrientation, self._prefOrientation))
         prefLookThruQ.triggered.connect(self._lookThruDefaults)
+        usageStatsQ.triggered[bool].connect(self._saveStatsPrefs)
         self.config_BTN.showMenu()
 
     def specConstrainOptions (self, pos):
@@ -749,28 +803,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             for btn in self.visSnapBtns:
                 self._clearAttrsSnapshotOpt(btn)
 
-
-# --------------------------------------------------------
-# Button reimplementation to allow right click
-# --------------------------------------------------------
-class MiniTools_BTN(QtWidgets.QPushButton):
-    # --------------------------------------------------------
-    # Signals
-    # --------------------------------------------------------
-    rightClick = QtCore.Signal(QtCore.QPoint, super)
-    def __init__(self, parent=None):
-        super(MiniTools_BTN, self).__init__(parent)
-        self.snap = dict()
-        self.hasSnap = False
-        self.parent = parent
-        
-    def mousePressEvent(self, event):
-        if event.type() == QtCore.QEvent.MouseButtonPress:
-            if event.button() == QtCore.Qt.RightButton:
-                cursor = QtGui.QCursor()
-                self.rightClick.emit(self.mapFromGlobal(cursor.pos()), self)
-            else:
-                super(MiniTools_BTN, self).mousePressEvent(event)
 
 
 # --------------------------------------------------------
