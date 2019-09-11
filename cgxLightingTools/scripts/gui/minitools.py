@@ -41,7 +41,7 @@ from cgxLightingTools.scripts.gui import minitools_icons
 class MiniTools_GUI(QtWidgets.QMainWindow):
     def __init__(self, parent=mWin.getMayaWindow()):
         super(MiniTools_GUI, self).__init__(parent)
-        self._prefOrientation = self._loadPrefOrientation()
+        self._prefOrientation = self._loadOrientationPref()
         self.factories = self._initFactories()
         self._setupUi()
         self._setConnections()
@@ -389,7 +389,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.config_BTN.setObjectName("config_BTN")
         self.config_BTN.setToolTip('Config Options')
         
-        #Enable this when lights manager gets reworked
+        # * Enable this when lights manager gets reworked
         self.lightsManager_BTN.setEnabled(False)
         
     def _loadHorizontal(self):
@@ -505,7 +505,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot06_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.visSnapshot06_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
 
-    def _savePrefOrientation(self, prefOrientation):
+    def _saveOrientationPref(self, prefOrientation):
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
         try:
@@ -529,7 +529,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         load()
         self.close()
     
-    def _loadPrefOrientation(self):
+    def _loadOrientationPref(self):
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
         filepath = os.path.join(finalDir, "MiniTools.pref")
@@ -709,7 +709,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools.resetGlobals()
     
     def closeEvent(self, event):
-        stats.save()
+        if self._loadStatsPrefs():
+            stats.save()
         QtWidgets.QMainWindow.closeEvent(self, event)
 
     # --------------------------------------------------------
@@ -734,7 +735,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             self._prefOrientation = 'vertical'
         else:
             self._prefOrientation = 'horizontal'
-        prefOrientationQ.triggered.connect(partial(self._savePrefOrientation, self._prefOrientation))
+        prefOrientationQ.triggered.connect(partial(self._saveOrientationPref, self._prefOrientation))
         prefLookThruQ.triggered.connect(self._lookThruDefaults)
         usageStatsQ.triggered[bool].connect(self._saveStatsPrefs)
         self.config_BTN.showMenu()
