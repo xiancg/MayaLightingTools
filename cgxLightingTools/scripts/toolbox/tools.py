@@ -162,11 +162,12 @@ def lightsVisibilitySnapshot():
 
 def lightsAttrsSnapshot():
     allLightsScene = getLightsInScene()
+    lightNodes = getLightNodesList()
     snapshot = dict()
     for light in allLightsScene:
         finalAttrsDict = dict()
         shapeNode = mc.listRelatives(light, shapes=True, noIntermediate=True,
-                                    fullPath=True, type='light')[0]
+                                     fullPath=True, type=lightNodes)[0]
         for key in getLightNodes().keys():
             if lightAttrs.get(key):
                 for attrName, attrDict in lightAttrs[key].iteritems():
@@ -363,11 +364,12 @@ getRenderEngines()
 getLightNodes()
 
 
+
 # --------------------------------------------------------
 #  Main
 # --------------------------------------------------------
 def main():
-    pass
+    print getLightsInScene()
 
 
 if __name__ == '__main__' or 'eclipsePython' in __name__:

@@ -1,6 +1,7 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Snapshots functions not working properly
 TODO: Make sure stats collection only happens if the option is active (read config)
 TODO: Add Debug mode to config options
 TODO: Add delete options with post methods
@@ -27,7 +28,7 @@ import maya.cmds as mc
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 from cgxLightingTools.scripts.toolbox import tools
 from cgxLightingTools.scripts.core import stats
-from cgxLightingTools.scripts.gui.minitools_button import MiniTools_BTN
+from cgxLightingTools.scripts.gui import minitools_buttons as btns
 from cgxLightingTools.scripts.gui.lightCreator import LightCreator_GUI
 from cgxLightingTools.scripts.gui.lightCreator import LightRenamer_GUI
 from cgxLightingTools.scripts.gui.lightDuplicator import LightDuplicator_GUI
@@ -198,16 +199,16 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         # TOOLS
-        self.simpleIsolate_BTN = MiniTools_BTN(self.centralwidget)
-        self.lookThru_BTN = MiniTools_BTN(self.centralwidget)
-        self.aimLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.specularConstrain_BTN = MiniTools_BTN(self.centralwidget)
-        self.cleanUpCams_BTN = MiniTools_BTN(self.centralwidget)
-        self.lightsManager_BTN = MiniTools_BTN(self.centralwidget)
-        self.alignLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.transformBake_BTN = MiniTools_BTN(self.centralwidget)
-        self.duplicateLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.renameLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.simpleIsolate_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.lookThru_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.aimLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.specularConstrain_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.cleanUpCams_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.lightsManager_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.alignLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.transformBake_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.duplicateLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.renameLight_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.simpleIsolate_BTN.setSizePolicy(sizePolicy)
         self.simpleIsolate_BTN.setMinimumSize(toolsBtnSize)
         self.simpleIsolate_BTN.setMaximumSize(toolsBtnSize)
@@ -264,16 +265,15 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.renameLight_BTN.setStyleSheet("font-size: 10px;")
 
         # LIGHT VIS SNAPSHOTS
-        self.visSnapshot01_BTN = MiniTools_BTN(self.centralwidget)
-        self.visSnapshot02_BTN = MiniTools_BTN(self.centralwidget)
-        self.visSnapshot03_BTN = MiniTools_BTN(self.centralwidget)
-        self.visSnapshot04_BTN = MiniTools_BTN(self.centralwidget)
-        self.visSnapshot05_BTN = MiniTools_BTN(self.centralwidget)
-        self.visSnapshot06_BTN = MiniTools_BTN(self.centralwidget)
-        self.visSnapBtns = [self.visSnapshot01_BTN, self.visSnapshot02_BTN, self.visSnapshot03_BTN,
-                            self.visSnapshot04_BTN, self.visSnapshot05_BTN, self.visSnapshot06_BTN]
-        for btn in self.visSnapBtns:
-            btn.setStyleSheet("background-color: grey")
+        self.visSnapshot01_BTN = btns.VisSnapshot_BTN(self.centralwidget)
+        self.visSnapshot02_BTN = btns.VisSnapshot_BTN(self.centralwidget)
+        self.visSnapshot03_BTN = btns.VisSnapshot_BTN(self.centralwidget)
+        self.visSnapshot04_BTN = btns.VisSnapshot_BTN(self.centralwidget)
+        self.visSnapshot05_BTN = btns.VisSnapshot_BTN(self.centralwidget)
+        self.visSnapshot06_BTN = btns.VisSnapshot_BTN(self.centralwidget)
+        self.visSnapBtns = [self.visSnapshot01_BTN, self.visSnapshot02_BTN, 
+                            self.visSnapshot03_BTN, self.visSnapshot04_BTN,
+                            self.visSnapshot05_BTN, self.visSnapshot06_BTN]
         self.visSnapshot01_BTN.setObjectName("visSnapshot01_BTN")
         self.visSnapshot01_BTN.setSizePolicy(sizePolicy)
         self.visSnapshot01_BTN.setMinimumSize(visBtnSize)
@@ -306,12 +306,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot06_BTN.setText("6")
 
         # DEFAULT LIGHTS
-        self.spotLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.pointLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.areaLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.directionalLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.ambientLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.volumeLight_BTN = MiniTools_BTN(self.centralwidget)
+        self.spotLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.pointLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.areaLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.directionalLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.ambientLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.volumeLight_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.spotLight_BTN.setSizePolicy(sizePolicy)
         self.spotLight_BTN.setMinimumSize(lightsBtnSize)
         self.spotLight_BTN.setMaximumSize(lightsBtnSize)
@@ -344,12 +344,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.volumeLight_BTN.setToolTip('Volume light')
 
         # MTOA LIGHTS
-        self.aiAreaLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.aiSkyDomeLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.aiMeshLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.aiPhotometricLight_BTN = MiniTools_BTN(self.centralwidget)
-        self.aiLightPortal_BTN = MiniTools_BTN(self.centralwidget)
-        self.aiPhysicalSky_BTN = MiniTools_BTN(self.centralwidget)
+        self.aiAreaLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.aiSkyDomeLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.aiMeshLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.aiPhotometricLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.aiLightPortal_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.aiPhysicalSky_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.aiAreaLight_BTN.setSizePolicy(sizePolicy)
         self.aiAreaLight_BTN.setMinimumSize(lightsBtnSize)
         self.aiAreaLight_BTN.setMaximumSize(lightsBtnSize)
@@ -382,7 +382,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.aiPhysicalSky_BTN.setToolTip('aiPhysicalSky')
 
         #CONFIG
-        self.config_BTN = MiniTools_BTN(self.centralwidget)
+        self.config_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.config_BTN.setSizePolicy(sizePolicy)
         self.config_BTN.setMaximumSize(configBtnSize)
         self.config_BTN.setMinimumSize(configBtnSize)
@@ -774,33 +774,30 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         clearAllSnapshotQ = menu.addAction("Clear all snapshots")
         menu.popup(btn.mapToGlobal(pos))
 
-        clearSnapshotQ.triggered.connect(partial(self._lightAttrsSnapshotOpt, btn))
+        clearSnapshotQ.triggered.connect(partial(self._clearAttrsSnapshotOpt, btn))
         clearAllSnapshotQ.triggered.connect(self._clearAllSnapshotsOpt)
     
     def _lightAttrsSnapshotOpt(self, btn):
-        if not btn.hasSnap:
+        if not btn.has_snap:
             btn.snap = tools.lightsAttrsSnapshot()
-            btn.hasSnap = True
-            btn.setStyleSheet("background-color: orange")
+            btn.has_snap = True # ! This is redudant with the dict being empty or not
+            btn.is_active = False
         else:
             tools.loadLightsAttrsSnapshot(btn.snap)
-            btn.setStyleSheet("background-color: green")
+            btn.is_active = True # ! Not updating stylesheet to green
             for each in self.visSnapBtns:
                 if each.objectName() != btn.objectName():
-                    if each.hasSnap:
-                        each.setStyleSheet("background-color: orange")
-                    else:
-                        each.setStyleSheet("background-color: grey")
+                    btn.is_active = False
 
     def _clearAttrsSnapshotOpt(self, btn):
         btn.snap.clear()
-        btn.hasSnap = False
-        btn.setStyleSheet("background-color: grey")
+        btn.has_snap = False
+        btn.is_active = False
     
     def _clearAllSnapshotsOpt(self):
         msgBox = QtWidgets.QMessageBox()
         result = msgBox.question(self, "Warning!", "Are you sure you want to clear all attribute snapshots?")
-        if result:
+        if result == msgBox.StandardButton.Yes:
             for btn in self.visSnapBtns:
                 self._clearAttrsSnapshotOpt(btn)
 
