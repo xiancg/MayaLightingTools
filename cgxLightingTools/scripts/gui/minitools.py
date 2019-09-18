@@ -786,7 +786,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             btn.is_active = True
             for each in self.visSnapBtns:
                 # ! Activation logic not working
-                print each.objectName(), "Snap:", bool(each.snap), "Active: ", each.is_active
+                # ! print each.objectName(), "Snap:", bool(each.snap), "Active: ", each.is_active
                 if each is not btn:
                     each.is_active = False
 
