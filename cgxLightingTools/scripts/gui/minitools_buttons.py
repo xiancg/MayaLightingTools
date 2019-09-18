@@ -33,15 +33,14 @@ class MiniTools_BTN(QtWidgets.QPushButton):
 class VisSnapshot_BTN(MiniTools_BTN):
     def __init__(self, parent=None):
         super(VisSnapshot_BTN, self).__init__(parent)
-        self.snap = dict()
-        self._has_snap = False
+        self._snap = dict()
         self._is_active = False
         self.update_status_style()
 
     def update_status_style(self):
-        if self.has_snap and self.is_active:
+        if self.snap and self.is_active:
             self.setStyleSheet("background-color: green")
-        elif self.has_snap and not self.is_active:
+        elif self.snap and not self.is_active:
             self.setStyleSheet("background-color: orange")
         else:
             self.setStyleSheet("background-color: grey")
@@ -56,14 +55,13 @@ class VisSnapshot_BTN(MiniTools_BTN):
         self.update_status_style()
 
     @property
-    def has_snap(self):
-        return self._has_snap
+    def snap(self):
+        return self._snap
 
-    @has_snap.setter
-    def has_snap(self, snap_bool):
-        self._has_snap = snap_bool
+    @snap.setter
+    def snap(self, d):
+        self._snap = d
         self.update_status_style()
-
 
 # --------------------------------------------------------
 #  Main

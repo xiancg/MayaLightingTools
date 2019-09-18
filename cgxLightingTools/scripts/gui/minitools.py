@@ -778,20 +778,20 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         clearAllSnapshotQ.triggered.connect(self._clearAllSnapshotsOpt)
     
     def _lightAttrsSnapshotOpt(self, btn):
-        if not btn.has_snap:
+        if not btn.snap:
             btn.snap = tools.lightsAttrsSnapshot()
-            btn.has_snap = True # ! This is redudant with the dict being empty or not
             btn.is_active = False
         else:
             tools.loadLightsAttrsSnapshot(btn.snap)
-            btn.is_active = True # ! Not updating stylesheet to green
+            btn.is_active = True
             for each in self.visSnapBtns:
-                if each.objectName() != btn.objectName():
-                    btn.is_active = False
+                # ! Activation logic not working
+                print each.objectName(), "Snap:", bool(each.snap), "Active: ", each.is_active
+                if each is not btn:
+                    each.is_active = False
 
     def _clearAttrsSnapshotOpt(self, btn):
         btn.snap.clear()
-        btn.has_snap = False
         btn.is_active = False
     
     def _clearAllSnapshotsOpt(self):
