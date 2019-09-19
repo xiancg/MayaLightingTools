@@ -1,7 +1,6 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Look thru preferences not used in tools library
 TODO: Add Debug mode to config options
 TODO: Add delete options with post methods
 TODO: Add separators to naming library
@@ -417,7 +416,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     
     def _setConnections(self):
         # BUTTONS
-        self.lookThru_BTN.clicked.connect(tools.lookThruLight)
+        self.lookThru_BTN.clicked.connect(self._lookThruLight)
         self.cleanUpCams_BTN.clicked.connect(tools.cleanUpCams)
         self.alignLight_BTN.clicked.connect(tools.alignLightToObject)
         self.aimLight_BTN.clicked.connect(tools.aimLightToObject)
@@ -577,7 +576,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                 json.dump(config, fp, indent = 4)
         else:
             config = {'lookThru_nearClip':nearClip,'lookThru_farClip':farClip,
-                    'lookThru_winWidth':winWidth,'lookThru_winHeight':winHeight}
+                      'lookThru_winWidth':winWidth,'lookThru_winHeight':winHeight}
             with open(filepath, 'w') as fp:
                 json.dump(config, fp, indent = 4)
     
@@ -596,7 +595,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         else:
             self._saveLookThruPrefs(629, 404, 1.0, 1000000)
             config = {'lookThru_nearClip':1.0, 'lookThru_farClip':1000000,
-                    'lookThru_winWidth': 629, 'lookThru_winHeight':404}
+                      'lookThru_winWidth': 629, 'lookThru_winHeight':404}
             return config
 
     def _saveStatsPrefs(self, statsBool):
@@ -685,6 +684,13 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         msgBox.setWindowTitle("Done!")
         msgBox.setText("Done baking transforms.")
         msgBox.exec_()
+    
+    def _lookThruLight(self):
+        config = self._loadLookThruPrefs()
+        tools.lookThruLight(config['lookThru_winWidth'],
+                            config['lookThru_winHeight'],
+                            config['lookThru_nearClip'],
+                            config['lookThru_farClip'])
     
     def _createLight(self, lightNodeType):
         dialog = LightCreator_GUI(lightNodeType, self.factories, self)
