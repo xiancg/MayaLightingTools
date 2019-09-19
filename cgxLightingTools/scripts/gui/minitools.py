@@ -1,8 +1,6 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Snapshots functions not working properly
-TODO: Make sure stats collection only happens if the option is active (read config)
 TODO: Look thru preferences not used in tools library
 TODO: Add Debug mode to config options
 TODO: Add delete options with post methods
@@ -264,6 +262,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.renameLight_BTN.setToolTip('Rename selected light.')
         self.renameLight_BTN.setText('Re\nname')
         self.renameLight_BTN.setStyleSheet("font-size: 10px;")
+        self.toolsBtns = [self.simpleIsolate_BTN, self.lookThru_BTN,
+                         self.aimLight_BTN, self.aimLight_BTN,
+                         self.specularConstrain_BTN, self.cleanUpCams_BTN,
+                         self.lightsManager_BTN, self.alignLight_BTN,
+                         self.transformBake_BTN, self.duplicateLight_BTN,
+                         self.renameLight_BTN]
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = btns.VisSnapshot_BTN(self.centralwidget)
@@ -272,9 +276,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot04_BTN = btns.VisSnapshot_BTN(self.centralwidget)
         self.visSnapshot05_BTN = btns.VisSnapshot_BTN(self.centralwidget)
         self.visSnapshot06_BTN = btns.VisSnapshot_BTN(self.centralwidget)
-        self.visSnapBtns = [self.visSnapshot01_BTN, self.visSnapshot02_BTN, 
-                            self.visSnapshot03_BTN, self.visSnapshot04_BTN,
-                            self.visSnapshot05_BTN, self.visSnapshot06_BTN]
         self.visSnapshot01_BTN.setObjectName("visSnapshot01_BTN")
         self.visSnapshot01_BTN.setSizePolicy(sizePolicy)
         self.visSnapshot01_BTN.setMinimumSize(visBtnSize)
@@ -305,6 +306,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot06_BTN.setMinimumSize(visBtnSize)
         self.visSnapshot06_BTN.setMaximumSize(visBtnSize)
         self.visSnapshot06_BTN.setText("6")
+        self.visSnapBtns = [self.visSnapshot01_BTN, self.visSnapshot02_BTN, 
+                            self.visSnapshot03_BTN, self.visSnapshot04_BTN,
+                            self.visSnapshot05_BTN, self.visSnapshot06_BTN]
 
         # DEFAULT LIGHTS
         self.spotLight_BTN = btns.MiniTools_BTN(self.centralwidget)
@@ -381,6 +385,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.aiPhysicalSky_BTN.setMaximumSize(lightsBtnSize)
         self.aiPhysicalSky_BTN.setObjectName("aiPhysicalSky_BTN")
         self.aiPhysicalSky_BTN.setToolTip('aiPhysicalSky')
+        self.lightBtns = [self.spotLight_BTN, self.pointLight_BTN,
+                         self.areaLight_BTN, self.directionalLight_BTN,
+                         self.ambientLight_BTN, self.volumeLight_BTN,
+                         self.aiAreaLight_BTN, self.aiSkyDomeLight_BTN,
+                         self.aiMeshLight_BTN, self.aiPhotometricLight_BTN,
+                         self.aiLightPortal_BTN, self.aiPhysicalSky_BTN]
 
         #CONFIG
         self.config_BTN = btns.MiniTools_BTN(self.centralwidget)
@@ -609,6 +619,10 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             config = {'stats':statsBool}
             with open(filepath, 'w') as fp:
                 json.dump(config, fp, indent = 4)
+        if statsBool:
+            for btn in self.toolsBtns:
+                btn.collect_stats = True
+        
 
     def _loadStatsPrefs(self):
         userPath = os.path.expanduser("~")
@@ -620,6 +634,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                 config = json.load(fp)
         if config.get('stats'):
             stats.load()
+            for btn in self.toolsBtns:
+                btn.collect_stats = True
             return config.get('stats')
         else:
             self._saveStatsPrefs(False)
@@ -799,7 +815,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if result == msgBox.StandardButton.Yes:
             for btn in self.visSnapBtns:
                 self._clearAttrsSnapshotOpt(btn)
-
 
 
 # --------------------------------------------------------
