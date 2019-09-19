@@ -3,6 +3,7 @@
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Snapshots functions not working properly
 TODO: Make sure stats collection only happens if the option is active (read config)
+TODO: Look thru preferences not used in tools library
 TODO: Add Debug mode to config options
 TODO: Add delete options with post methods
 TODO: Add separators to naming library
@@ -785,8 +786,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools.loadLightsAttrsSnapshot(btn.snap)
             btn.is_active = True
             for each in self.visSnapBtns:
-                # ! Activation logic not working
-                # ! print each.objectName(), "Snap:", bool(each.snap), "Active: ", each.is_active
                 if each is not btn:
                     each.is_active = False
 

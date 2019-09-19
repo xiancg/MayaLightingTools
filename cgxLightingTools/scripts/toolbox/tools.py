@@ -185,10 +185,11 @@ def lightsAttrsSnapshot():
 
 def loadLightsAttrsSnapshot(snapshot):
     try:
+        lightNodes = getLightNodesList()
         for light, finalAttrsDict in snapshot.iteritems():
             if mc.objExists(light):
                 shapeNode = mc.listRelatives(light, shapes=True, noIntermediate=True,
-                                            fullPath=True, type='light')[0]
+                                            fullPath=True, type=lightNodes)[0]
                 for attrName, attrDict in finalAttrsDict.iteritems():
                     objAttr = shapeNode + "." + attrName
                     if attrName in mc.listAttr(shapeNode) and not mc.connectionInfo(objAttr, isDestination=True):
@@ -201,6 +202,7 @@ def loadLightsAttrsSnapshot(snapshot):
                                         attrDict['value'][1], attrDict['value'][2],
                                         type= "double3")
     except:
+        logger.warning('Attributes snapshot could not be loaded.')
         return False
     return True
 
