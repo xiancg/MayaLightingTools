@@ -514,8 +514,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot05_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
         self.visSnapshot06_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.visSnapshot06_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
-
-    def _saveOrientationPref(self, prefOrientation):
+    
+    def _prefs_path(self):
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
         try:
@@ -524,6 +524,10 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         except:
             pass
         filepath = os.path.join(finalDir, "MiniTools.pref")
+        return filepath
+
+    def _saveOrientationPref(self, prefOrientation):
+        filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
             with open(filepath) as fp:
@@ -540,9 +544,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.close()
     
     def _loadOrientationPref(self):
-        userPath = os.path.expanduser("~")
-        finalDir = os.path.join(userPath, ".CGXTools")
-        filepath = os.path.join(finalDir, "MiniTools.pref")
+        filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
             with open(filepath) as fp:
@@ -556,14 +558,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             return 'horizontal'
     
     def _saveLookThruPrefs(self, winWidth, winHeight, nearClip, farClip):
-        userPath = os.path.expanduser("~")
-        finalDir = os.path.join(userPath, ".CGXTools")
-        try:
-            if not os.path.exists(finalDir):
-                os.mkdir(finalDir)
-        except:
-            pass
-        filepath = os.path.join(finalDir, "MiniTools.pref")
+        filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
             with open(filepath) as fp:
@@ -581,9 +576,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                 json.dump(config, fp, indent = 4)
     
     def _loadLookThruPrefs(self):
-        userPath = os.path.expanduser("~")
-        finalDir = os.path.join(userPath, ".CGXTools")
-        filepath = os.path.join(finalDir, "MiniTools.pref")
+        filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
             with open(filepath) as fp:
@@ -599,14 +592,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             return config
 
     def _saveStatsPrefs(self, statsBool):
-        userPath = os.path.expanduser("~")
-        finalDir = os.path.join(userPath, ".CGXTools")
-        try:
-            if not os.path.exists(finalDir):
-                os.mkdir(finalDir)
-        except:
-            pass
-        filepath = os.path.join(finalDir, "MiniTools.pref")
+        filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
             with open(filepath) as fp:
@@ -624,9 +610,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         
 
     def _loadStatsPrefs(self):
-        userPath = os.path.expanduser("~")
-        finalDir = os.path.join(userPath, ".CGXTools")
-        filepath = os.path.join(finalDir, "MiniTools.pref")
+        filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
             with open(filepath) as fp:
