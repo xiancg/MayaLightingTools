@@ -86,8 +86,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             spacerWidth = 16
             spacerHeight = 20
             spacerItem1 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
-                                QtWidgets.QSizePolicy.Expanding,
-                                QtWidgets.QSizePolicy.Minimum)
+                          QtWidgets.QSizePolicy.Expanding,
+                          QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot01_BTN, 1, 0, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot02_BTN, 1, 1, 1, 1)
@@ -101,8 +101,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtVis_GRIDLAY.setRowStretch(3,10)
             mainLayout.addLayout(lgtVis_GRIDLAY)
             spacerItem2 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
-                                        QtWidgets.QSizePolicy.Expanding,
-                                        QtWidgets.QSizePolicy.Minimum)
+                          QtWidgets.QSizePolicy.Expanding,
+                          QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem2)
             lgtCreate_GRIDLAY.addWidget(self.spotLight_BTN, 1, 0, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.pointLight_BTN, 1, 1, 1, 1)
@@ -124,8 +124,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtCreate_GRIDLAY.setRowStretch(4,1)
             mainLayout.addLayout(lgtCreate_GRIDLAY)
             spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
-                                        QtWidgets.QSizePolicy.Expanding,
-                                        QtWidgets.QSizePolicy.Minimum)
+                          QtWidgets.QSizePolicy.Expanding,
+                          QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem3)
         else:
             tools_GRIDLAY.addWidget(self.simpleIsolate_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
@@ -142,8 +142,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             spacerWidth = 20
             spacerHeight = 16
             spacerItem1 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
-                                QtWidgets.QSizePolicy.Minimum,
-                                QtWidgets.QSizePolicy.Expanding)
+                          QtWidgets.QSizePolicy.Minimum,
+                          QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot01_BTN, 0, 1, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot02_BTN, 0, 2, 1, 1)
@@ -157,8 +157,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtVis_GRIDLAY.setColumnStretch(3,10)
             mainLayout.addLayout(lgtVis_GRIDLAY)
             spacerItem2 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
-                                        QtWidgets.QSizePolicy.Minimum,
-                                        QtWidgets.QSizePolicy.Expanding)
+                          QtWidgets.QSizePolicy.Minimum,
+                          QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem2)
             lgtCreate_GRIDLAY.addWidget(self.spotLight_BTN, 0, 0, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.pointLight_BTN, 0, 1, 1, 1)
@@ -176,8 +176,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtCreate_GRIDLAY.setRowStretch(2,3)
             mainLayout.addLayout(lgtCreate_GRIDLAY)
             spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
-                                        QtWidgets.QSizePolicy.Minimum,
-                                        QtWidgets.QSizePolicy.Expanding)
+                          QtWidgets.QSizePolicy.Minimum,
+                          QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem3)
 
         mainLayout.addWidget(self.config_BTN)
@@ -193,7 +193,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         lightsBtnSize = QtCore.QSize(16, 16)
         configBtnSize = QtCore.QSize(20, 20)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                            QtWidgets.QSizePolicy.Fixed)
+                                           QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         # TOOLS
@@ -262,11 +262,11 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.renameLight_BTN.setText('Re\nname')
         self.renameLight_BTN.setStyleSheet("font-size: 10px;")
         self.toolsBtns = [self.simpleIsolate_BTN, self.lookThru_BTN,
-                         self.aimLight_BTN, self.aimLight_BTN,
-                         self.specularConstrain_BTN, self.cleanUpCams_BTN,
-                         self.lightsManager_BTN, self.alignLight_BTN,
-                         self.transformBake_BTN, self.duplicateLight_BTN,
-                         self.renameLight_BTN]
+                          self.aimLight_BTN, self.aimLight_BTN,
+                          self.specularConstrain_BTN, self.cleanUpCams_BTN,
+                          self.lightsManager_BTN, self.alignLight_BTN,
+                          self.transformBake_BTN, self.duplicateLight_BTN,
+                          self.renameLight_BTN]
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = btns.VisSnapshot_BTN(self.centralwidget)
@@ -385,11 +385,11 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.aiPhysicalSky_BTN.setObjectName("aiPhysicalSky_BTN")
         self.aiPhysicalSky_BTN.setToolTip('aiPhysicalSky')
         self.lightBtns = [self.spotLight_BTN, self.pointLight_BTN,
-                         self.areaLight_BTN, self.directionalLight_BTN,
-                         self.ambientLight_BTN, self.volumeLight_BTN,
-                         self.aiAreaLight_BTN, self.aiSkyDomeLight_BTN,
-                         self.aiMeshLight_BTN, self.aiPhotometricLight_BTN,
-                         self.aiLightPortal_BTN, self.aiPhysicalSky_BTN]
+                          self.areaLight_BTN, self.directionalLight_BTN,
+                          self.ambientLight_BTN, self.volumeLight_BTN,
+                          self.aiAreaLight_BTN, self.aiSkyDomeLight_BTN,
+                          self.aiMeshLight_BTN, self.aiPhotometricLight_BTN,
+                          self.aiLightPortal_BTN, self.aiPhysicalSky_BTN]
 
         #CONFIG
         self.config_BTN = btns.MiniTools_BTN(self.centralwidget)
@@ -549,7 +549,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
-        if config.get('orientation') is not None and config.get('orientation') in ['horizontal','vertical']:
+        if config.get('orientation') is not None and \
+           config.get('orientation') in ['horizontal','vertical']:
             return config.get('orientation')
         else:
             config = {'orientation': 'horizontal'}
@@ -608,7 +609,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             for btn in self.toolsBtns:
                 btn.collect_stats = True
         
-
     def _loadStatsPrefs(self):
         filepath = self._prefs_path()
         config = dict()
@@ -631,7 +631,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         if renderers is not None:
             rendererNames = renderers.keys()
             factoryPath = os.path.dirname(lightsFactory.__file__)
-            factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath]) if name.endswith('factory')]
+            factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath])
+                         if name.endswith('factory')]
             for factory in factories:
                 if factory.rsplit('_')[0] in rendererNames:
                     for name, obj in inspect.getmembers(eval('lightsFactory.{}'.format(factory))):
@@ -693,7 +694,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         else:
             lightNode = allSel[0]
             if mc.nodeType(lightNode) == 'transform':
-                objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+                objShape = mc.listRelatives(lightNode, shapes=True, 
+                                            noIntermediate=True, fullPath=True)[0]
                 objTransform = lightNode
             else:
                 objShape = lightNode
@@ -801,7 +803,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     
     def _clearAllSnapshotsOpt(self):
         msgBox = QtWidgets.QMessageBox()
-        result = msgBox.question(self, "Warning!", "Are you sure you want to clear all attribute snapshots?")
+        result = msgBox.question(self, "Warning!",
+                 "Are you sure you want to clear all attribute snapshots?")
         if result == msgBox.StandardButton.Yes:
             for btn in self.visSnapBtns:
                 self._clearAttrsSnapshotOpt(btn)
