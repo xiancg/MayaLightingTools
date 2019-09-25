@@ -11,6 +11,8 @@ import sys
 import os
 import copy
 import json
+import time
+from datetime import date
 import cgxLightingTools.scripts.core as core
 import maya.cmds as mc
 
@@ -25,8 +27,8 @@ lightAttrs = config
 logger = logging.getLogger(name='lgtToolsLog')
 
 
-def initLogger(fileLog=False):
-    logger.setLevel(logging.DEBUG)
+def initLogger():
+    logger.setLevel(logging.WARNING)
     #Formatter
     formatter = logging.Formatter(
                 '[%(asctime)s:%(module)s:%(funcName)s:%(lineno)s:%(levelname)s] %(message)s')
@@ -35,19 +37,27 @@ def initLogger(fileLog=False):
     streamHandler.setLevel(logging.WARNING)
     streamHandler.setFormatter(formatter)
     logger.addHandler(streamHandler)
+    
+
+def initFileLogger():
+    #Formatter
+    formatter = logging.Formatter(
+                '[%(asctime)s:%(module)s:%(funcName)s:%(lineno)s:%(levelname)s] %(message)s')
     #Log file stream
-    if fileLog:
-        userPath = os.path.expanduser("~")
-        finalDir = os.path.join(userPath, ".CGXTools")
-        try:
-            if not os.path.exists(finalDir):
-                os.mkdir(finalDir)
-        except:
-            pass
-        fileHandler = logging.FileHandler(os.path.join(finalDir, 'lgtTools.log'), mode='w')
-        fileHandler.setLevel(logging.DEBUG)
-        fileHandler.setFormatter(formatter)
-        logger.addHandler(fileHandler)
+    userPath = os.path.expanduser("~")
+    finalDir = os.path.join(userPath, ".CGXTools")
+    try:
+        if not os.path.exists(finalDir):
+            os.mkdir(finalDir)
+    except:
+        pass
+    today = date.today()
+    date_string = today.strftime("%d-%m-%Y")
+    log_file_path = os.path.join(finalDir, 'lgtTools_{}.log'.format(date_string))
+    fileHandler = logging.FileHandler(log_file_path, mode='a')
+    fileHandler.setLevel(logging.DEBUG)
+    fileHandler.setFormatter(formatter)
+    logger.addHandler(fileHandler)
 
 
 def getRenderEngines():
@@ -233,7 +243,7 @@ def cleanUpCams ():
             if mc.nodeType(each) == "camera":
                 i += 1
                 mc.delete(each)
-    logger.info('Deleted {} cameras from lights.'.format(i))
+    logger.warning('Deleted {} cameras from lights.'.format(i))
 
 
 def lookThruLight (winWidth=629, winHeight=404, nearClip=1.0, farClip= 1000000):
@@ -360,7 +370,7 @@ def resetGlobals():
     getLightNodes()
 
 
-initLogger(fileLog=True)
+initLogger()
 lightsVisibilitySnapshot()
 getRenderEngines()
 getLightNodes()

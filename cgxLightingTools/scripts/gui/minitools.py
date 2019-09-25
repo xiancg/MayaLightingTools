@@ -1,10 +1,11 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Add Debug mode to config options
+TODO: Move initFactories out of this module
+TODO: Generalize load and save prefs functions or at least move them to a different module
 TODO: Add delete options with post methods
-TODO: Add separators to naming library
 TODO: Options to create lights aligned with selection with some default offset
+TODO: Add separators to naming library
 TODO: Create GUI for naming library
 TODO: Implement new stylesheet
 TODO: Move rename, duplicate and delete closer to the creation buttons and set icons
@@ -623,6 +624,35 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         else:
             self._saveStatsPrefs(False)
             return False
+    
+    def _saveDebugPrefs(self, debugBool):
+        filepath = self._prefs_path()
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+                config['debug'] = debugBool
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+        else:
+            config = {'debug':debugBool}
+            with open(filepath, 'w') as fp:
+                json.dump(config, fp, indent = 4)
+        if debugBool:
+            tools.initFileLogger()
+    
+    def _loadDebugPrefs(self):
+        filepath = self._prefs_path()
+        config = dict()
+        if os.path.exists(filepath):
+            with open(filepath) as fp:
+                config = json.load(fp)
+        if config.get('debug'):
+            tools.initFileLogger()
+            return config.get('debug')
+        else:
+            self._saveStatsPrefs(False)
+            return False
 
     def _initFactories(self):
         defaultFactory = lightsFactory.default_factory.LightsFactory()
@@ -731,22 +761,30 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         prefOrientationQ = menu.addAction("Toggle tools orientation")
         prefLookThruQ = menu.addAction("Look thru preferences")
         menu.addSeparator()
+
         usageStatsQ = menu.addAction("Help collecting usage statistics")
         usageStatsQ.setCheckable(True)
         usageStatsQ.setObjectName("config_stats")
         if self._loadStatsPrefs():
             usageStatsQ.setChecked(True)
+
         debugModeQ = menu.addAction("Debug Mode")
         debugModeQ.setCheckable(True)
         debugModeQ.setObjectName("config_debugMode")
+        if self._loadDebugPrefs():
+            debugModeQ.setChecked(True)
+
         self.config_BTN.setMenu(menu)
         if self._prefOrientation == 'horizontal':
             self._prefOrientation = 'vertical'
         else:
             self._prefOrientation = 'horizontal'
+
         prefOrientationQ.triggered.connect(partial(self._saveOrientationPref, self._prefOrientation))
         prefLookThruQ.triggered.connect(self._lookThruDefaults)
         usageStatsQ.triggered[bool].connect(self._saveStatsPrefs)
+        debugModeQ.triggered[bool].connect(self._saveDebugPrefs)
+
         self.config_BTN.showMenu()
 
     def specConstrainOptions (self, pos):
