@@ -14,6 +14,7 @@ import json
 import time
 from datetime import date
 import cgxLightingTools.scripts.core as core
+
 import maya.cmds as mc
 
 lightsOff = list()
@@ -133,8 +134,9 @@ def getSelectedLights():
     selObjs = mc.ls(sl=True, long=True)
     selLights = list()
     for e in selObjs:
-        eShape = mc.listRelatives(
-            e, shapes=True, noIntermediate=True, fullPath=True)
+        eShape = mc.listRelatives(e, shapes=True, 
+                                  noIntermediate=True,
+                                  fullPath=True)
         eNodeType = mc.nodeType(eShape[0])
         if eNodeType in lightNodes:
             selLights.append(e)
@@ -376,12 +378,12 @@ getRenderEngines()
 getLightNodes()
 
 
-
 # --------------------------------------------------------
 #  Main
 # --------------------------------------------------------
 def main():
-    print getLightsInScene()
+    #print getLightsInScene()
+    pass
 
 
 if __name__ == '__main__' or 'eclipsePython' in __name__:
