@@ -133,13 +133,20 @@ def getSelectedLights():
     lightNodes = getLightNodesList()
     selObjs = mc.ls(sl=True, long=True)
     selLights = list()
-    for e in selObjs:
-        eShape = mc.listRelatives(e, shapes=True, 
-                                  noIntermediate=True,
-                                  fullPath=True)
-        eNodeType = mc.nodeType(eShape[0])
-        if eNodeType in lightNodes:
-            selLights.append(e)
+    for each in selObjs:
+        node_type = mc.nodeType(each)
+        if node_type == "transform":
+            shape_node = mc.listRelatives(each, shapes=True, 
+                                          noIntermediate=True,
+                                          fullPath=True)[0]
+            node_type = mc.nodeType(shape_node)
+            if node_type in lightNodes:
+                selLights.append(each)
+        else:
+            transform = mc.listRelatives(each, parent=True, 
+                                         fullPath=True)[0]
+            if node_type in lightNodes:
+                selLights.append(transform)
     
     return selLights
 
