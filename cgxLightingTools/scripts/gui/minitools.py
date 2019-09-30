@@ -1,9 +1,7 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Generalize load and save prefs functions or at least move them to a different module
 TODO: Add delete options with post methods
-TODO: Light toggle not taking shape selection
 TODO: Options to create lights aligned with selection with some default offset
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
