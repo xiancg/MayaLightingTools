@@ -151,6 +151,17 @@ def getSelectedLights():
     return selLights
 
 
+def getTransformAndShape(lightNode):
+    if mc.nodeType(lightNode) == 'transform':
+        objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
+        objTransform = lightNode
+    else:
+        objShape = lightNode
+        objTransform = mc.listRelatives(lightNode, parent=True)[0]
+
+    return objTransform, objShape
+
+
 def simpleIsolateLights():
     allLightsScene = getLightsInScene()
     # Selected scene lights
