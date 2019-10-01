@@ -257,12 +257,7 @@ class LightRenamer_GUI(LightCreator_GUI):
         
     def _parseOldNameParts(self, lightNode):
         '''TODO: This could be moved to the factories so the tools enforce good naming when duplicating'''
-        if mc.nodeType(lightNode) == 'transform':
-            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
-            objTransform = lightNode
-        else:
-            objShape = lightNode
-            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        objTransform, objShape= tools.getTransformAndShape(lightNode)
         if mc.nodeType(objShape) in tools.getLightNodesList():
             if '_' in objTransform:
                 nameSplit = objTransform.split('_')

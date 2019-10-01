@@ -109,13 +109,8 @@ class LightDuplicator_GUI(QtWidgets.QDialog):
             msgBox.exec_()
             tools.logger.info('Please select at least one light to duplicate.')
         else:
-            for each in mc.ls(sl=True):
-                if mc.nodeType(each) == 'transform':
-                    objShape = mc.listRelatives(each, shapes=True, noIntermediate=True, fullPath=True)[0]
-                    objTransform = each
-                else:
-                    objShape = each
-                    objTransform = mc.listRelatives(each, parent=True)[0]
+            for each in allSel:
+                objTransform, objShape= tools.getTransformAndShape(each)
                 for name, factory in self.factories.iteritems():
                     if mc.nodeType(objShape) in factory.lightNodeTypes:
                         for i in range(self.howMany_SPINBOX.value()):
