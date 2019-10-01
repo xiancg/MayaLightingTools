@@ -1,6 +1,7 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
+TODO: Assign hotkey for deleting (Ctrl+Del?)
 TODO: Move rename, duplicate and delete closer to the creation buttons.
 TODO: Options to create lights aligned with selection with some default offset
 TODO: Add separators to naming library
