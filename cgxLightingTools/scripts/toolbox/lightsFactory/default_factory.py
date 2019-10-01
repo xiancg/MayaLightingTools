@@ -55,19 +55,15 @@ class LightsFactory(object):
             return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
-            self.post_fn.postLightCreation(shapeNode, *args, **kwargs)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
+            self.post_fn.postLightCreation(transformNode, shapeNode, *args, **kwargs)
+            
             return transformNode, shapeNode
         else: 
             return None
     
     def duplicateLight(self, lightNode, withInputs=False, withNodes=False, *args, **kwargs):
-        if mc.nodeType(lightNode) == 'transform':
-            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
-            objTransform = lightNode
-        else:
-            objShape = lightNode
-            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        objTransform, objShape= tools.getTransformAndShape(lightNode)
         transformNode = str()
         shapeNode = str()
         if mc.nodeType(objShape) in tools.getLightNodesList():
@@ -92,33 +88,36 @@ class LightsFactory(object):
             tools.logger.info('Only lights accepted. {} is {}'.format(lightNode, mc.nodeType(lightNode)))
             return None
         
-        self.post_fn.postLightDuplicate(shapeNode, *args, **kwargs)
+        self.post_fn.postLightDuplicate(transformNode, shapeNode, *args, **kwargs)
 
         return transformNode, shapeNode
     
     def renameLight(self, lightNode, lightName, *args, **kwargs):
-        if mc.nodeType(lightNode) == 'transform':
-            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
-            objTransform = lightNode
-        else:
-            objShape = lightNode
-            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        objTransform, objShape= tools.getTransformAndShape(lightNode)
         parsedName = self.naming.parse(lightName)
         finalLightName = self.buildName(**parsedName)
         result = mc.rename(objTransform, finalLightName)
         shapeNode = mc.listRelatives(result, shapes=True, noIntermediate=True, fullPath=True)[0]
 
-        self.post_fn.postLightRename(shapeNode, *args, **kwargs)
+        self.post_fn.postLightRename(result, shapeNode, *args, **kwargs)
         
         return result
     
+    def deleteLight(self, lightNode, lightName, *args, **kwargs):
+        objTransform, objShape= tools.getTransformAndShape(lightNode)
+        success = False
+        try:
+            mc.delete(objTransform)
+            success = True
+        except:
+            pass
+
+        self.post_fn.postLightDelete(objTransform, objShape, *args, **kwargs)
+        
+        return success
+    
     def parseOldNameByTokens(self, lightNode):
-        if mc.nodeType(lightNode) == 'transform':
-            objShape = mc.listRelatives(lightNode, shapes=True, noIntermediate=True, fullPath=True)[0]
-            objTransform = lightNode
-        else:
-            objShape = lightNode
-            objTransform = mc.listRelatives(lightNode, parent=True)[0]
+        objTransform, objShape= tools.getTransformAndShape(lightNode)
         nameSplit = objTransform.split('_')
         result = None
         if len(nameSplit) == len(self.naming.getActiveRule().fields):

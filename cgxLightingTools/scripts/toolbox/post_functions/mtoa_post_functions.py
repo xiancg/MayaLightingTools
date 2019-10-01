@@ -12,36 +12,45 @@ class PostFunctions_mtoa(PostFunctions_default):
     def __init__(self):
         super(PostFunctions_mtoa, self).__init__()
 
-    def postLightCreation(self, shapeNode, *args, **kwargs):
+    def postLightCreation(self, transformNode, shapeNode, *args, **kwargs):
         '''Place here all custom stuff you want to do with the created light node'''
-        transform = mc.listRelatives(shapeNode, parent=True)[0]
-        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
-        newAOVName = 'RGBA_LG_' + transform
+        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transformNode, type='string')
+        newAOVName = 'RGBA_LG_' + transformNode
         aovNode = aovs.AOVInterface().addAOV(newAOVName).node
-        mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transform, type="string")
+        mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transformNode, type="string")
         mc.setAttr(aovNode + ".type", 6)
         mc.setAttr(aovNode + ".enabled", True)
         mc.select(shapeNode, replace=True)
 
-    def postLightDuplicate(self, shapeNode, *args, **kwargs):
+    def postLightDuplicate(self, transformNode, shapeNode, *args, **kwargs):
         '''Place here all custom stuff you want to do with the duplicated light node'''
         if not kwargs.get('keepAOVSetup'):
-            transform = mc.listRelatives(shapeNode, parent=True)[0]
-            mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
-            newAOVName = 'RGBA_LG_' + transform
+            mc.setAttr(shapeNode + '.aiAov', 'LG_' + transformNode, type='string')
+            newAOVName = 'RGBA_LG_' + transformNode
             aovNode = aovs.AOVInterface().addAOV(newAOVName).node
-            mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transform, type="string")
+            mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transformNode, type="string")
             mc.setAttr(aovNode + ".type", 6)
             mc.setAttr(aovNode + ".enabled", True)
             mc.select(shapeNode, replace=True)
 
-    def postLightRename(self, shapeNode, *args, **kwargs):
+    def postLightRename(self, transformNode, shapeNode, *args, **kwargs):
         '''Place here all custom stuff you want to do with the renamed light node'''
-        transform = mc.listRelatives(shapeNode, parent=True)[0]
         oldLightGroup = mc.getAttr(shapeNode + '.aiAov')
         oldAOV = 'aiAOV_RGBA_' + oldLightGroup
-        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transform, type='string')
+        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transformNode, type='string')
         if mc.objExists(oldAOV):
-            aovNode = mc.rename(oldAOV, 'RGBA_LG_' + transform)
-            mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transform, type="string")
+            aovNode = mc.rename(oldAOV, 'RGBA_LG_' + transformNode)
+            mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transformNode, type="string")
         mc.select(shapeNode, replace=True)
+    
+    def postLightDelete(self, transformNode, shapeNode, *args, **kwargs):
+        '''Place here all custom stuff you want to do with the deleted light node.
+           Keep in mind the node doesn't exist anymore, you're just operating
+           with the name.
+        '''
+        oldAOV = 'aiAOV_RGBA_LG_' + transformNode
+        if mc.objExists(oldAOV):
+            try:
+                mc.delete(oldAOV)
+            except:
+                pass

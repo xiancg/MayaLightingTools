@@ -1,14 +1,13 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Add delete options with post methods
+TODO: Move rename, duplicate and delete closer to the creation buttons.
 TODO: Options to create lights aligned with selection with some default offset
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
-TODO: Implement new stylesheet
-TODO: Move rename, duplicate and delete closer to the creation buttons and set icons
 TODO: Change light attrs implementation
 TODO: Create light attrs GUI
+TODO: Implement new stylesheet
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
@@ -50,13 +49,13 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         if self._prefOrientation == 'horizontal':
-            self.resize(432, 90)
-            self.setMinimumSize(QtCore.QSize(432,90))
+            self.resize(462, 90)
+            self.setMinimumSize(QtCore.QSize(462,90))
             self.setMaximumSize(QtCore.QSize(10000, 90))
             mainLayout = self._loadHorizontal()
         else:
-            self.resize(100, 380)
-            self.setMinimumSize(QtCore.QSize(100,380))
+            self.resize(100, 406)
+            self.setMinimumSize(QtCore.QSize(100, 406))
             self.setMaximumSize(QtCore.QSize(100, 10000))
             mainLayout = self._loadVertical()
         tools_GRIDLAY = QtWidgets.QGridLayout()
@@ -74,11 +73,13 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.aimLight_BTN, 0, 2, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lightsManager_BTN, 0, 3, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 4, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.deleteLight_BTN, 0, 5, 2, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.specularConstrain_BTN, 1, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.cleanUpCams_BTN, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 1, 2, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.transformBake_BTN, 1, 3, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.renameLight_BTN, 1, 4, 1, 1, QtCore.Qt.AlignCenter)
+
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 16
             spacerHeight = 20
@@ -135,6 +136,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.lightsManager_BTN, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.renameLight_BTN, 4, 1, 1, 1, QtCore.Qt.AlignCenter)
+            tools_GRIDLAY.addWidget(self.deleteLight_BTN, 5, 0, 1, 2, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 20
             spacerHeight = 16
@@ -204,6 +206,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.transformBake_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.duplicateLight_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.renameLight_BTN = btns.MiniTools_BTN(self.centralwidget)
+        self.deleteLight_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.simpleIsolate_BTN.setSizePolicy(sizePolicy)
         self.simpleIsolate_BTN.setMinimumSize(toolsBtnSize)
         self.simpleIsolate_BTN.setMaximumSize(toolsBtnSize)
@@ -258,12 +261,19 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.renameLight_BTN.setToolTip('Rename selected light.')
         self.renameLight_BTN.setText('Re\nname')
         self.renameLight_BTN.setStyleSheet("font-size: 10px;")
+        self.deleteLight_BTN.setSizePolicy(sizePolicy)
+        self.deleteLight_BTN.setMinimumSize(toolsBtnSize)
+        self.deleteLight_BTN.setMaximumSize(toolsBtnSize)
+        self.deleteLight_BTN.setObjectName("deleteLight_BTN")
+        self.deleteLight_BTN.setToolTip('Delete selected lights.')
+        self.deleteLight_BTN.setText('Del')
+        self.deleteLight_BTN.setStyleSheet("font-size: 10px;")
         self.toolsBtns = [self.simpleIsolate_BTN, self.lookThru_BTN,
                           self.aimLight_BTN, self.aimLight_BTN,
                           self.specularConstrain_BTN, self.cleanUpCams_BTN,
                           self.lightsManager_BTN, self.alignLight_BTN,
                           self.transformBake_BTN, self.duplicateLight_BTN,
-                          self.renameLight_BTN]
+                          self.renameLight_BTN, self.deleteLight_BTN]
 
         # LIGHT VIS SNAPSHOTS
         self.visSnapshot01_BTN = btns.VisSnapshot_BTN(self.centralwidget)
@@ -422,6 +432,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.transformBake_BTN.clicked.connect(self._transformBake)
         self.duplicateLight_BTN.clicked.connect(self._duplicateLight)
         self.renameLight_BTN.clicked.connect(self._renameLight)
+        self.deleteLight_BTN.clicked.connect(self._deleteLight)
         self.visSnapshot01_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot01_BTN))
         self.visSnapshot02_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot02_BTN))
         self.visSnapshot03_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot03_BTN))
@@ -702,13 +713,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools.logger.info('Please select one light only.')
         else:
             lightNode = allSel[0]
-            if mc.nodeType(lightNode) == 'transform':
-                objShape = mc.listRelatives(lightNode, shapes=True, 
-                                            noIntermediate=True, fullPath=True)[0]
-                objTransform = lightNode
-            else:
-                objShape = lightNode
-                objTransform = mc.listRelatives(lightNode, parent=True)[0]
+            objTransform, objShape= tools.getTransformAndShape(lightNode)
             dialog = LightRenamer_GUI(objShape, self.factories, self)
             dialog.show()
             if dialog == 1:
@@ -719,6 +724,20 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         dialog.exec_()
         if dialog == 1:
             tools.resetGlobals()
+    
+    def _deleteLight(self):
+        allSel = mc.ls(sl=True)
+        success = False
+        for each in allSel:
+            objTransform, objShape= tools.getTransformAndShape(each)
+            for name, factory in self.factories.iteritems():
+                if mc.nodeType(objShape) in factory.lightNodeTypes:
+                    factory.deleteLight(objTransform, objShape)
+                    success = True
+                    break
+        if success:
+            tools.resetGlobals()
+
 
     def _lookThruDefaults(self):
         dialog = LookThruDefaults_GUI(self)
