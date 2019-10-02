@@ -1,7 +1,7 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Assign hotkey for deleting (Ctrl+Del?)
+TODO: Review code to show, hide and close
 TODO: Move rename, duplicate and delete closer to the creation buttons.
 TODO: Options to create lights aligned with selection with some default offset
 TODO: Add separators to naming library
@@ -9,6 +9,8 @@ TODO: Create GUI for naming library
 TODO: Change light attrs implementation
 TODO: Create light attrs GUI
 TODO: Implement new stylesheet
+TODO: Shortcuts implementation pass for everything
+TODO: Add option to set shortcuts for tools
 TODO: All alerts should be changed to something without the need for confirmation
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
@@ -266,9 +268,13 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.deleteLight_BTN.setMinimumSize(toolsBtnSize)
         self.deleteLight_BTN.setMaximumSize(toolsBtnSize)
         self.deleteLight_BTN.setObjectName("deleteLight_BTN")
-        self.deleteLight_BTN.setToolTip('Delete selected lights.')
+        self.deleteLight_BTN.setToolTip('Delete selected lights (Ctrl+Del)')
         self.deleteLight_BTN.setText('Del')
         self.deleteLight_BTN.setStyleSheet("font-size: 10px;")
+        delLight = QtWidgets.QAction("Delete Light", self.deleteLight_BTN,
+                                     shortcut=QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Delete),
+                                     triggered=self._deleteLight)
+        self.deleteLight_BTN.addAction(delLight)
         self.toolsBtns = [self.simpleIsolate_BTN, self.lookThru_BTN,
                           self.aimLight_BTN, self.aimLight_BTN,
                           self.specularConstrain_BTN, self.cleanUpCams_BTN,
@@ -662,7 +668,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             self._saveStatsPrefs(False)
             return False
     
-
     def _transformBake(self):
         allSel = mc.ls(sl=True)
         if len(allSel) < 1:
@@ -738,7 +743,6 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                     break
         if success:
             tools.resetGlobals()
-
 
     def _lookThruDefaults(self):
         dialog = LookThruDefaults_GUI(self)
