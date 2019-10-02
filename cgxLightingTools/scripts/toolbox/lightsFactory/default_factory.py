@@ -56,9 +56,13 @@ class LightsFactory(object):
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
-            self.post_fn.postLightCreation(transformNode, shapeNode, *args, **kwargs)
-            
-            return transformNode, shapeNode
+            try:
+                self.post_fn.postLightCreation(transformNode, shapeNode, *args, **kwargs)
+            except BaseException as e:
+                tools.logger.warning("Post light creation function not executed due to exceptions.")
+                raise
+            finally:
+                return transformNode, shapeNode
         else: 
             return None
     
