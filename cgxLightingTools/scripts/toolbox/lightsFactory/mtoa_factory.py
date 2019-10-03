@@ -36,9 +36,8 @@ class ArnoldFactory(LightsFactory):
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
             try:
                 self.post_fn.postLightCreation(transformNode, shapeNode, *args, **kwargs)
-            except BaseException as e:
-                tools.logger.warning("Post light creation function not executed due to exceptions.")
-                raise
+            except:
+                tools.logger.exception("Post light creation function not executed due to exceptions")
             finally:
                 return transformNode, shapeNode
         else: 

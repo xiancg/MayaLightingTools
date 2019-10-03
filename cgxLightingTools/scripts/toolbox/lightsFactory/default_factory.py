@@ -58,9 +58,8 @@ class LightsFactory(object):
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
             try:
                 self.post_fn.postLightCreation(transformNode, shapeNode, *args, **kwargs)
-            except BaseException as e:
-                tools.logger.warning("Post light creation function not executed due to exceptions.")
-                raise
+            except:
+                tools.logger.exception("Post light creation function not executed due to exceptions")
             finally:
                 return transformNode, shapeNode
         else: 
@@ -92,9 +91,12 @@ class LightsFactory(object):
             tools.logger.info('Only lights accepted. {} is {}'.format(lightNode, mc.nodeType(lightNode)))
             return None
         
-        self.post_fn.postLightDuplicate(transformNode, shapeNode, *args, **kwargs)
-
-        return transformNode, shapeNode
+        try:
+            self.post_fn.postLightDuplicate(transformNode, shapeNode, *args, **kwargs)
+        except:
+            tools.logger.exception("Post light duplicate function not executed due to exceptions")
+        finally:
+            return transformNode, shapeNode
     
     def renameLight(self, lightNode, lightName, *args, **kwargs):
         objTransform, objShape= tools.getTransformAndShape(lightNode)
@@ -103,9 +105,12 @@ class LightsFactory(object):
         result = mc.rename(objTransform, finalLightName)
         shapeNode = mc.listRelatives(result, shapes=True, noIntermediate=True, fullPath=True)[0]
 
-        self.post_fn.postLightRename(result, shapeNode, *args, **kwargs)
-        
-        return result
+        try:
+            self.post_fn.postLightRename(result, shapeNode, *args, **kwargs)
+        except:
+            tools.logger.exception("Post light rename function not executed due to exceptions")
+        finally:
+            return result
     
     def deleteLight(self, lightNode, lightName, *args, **kwargs):
         objTransform, objShape= tools.getTransformAndShape(lightNode)
@@ -116,9 +121,12 @@ class LightsFactory(object):
         except:
             pass
 
-        self.post_fn.postLightDelete(objTransform, objShape, *args, **kwargs)
-        
-        return success
+        try:
+            self.post_fn.postLightDelete(objTransform, objShape, *args, **kwargs)
+        except:
+            tools.logger.exception("Post light delete function not executed due to exceptions")
+        finally:
+            return success
     
     def parseOldNameByTokens(self, lightNode):
         objTransform, objShape= tools.getTransformAndShape(lightNode)

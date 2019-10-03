@@ -14,7 +14,7 @@ class PostFunctions_mtoa(PostFunctions_default):
 
     def postLightCreation(self, transformNode, shapeNode, *args, **kwargs):
         '''Place here all custom stuff you want to do with the created light node'''
-        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transformNode, type='string', sanata=0)
+        mc.setAttr(shapeNode + '.aiAov', 'LG_' + transformNode, type='string')
         newAOVName = 'RGBA_LG_' + transformNode
         aovNode = aovs.AOVInterface().addAOV(newAOVName).node
         mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transformNode, type="string")
