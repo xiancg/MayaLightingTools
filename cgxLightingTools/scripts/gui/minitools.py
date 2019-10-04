@@ -1,8 +1,6 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Review code to show, hide and close
-TODO: Store dialog position when closed and use it when shown
 TODO: Move rename, duplicate and delete closer to the creation buttons.
 TODO: Options to create lights aligned with selection with some default offset
 TODO: Add separators to naming library
@@ -45,6 +43,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self._setupUi()
         self._setConnections()
         self._loadStatsPrefs()
+        self._loadGeoPrefs()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
     
     def _setupUi(self):
@@ -669,6 +668,22 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             self._saveStatsPrefs(False)
             return False
     
+    def _saveGeoPrefs(self):
+        prefsFilePath = self._prefs_path()
+        baseDir = os.path.dirname(prefsFilePath)
+        iniFile = os.path.join(baseDir, "MiniTools.ini")
+        settings = QtCore.QSettings(iniFile, QtCore.QSettings.IniFormat)
+        geometry = self.saveGeometry()
+        settings.setValue("geometry", geometry)
+
+    def _loadGeoPrefs(self):
+        prefsFilePath = self._prefs_path()
+        baseDir = os.path.dirname(prefsFilePath)
+        iniFile = os.path.join(baseDir, "MiniTools.ini")
+        if os.path.exists(iniFile):
+            settings= QtCore.QSettings(iniFile, QtCore.QSettings.IniFormat)
+            self.restoreGeometry(settings.value("geometry"))
+    
     def _transformBake(self):
         allSel = mc.ls(sl=True)
         if len(allSel) < 1:
@@ -754,7 +769,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     def closeEvent(self, event):
         if self._loadStatsPrefs():
             stats.save()
-        QtWidgets.QMainWindow.closeEvent(self, event)
+        self._saveGeoPrefs()
+        super(MiniTools_GUI, self).closeEvent(event)
 
     # --------------------------------------------------------
 	# Method for right-click menus
