@@ -1,7 +1,7 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Move rename, duplicate and delete closer to the creation buttons.
+TODO: Add strip whitespace to rename and create dialogs
 TODO: Options to create lights aligned with selection with some default offset
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
@@ -52,14 +52,14 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         if self._prefOrientation == 'horizontal':
-            self.resize(462, 90)
-            self.setMinimumSize(QtCore.QSize(462,90))
+            self.resize(440, 90)
+            self.setMinimumSize(QtCore.QSize(440,90))
             self.setMaximumSize(QtCore.QSize(10000, 90))
             mainLayout = self._loadHorizontal()
         else:
-            self.resize(100, 406)
-            self.setMinimumSize(QtCore.QSize(100, 406))
-            self.setMaximumSize(QtCore.QSize(100, 10000))
+            self.resize(124, 390)
+            self.setMinimumSize(QtCore.QSize(124, 390))
+            self.setMaximumSize(QtCore.QSize(124, 10000))
             mainLayout = self._loadVertical()
         tools_GRIDLAY = QtWidgets.QGridLayout()
         tools_GRIDLAY.setObjectName("tools_GRIDLAY")
@@ -67,6 +67,10 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         lgtVis_GRIDLAY.setObjectName("lgtVis_GRIDLAY")
         lgtVis_GRIDLAY.setHorizontalSpacing(3)
         lgtVis_GRIDLAY.setVerticalSpacing(3)
+        lgtDRD_GRIDLAY = QtWidgets.QGridLayout()
+        lgtDRD_GRIDLAY.setObjectName("lgtDRD_GRIDLAY")
+        lgtDRD_GRIDLAY.setHorizontalSpacing(3)
+        lgtDRD_GRIDLAY.setVerticalSpacing(3)
         lgtCreate_GRIDLAY = QtWidgets.QGridLayout()
         lgtCreate_GRIDLAY.setObjectName("lgtCreate_GRIDLAY")
         self._createButtons()
@@ -75,13 +79,10 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools_GRIDLAY.addWidget(self.lookThru_BTN, 0, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.aimLight_BTN, 0, 2, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lightsManager_BTN, 0, 3, 1, 1, QtCore.Qt.AlignCenter)
-            tools_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 4, 1, 1, QtCore.Qt.AlignCenter)
-            tools_GRIDLAY.addWidget(self.deleteLight_BTN, 0, 5, 2, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.specularConstrain_BTN, 1, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.cleanUpCams_BTN, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.alignLight_BTN, 1, 2, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.transformBake_BTN, 1, 3, 1, 1, QtCore.Qt.AlignCenter)
-            tools_GRIDLAY.addWidget(self.renameLight_BTN, 1, 4, 1, 1, QtCore.Qt.AlignCenter)
 
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 16
@@ -105,6 +106,16 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                           QtWidgets.QSizePolicy.Expanding,
                           QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem2)
+
+            lgtDRD_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
+            lgtDRD_GRIDLAY.addWidget(self.renameLight_BTN, 1, 0, 1, 1, QtCore.Qt.AlignCenter)
+            lgtDRD_GRIDLAY.addWidget(self.deleteLight_BTN, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
+            mainLayout.addLayout(lgtDRD_GRIDLAY)
+            spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
+                          QtWidgets.QSizePolicy.Expanding,
+                          QtWidgets.QSizePolicy.Minimum)
+            mainLayout.addItem(spacerItem3)
+
             lgtCreate_GRIDLAY.addWidget(self.spotLight_BTN, 1, 0, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.pointLight_BTN, 1, 1, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.areaLight_BTN, 1, 2, 1, 1)
@@ -124,10 +135,10 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtCreate_GRIDLAY.setRowMinimumHeight(4,1)
             lgtCreate_GRIDLAY.setRowStretch(4,1)
             mainLayout.addLayout(lgtCreate_GRIDLAY)
-            spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
+            spacerItem4 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
                           QtWidgets.QSizePolicy.Expanding,
                           QtWidgets.QSizePolicy.Minimum)
-            mainLayout.addItem(spacerItem3)
+            mainLayout.addItem(spacerItem4)
         else:
             tools_GRIDLAY.addWidget(self.simpleIsolate_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
             tools_GRIDLAY.addWidget(self.lookThru_BTN, 0, 1, 1, 1, QtCore.Qt.AlignCenter)
@@ -162,6 +173,18 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                           QtWidgets.QSizePolicy.Minimum,
                           QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem2)
+
+
+            lgtDRD_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
+            lgtDRD_GRIDLAY.addWidget(self.renameLight_BTN, 0, 1, 1, 1, QtCore.Qt.AlignCenter)
+            lgtDRD_GRIDLAY.addWidget(self.deleteLight_BTN, 0, 2, 1, 1, QtCore.Qt.AlignCenter)
+            mainLayout.addLayout(lgtDRD_GRIDLAY)
+            spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
+                          QtWidgets.QSizePolicy.Minimum,
+                          QtWidgets.QSizePolicy.Expanding)
+            mainLayout.addItem(spacerItem3)
+
+
             lgtCreate_GRIDLAY.addWidget(self.spotLight_BTN, 0, 0, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.pointLight_BTN, 0, 1, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.areaLight_BTN, 0, 2, 1, 1)
@@ -177,10 +200,10 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtCreate_GRIDLAY.setRowMinimumHeight(2,3)
             lgtCreate_GRIDLAY.setRowStretch(2,3)
             mainLayout.addLayout(lgtCreate_GRIDLAY)
-            spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
+            spacerItem4 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
                           QtWidgets.QSizePolicy.Minimum,
                           QtWidgets.QSizePolicy.Expanding)
-            mainLayout.addItem(spacerItem3)
+            mainLayout.addItem(spacerItem4)
 
         mainLayout.addWidget(self.config_BTN)
         mainLayout.setAlignment(self.config_BTN, QtCore.Qt.AlignCenter)
@@ -192,6 +215,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     def _createButtons(self):
         toolsBtnSize = QtCore.QSize(32, 32)
         visBtnSize = QtCore.QSize(14, 14)
+        drdBtnSize = QtCore.QSize(32, 16)
         lightsBtnSize = QtCore.QSize(16, 16)
         configBtnSize = QtCore.QSize(20, 20)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
@@ -251,22 +275,22 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.transformBake_BTN.setObjectName("transformBake_BTN")
         self.transformBake_BTN.setToolTip('Transform bake. Objects or vertex.')
         self.duplicateLight_BTN.setSizePolicy(sizePolicy)
-        self.duplicateLight_BTN.setMinimumSize(toolsBtnSize)
-        self.duplicateLight_BTN.setMaximumSize(toolsBtnSize)
+        self.duplicateLight_BTN.setMinimumSize(drdBtnSize)
+        self.duplicateLight_BTN.setMaximumSize(drdBtnSize)
         self.duplicateLight_BTN.setObjectName("duplicateLight_BTN")
         self.duplicateLight_BTN.setToolTip('Duplicate lights. Right click for more options.')
-        self.duplicateLight_BTN.setText('Dupli\ncate')
+        self.duplicateLight_BTN.setText('Dup')
         self.duplicateLight_BTN.setStyleSheet("font-size: 10px;")
         self.renameLight_BTN.setSizePolicy(sizePolicy)
-        self.renameLight_BTN.setMinimumSize(toolsBtnSize)
-        self.renameLight_BTN.setMaximumSize(toolsBtnSize)
+        self.renameLight_BTN.setMinimumSize(drdBtnSize)
+        self.renameLight_BTN.setMaximumSize(drdBtnSize)
         self.renameLight_BTN.setObjectName("renameLight_BTN")
         self.renameLight_BTN.setToolTip('Rename selected light.')
-        self.renameLight_BTN.setText('Re\nname')
+        self.renameLight_BTN.setText('Ren')
         self.renameLight_BTN.setStyleSheet("font-size: 10px;")
         self.deleteLight_BTN.setSizePolicy(sizePolicy)
-        self.deleteLight_BTN.setMinimumSize(toolsBtnSize)
-        self.deleteLight_BTN.setMaximumSize(toolsBtnSize)
+        self.deleteLight_BTN.setMinimumSize(drdBtnSize)
+        self.deleteLight_BTN.setMaximumSize(drdBtnSize)
         self.deleteLight_BTN.setObjectName("deleteLight_BTN")
         self.deleteLight_BTN.setToolTip('Delete selected lights (Ctrl+Del)')
         self.deleteLight_BTN.setText('Del')
