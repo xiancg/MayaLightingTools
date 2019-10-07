@@ -128,6 +128,14 @@ class LightsFactory(object):
         finally:
             return success
     
+    def alignLight(self, lightTransform):
+        selObj = mc.ls(sl=True, long=True)
+        if len(selObj) >= 1:
+            selList = [lightTransform, selObj[0]]
+            tools.alignLightToObject(selList)
+        else:
+            tools.logger.warning('No selection found to align the light to, created at default position.')
+    
     def parseOldNameByTokens(self, lightNode):
         objTransform, objShape= tools.getTransformAndShape(lightNode)
         nameSplit = objTransform.split('_')
