@@ -1,7 +1,6 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Add strip whitespace to rename and create dialogs
 TODO: Options to create lights aligned with selection with some default offset
 TODO: Add separators to naming library
 TODO: Create GUI for naming library

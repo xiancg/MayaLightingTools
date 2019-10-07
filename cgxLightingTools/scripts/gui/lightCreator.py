@@ -183,7 +183,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
                         kwargs[tokenObj.name] = tokenCtrl.value()
                     else:
                         if tokenObj.required:
-                            kwargs[tokenObj.name] = tokenCtrl.text()
+                            kwargs[tokenObj.name] = tokenCtrl.text().replace(" ", "")
                         else:
                             kwargs[tokenObj.name] = tokenCtrl.currentText()
                 lightName = factory.buildName(**kwargs)
@@ -287,7 +287,7 @@ class LightRenamer_GUI(LightCreator_GUI):
                         kwargs[tokenObj.name] = tokenCtrl.value()
                     else:
                         if tokenObj.required:
-                            kwargs[tokenObj.name] = tokenCtrl.text()
+                            kwargs[tokenObj.name] = tokenCtrl.text().replace(" ", "")
                         else:
                             kwargs[tokenObj.name] = tokenCtrl.currentText()
                 lightName = factory.buildName(**kwargs)
