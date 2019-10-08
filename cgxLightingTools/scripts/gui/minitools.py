@@ -1,7 +1,6 @@
 '''
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Create light aligned to selection (add parameter to functions and use alignLight method in factory)
 TODO: Add separators to naming library
 TODO: Create GUI for naming library
 TODO: Change light attrs implementation

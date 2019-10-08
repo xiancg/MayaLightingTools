@@ -281,11 +281,12 @@ def lookThruLight (winWidth=629, winHeight=404, nearClip=1.0, farClip= 1000000):
         logger.warning('Please select at least one light to look thru.')
     
 
-def alignLightToObject (selection=mc.ls(sl=True, long=True)):
+def alignLightToObject (selList=mc.ls(sl=True, long=True)):
     '''Select lights first, target last'''
-    if len(selection) >= 2:
+    mc.select(selList, replace=True)
+    if len(selList) >= 2:
         mc.align(alignToLead=True, xAxis='mid', yAxis='mid', zAxis='mid')
-    elif len(selection) <= 1:
+    elif len(selList) <= 1:
        logger.warning('Select at least one light and one object to align the light to.')
 
 

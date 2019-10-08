@@ -31,6 +31,12 @@ class LightsFactory(object):
         self.post_fn = self._initPostFunctions()
     
     def createLight(self, lightNodeType, lightName, *args, **kwargs):
+        preCreationSelection = mc.ls(sl=True, long=True)
+        if len(preCreationSelection) < 1:
+            preCreationSelection = None
+        else:
+            preCreationSelection = preCreationSelection[0]
+
         if lightNodeType == 'spotLight':
             shapeNode = mc.spotLight(name=lightName)
         elif lightNodeType == 'directionalLight':
@@ -54,8 +60,10 @@ class LightsFactory(object):
         else:
             return None
         if shapeNode:
-            tools.setDefaultAttrs(shapeNode)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
+            self.alignLight(transformNode, preCreationSelection)
+            tools.setDefaultAttrs(shapeNode)
+            
             try:
                 self.post_fn.postLightCreation(transformNode, shapeNode, *args, **kwargs)
             except:
@@ -128,13 +136,14 @@ class LightsFactory(object):
         finally:
             return success
     
-    def alignLight(self, lightTransform):
-        selObj = mc.ls(sl=True, long=True)
-        if len(selObj) >= 1:
-            selList = [lightTransform, selObj[0]]
-            tools.alignLightToObject(selList)
-        else:
-            tools.logger.warning('No selection found to align the light to, created at default position.')
+    def alignLight(self, lightTransform, objTransform):
+        if objTransform != None:
+            if mc.objExists(objTransform) and mc.nodeType(objTransform) == 'transform':
+                selList = [lightTransform, objTransform]
+                tools.alignLightToObject(selList)
+                tools.logger.warning('Created light {} aligned to {}.'.format(lightTransform, objTransform))
+            else:
+                tools.logger.warning('No transform selection found to align {}, created at default position.'.format(lightTransform))
     
     def parseOldNameByTokens(self, lightNode):
         objTransform, objShape= tools.getTransformAndShape(lightNode)

@@ -19,21 +19,36 @@ class ArnoldFactory(LightsFactory):
         mcore.createOptions()
         
     def createLight(self, lightNodeType, lightName, *args, **kwargs):
-        if lightNodeType in self.lightNodeTypes and lightNodeType == 'aiMeshLight':
+        preCreationSelection = mc.ls(sl=True, long=True)
+        if len(preCreationSelection) < 1:
+            preCreationSelection = None
+        else:
+            preCreationSelection = preCreationSelection[0]
+
+        if lightNodeType in self.lightNodeTypes and \
+           lightNodeType == 'aiMeshLight':
             shapeNode = self._createMeshLight(lightName)
-        elif lightNodeType in self.lightNodeTypes and lightNodeType == 'aiSky':
+        elif lightNodeType in self.lightNodeTypes and \
+             lightNodeType == 'aiSky':
             skydome = mutils.createLocatorWithName('aiSkyDomeLight', lightName, asLight=True)
             shapeNode = mc.createNode('aiPhysicalSky', name= lightName + '_aiPS')
             mc.connectAttr(shapeNode + ".outColor", skydome[0] + ".color")
-        elif lightNodeType in self.lightNodeTypes and lightNodeType == 'aiLightPortal' and len(mc.ls(type='aiSkyDome')) >= 1:
+        elif lightNodeType in self.lightNodeTypes and \
+             lightNodeType == 'aiLightPortal' and \
+             len(mc.ls(type='aiSkyDome')) >= 1:
             shapeNode, transform = mutils.createLocatorWithName(lightNodeType, lightName, asLight=True)
-        elif lightNodeType in self.lightNodeTypes and lightNodeType != 'aiLightPortal':
+        elif lightNodeType in self.lightNodeTypes and \
+             lightNodeType != 'aiLightPortal':
             shapeNode, transform = mutils.createLocatorWithName(lightNodeType, lightName, asLight=True)
         else:
             return None
         if shapeNode:
             tools.setDefaultAttrs(shapeNode)
             transformNode = mc.listRelatives(shapeNode, parent=True)[0]
+
+            if lightNodeType not in ['aiMeshLight','aiSkyDomeLight','aiPhysicalSky']:
+                self.alignLight(transformNode, preCreationSelection)
+
             try:
                 self.post_fn.postLightCreation(transformNode, shapeNode, *args, **kwargs)
             except:
