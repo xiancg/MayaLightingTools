@@ -567,10 +567,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
-            with open(filepath) as fp:
+            with open(filepath, 'w') as fp:
                 config = json.load(fp)
                 config['orientation'] = prefOrientation
-            with open(filepath, 'w') as fp:
                 json.dump(config, fp, indent = 4)
         else:
             config = {'orientation': prefOrientation}
@@ -599,13 +598,12 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
-            with open(filepath) as fp:
+            with open(filepath, 'w') as fp:
                 config = json.load(fp)
                 config['lookThru_nearClip'] = nearClip
                 config['lookThru_farClip'] = farClip
                 config['lookThru_winWidth'] = winWidth
                 config['lookThru_winHeight'] = winHeight
-            with open(filepath, 'w') as fp:
                 json.dump(config, fp, indent = 4)
         else:
             config = {'lookThru_nearClip':nearClip,'lookThru_farClip':farClip,
@@ -633,10 +631,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
-            with open(filepath) as fp:
+            with open(filepath, 'w') as fp:
                 config = json.load(fp)
                 config['stats'] = statsBool
-            with open(filepath, 'w') as fp:
                 json.dump(config, fp, indent = 4)
         else:
             config = {'stats':statsBool}
@@ -665,10 +662,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         filepath = self._prefs_path()
         config = dict()
         if os.path.exists(filepath):
-            with open(filepath) as fp:
+            with open(filepath, 'w') as fp:
                 config = json.load(fp)
                 config['debug'] = debugBool
-            with open(filepath, 'w') as fp:
                 json.dump(config, fp, indent = 4)
         else:
             config = {'debug':debugBool}
