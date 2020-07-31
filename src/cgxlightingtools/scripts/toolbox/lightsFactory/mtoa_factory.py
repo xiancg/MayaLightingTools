@@ -1,14 +1,11 @@
-'''
-Created on July 4, 2019
+# coding=utf-8
+from __future__ import absolute_import, print_function
 
-@author: Chris Granados - Xian
-@contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-'''
 import maya.cmds as mc
 import mtoa.utils as mutils
 import mtoa.core as mcore
-from cgxLightingTools.scripts.toolbox.lightsFactory.default_factory import LightsFactory
-import cgxLightingTools.scripts.toolbox.tools as tools
+from cgxlightingtools.scripts.toolbox.lightsFactory.default_factory import LightsFactory
+import cgxlightingtools.scripts.toolbox.tools as tools
 
 
 class ArnoldFactory(LightsFactory):

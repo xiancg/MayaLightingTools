@@ -1,20 +1,19 @@
-'''
-Created on July 3, 2019
+# coding=utf-8
+from __future__ import absolute_import, print_function
 
-@author: Chris Granados - Xian
-@contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Implement attributes on default and arnold. This will require 
-a lot of work to do it automatically, use config file preset for now.
-'''
 import os
 import json
 import pkgutil
 import inspect
 import maya.cmds as mc
-from cgxLightingTools.scripts.toolbox import tools
-import cgxLightingTools.scripts.core.namingConventions as naming
-import cgxLightingTools.scripts.toolbox.post_functions as post_functions
+from cgxlightingtools.scripts.toolbox import tools
+import cgxlightingtools.scripts.core.namingConventions as naming
+import cgxlightingtools.scripts.toolbox.post_functions as post_functions
 
+'''
+TODO: Implement attributes on default and arnold. This will require 
+a lot of work to do it automatically, use config file preset for now.
+'''
 
 class LightsFactory(object):
     def __init__(self):

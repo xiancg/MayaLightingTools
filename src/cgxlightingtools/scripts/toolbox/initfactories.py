@@ -1,28 +1,25 @@
-'''
-Created on Aug 30, 2019
+# coding=utf-8
+from __future__ import absolute_import, print_function
 
-@author: Chris Granados - Xian
-@contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-'''
-
-from __future__ import absolute_import
 import os
 import pkgutil
 import inspect
 
-from cgxLightingTools.scripts.toolbox import tools
-import cgxLightingTools.scripts.toolbox.lightsFactory as lightsFactory
+from cgxlightinglools.scripts.toolbox import tools
+import cgxlightinglools.scripts.toolbox.lightsFactory as lightsFactory
 
 
 def init_factories():
     defaultFactory = lightsFactory.default_factory.LightsFactory()
-    result = {'default':defaultFactory}
+    result = {'default': defaultFactory}
     renderers = tools.getRenderEngines()
     if renderers is not None:
         rendererNames = renderers.keys()
         factoryPath = os.path.dirname(lightsFactory.__file__)
-        factories = [name for _, name, _ in pkgutil.iter_modules([factoryPath])
-                        if name.endswith('factory')]
+        factories = [
+            name for _, name, _ in pkgutil.iter_modules([factoryPath])
+            if name.endswith('factory')
+        ]
         for factory in factories:
             if factory.rsplit('_')[0] in rendererNames:
                 for name, obj in inspect.getmembers(eval('lightsFactory.{}'.format(factory))):

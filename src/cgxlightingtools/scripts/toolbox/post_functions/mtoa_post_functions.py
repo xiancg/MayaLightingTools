@@ -1,12 +1,11 @@
-'''
-@author: Chris Granados - Xian
-@contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-'''
-from __future__ import absolute_import
+# coding=utf-8
+from __future__ import absolute_import, print_function
+
 
 import maya.cmds as mc
 import mtoa.aovs as aovs
-from cgxLightingTools.scripts.toolbox.post_functions.default_post_functions import PostFunctions_default
+from cgxlightingtools.scripts.toolbox.post_functions.default_post_functions import PostFunctions_default
+
 
 class PostFunctions_mtoa(PostFunctions_default):
     def __init__(self):
@@ -42,7 +41,7 @@ class PostFunctions_mtoa(PostFunctions_default):
             aovNode = mc.rename(oldAOV, 'RGBA_LG_' + transformNode)
             mc.setAttr(aovNode + ".name", 'RGBA_LG_' + transformNode, type="string")
         mc.select(shapeNode, replace=True)
-    
+
     def postLightDelete(self, transformNode, shapeNode, *args, **kwargs):
         '''Place here all custom stuff you want to do with the deleted light node.
            Keep in mind the node doesn't exist anymore, you're just operating

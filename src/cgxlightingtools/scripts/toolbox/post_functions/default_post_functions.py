@@ -1,10 +1,8 @@
-'''
-@author: Chris Granados - Xian
-@contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-'''
-from __future__ import absolute_import
+# coding=utf-8
+from __future__ import absolute_import, print_function
 
 import maya.cmds as mc
+
 
 class PostFunctions_default(object):
     def __init__(self):
@@ -26,11 +24,13 @@ class PostFunctions_default(object):
         '''Place here all custom stuff you want to do with the deleted light node'''
         pass
 
+
 # --------------------------------------------------------
 #  Main
 # --------------------------------------------------------
 def main():
     pass
+
 
 if __name__ == '__main__' or 'eclipsePython' in __name__:
     main()

@@ -1,26 +1,24 @@
-'''
-Created on Jun 29, 2019
+# coding=utf-8
+from __future__ import absolute_import, print_function
 
-@author: Chris Granados - Xian
-@contact: chris.granados@xiancg.com http://www.chrisgranados.com/
-TODO: Refactor harcoded naming in specularConstrain
-'''
-from __future__ import absolute_import
 import logging
 import sys
 import os
 import copy
 import json
-import time
 from datetime import date
-import cgxLightingTools.scripts.core as core
+import cgxlightinglools.scripts.core as core
 
 import maya.cmds as mc
+
+'''
+TODO: Refactor harcoded naming in specularConstrain
+'''
 
 lightsOff = list()
 renderEngines = dict()
 lightNodesDict = dict()
-_cfgPath = os.path.join(os.path.dirname(os.path.abspath(core.__file__)),'cfg')
+_cfgPath = os.path.join(os.path.dirname(os.path.abspath(core.__file__)), 'cfg')
 _lightAttrsPath = os.path.join(_cfgPath, 'lightAttrs.json')
 with open(_lightAttrsPath) as fp:
     config = json.load(fp)
@@ -30,21 +28,21 @@ logger = logging.getLogger(name='lgtToolsLog')
 
 def initLogger():
     logger.setLevel(logging.WARNING)
-    #Formatter
+    # Formatter
     formatter = logging.Formatter(
                 '[%(asctime)s:%(module)s:%(funcName)s:%(lineno)s:%(levelname)s] %(message)s')
-    #STDOUT stream
+    # STDOUT stream
     streamHandler = logging.StreamHandler(sys.stdout)
     streamHandler.setLevel(logging.WARNING)
     streamHandler.setFormatter(formatter)
     logger.addHandler(streamHandler)
-    
+
 
 def initFileLogger():
-    #Formatter
+    # Formatter
     formatter = logging.Formatter(
                 '[%(asctime)s:%(module)s:%(funcName)s:%(lineno)s:%(levelname)s] %(message)s')
-    #Log file stream
+    # Log file stream
     userPath = os.path.expanduser("~")
     finalDir = os.path.join(userPath, ".CGXTools")
     try:
@@ -136,18 +134,16 @@ def getSelectedLights():
     for each in selObjs:
         node_type = mc.nodeType(each)
         if node_type == "transform":
-            shape_node = mc.listRelatives(each, shapes=True, 
-                                          noIntermediate=True,
-                                          fullPath=True)[0]
+            shape_node = mc.listRelatives(
+                each, shapes=True, noIntermediate=True, fullPath=True)[0]
             node_type = mc.nodeType(shape_node)
             if node_type in lightNodes:
                 selLights.append(each)
         else:
-            transform = mc.listRelatives(each, parent=True, 
-                                         fullPath=True)[0]
+            transform = mc.listRelatives(each, parent=True, fullPath=True)[0]
             if node_type in lightNodes:
                 selLights.append(transform)
-    
+
     return selLights
 
 
@@ -173,10 +169,10 @@ def simpleIsolateLights():
         # Toggle visibilities
         for light in allLightsScene:
             # If light is ON but not selected, switch it OFF
-            if mc.getAttr(light + ".visibility") == True and light not in selLights:
+            if mc.getAttr(light + ".visibility") is True and light not in selLights:
                 mc.setAttr((light + ".visibility"), False)
-            #Else, if light is OFF and was not OFF before this command, switch it ON
-            elif mc.getAttr(light + ".visibility") == False and light not in lightsOff:
+            # Else, if light is OFF and was not OFF before this command, switch it ON
+            elif mc.getAttr(light + ".visibility") is False and light not in lightsOff:
                 mc.setAttr((light + ".visibility"), True)
 
 
@@ -184,7 +180,7 @@ def lightsVisibilitySnapshot():
     del lightsOff[:]
     allLightsScene = getLightsInScene()
     for light in allLightsScene:
-        if mc.getAttr(light + ".visibility") == False:
+        if mc.getAttr(light + ".visibility") is False:
             lightsOff.append(light)
     logger.debug('Lights visibility snapshot taken. {} lights off found.'.format(len(lightsOff)))
     return copy.deepcopy(lightsOff)
@@ -202,13 +198,15 @@ def lightsAttrsSnapshot():
             if lightAttrs.get(key):
                 for attrName, attrDict in lightAttrs[key].iteritems():
                     objAttr = shapeNode + "." + attrName
-                    if attrName in mc.listAttr(shapeNode) and not mc.connectionInfo(objAttr, isDestination=True):
-                        if attrDict["uiControl"] in ['floatslider', 'intslider','combobox', 'booleancombobox']:
+                    if (attrName in mc.listAttr(shapeNode)
+                            and not mc.connectionInfo(objAttr, isDestination=True)):
+                        if (attrDict["uiControl"]
+                                in ['floatslider', 'intslider', 'combobox', 'booleancombobox']):
                             value = mc.getAttr(objAttr)
-                            finalAttrsDict[attrName] = {'value':value,'uiControl':attrDict["uiControl"]}
+                            finalAttrsDict[attrName] = {'value': value, 'uiControl': attrDict["uiControl"]}
                         elif attrDict["uiControl"] == "colorswatch":
                             value = list(mc.getAttr(objAttr)[0])
-                            finalAttrsDict[attrName] = {'value':value,'uiControl':attrDict["uiControl"]}
+                            finalAttrsDict[attrName] = {'value': value, 'uiControl': attrDict["uiControl"]}
         snapshot[light] = finalAttrsDict
     return snapshot
 
@@ -218,19 +216,23 @@ def loadLightsAttrsSnapshot(snapshot):
         lightNodes = getLightNodesList()
         for light, finalAttrsDict in snapshot.iteritems():
             if mc.objExists(light):
-                shapeNode = mc.listRelatives(light, shapes=True, noIntermediate=True,
-                                            fullPath=True, type=lightNodes)[0]
+                shapeNode = mc.listRelatives(
+                    light, shapes=True, noIntermediate=True,
+                    fullPath=True, type=lightNodes)[0]
                 for attrName, attrDict in finalAttrsDict.iteritems():
                     objAttr = shapeNode + "." + attrName
-                    if attrName in mc.listAttr(shapeNode) and not mc.connectionInfo(objAttr, isDestination=True):
-                        if attrDict["uiControl"] in ["floatslider","intslider"]:
+                    if (attrName in mc.listAttr(shapeNode)
+                            and not mc.connectionInfo(objAttr, isDestination=True)):
+                        if attrDict["uiControl"] in ["floatslider", "intslider"]:
                             mc.setAttr(objAttr, attrDict['value'])
-                        elif attrDict["uiControl"] in ["combobox","booleancombobox"]:
+                        elif attrDict["uiControl"] in ["combobox", "booleancombobox"]:
                             mc.setAttr(objAttr, int(attrDict['value']))
                         elif attrDict["uiControl"] == "colorswatch":
-                            mc.setAttr(objAttr, attrDict['value'][0],
-                                        attrDict['value'][1], attrDict['value'][2],
-                                        type= "double3")
+                            mc.setAttr(
+                                objAttr, attrDict['value'][0],
+                                attrDict['value'][1], attrDict['value'][2],
+                                type="double3"
+                            )
     except:
         logger.warning('Attributes snapshot could not be loaded.')
         return False
@@ -243,22 +245,22 @@ def setDefaultAttrs(lightNode):
         if lightAttrs.get(key):
             for attrName, attrDict in lightAttrs[key].iteritems():
                 value = attrDict["default"]
-                if attrName in mc.listAttr(lightNode):#Check if attribute exists in the object
+                if attrName in mc.listAttr(lightNode):  # Check if attribute exists in the object
                     if attrDict["uiControl"] == "floatslider" or attrDict["uiControl"] == "intslider":
                         mc.setAttr(lightNode + "." + attrName, value)
                     elif attrDict["uiControl"] == "combobox" or attrDict["uiControl"] == "booleancombobox":
                         valueIndex = attrDict["values"].index(value)
                         mc.setAttr(lightNode + "." + attrName, valueIndex)
                     elif attrDict["uiControl"] == "colorswatch":
-                        mc.setAttr(lightNode + "." + attrName, 1, 1, 1, type= "double3")
-                    
+                        mc.setAttr(lightNode + "." + attrName, 1, 1, 1, type="double3")
 
-def cleanUpCams ():
+
+def cleanUpCams():
     allLightsScene = getLightsInScene()
-    #Selected scene lights
+    # Selected scene lights
     i = 0
     for each in allLightsScene:
-        shapes = mc.listRelatives(each, shapes=True, noIntermediate = True, fullPath=True)
+        shapes = mc.listRelatives(each, shapes=True, noIntermediate=True, fullPath=True)
         for each in shapes:
             if mc.nodeType(each) == "camera":
                 i += 1
@@ -266,69 +268,68 @@ def cleanUpCams ():
     logger.warning('Deleted {} cameras from lights.'.format(i))
 
 
-def lookThruLight (winWidth=629, winHeight=404, nearClip=1.0, farClip= 1000000):
+def lookThruLight(winWidth=629, winHeight=404, nearClip=1.0, farClip=1000000):
     selLight = getSelectedLights()
     if len(selLight) >= 1:
         for e in selLight:
-            window = mc.window(width= winWidth, height= winHeight, title= e)
+            window = mc.window(width=winWidth, height=winHeight, title=e)
             mc.paneLayout()
             thisPanel = mc.modelPanel()
-            mc.showWindow( window )
-            
-            selLightShape = mc.listRelatives(e, shapes = True, noIntermediate = True, fullPath=True)
-            mc.lookThru(thisPanel, selLightShape[0], nc=nearClip, fc= farClip)
+            mc.showWindow(window)
+            selLightShape = mc.listRelatives(e, shapes=True, noIntermediate=True, fullPath=True)
+            mc.lookThru(thisPanel, selLightShape[0], nc=nearClip, fc=farClip)
     elif len(selLight) == 0:
         logger.warning('Please select at least one light to look thru.')
-    
 
-def alignLightToObject (selList=mc.ls(sl=True, long=True)):
+
+def alignLightToObject(selList=mc.ls(sl=True, long=True)):
     '''Select lights first, target last'''
     mc.select(selList, replace=True)
     if len(selList) >= 2:
         mc.align(alignToLead=True, xAxis='mid', yAxis='mid', zAxis='mid')
     elif len(selList) <= 1:
-       logger.warning('Select at least one light and one object to align the light to.')
+        logger.warning('Select at least one light and one object to align the light to.')
 
 
-def aimLightToObject ():
+def aimLightToObject():
     selection = mc.ls(sl=True, long=True)
     if len(selection) >= 2:
         target = selection[-1]
         for each in selection[:-1]:
-            mc.aimConstraint(target, each, aimVector=(0,0,-1))
+            mc.aimConstraint(target, each, aimVector=(0, 0, -1))
     elif len(selection) <= 1:
         logger.warning('Select at least one light and one target to aim the light to.')
 
 
-def specularConstrain (_fixed=True):
+def specularConstrain(_fixed=True):
     selection = mc.ls(sl=True)
     i = 0
     for vertex in selection:
         if '.vtx' in vertex:
-            #Create locator
-            locator = mc.spaceLocator(name= 'LGT_' +  vertex.rsplit('.vtx')[0] + '_LOC')[0]
+            # Create locator
+            locator = mc.spaceLocator(name='LGT_' + vertex.rsplit('.vtx')[0] + '_LOC')[0]
             mc.setAttr(locator + '.visibility', 0)
-            #Create point light
-            pntLightShape = mc.pointLight(name= 'LGT_' + vertex.rsplit('.vtx')[0] + '_01_Specular')
-            #Group point light
+            # Create point light
+            pntLightShape = mc.pointLight(name='LGT_' + vertex.rsplit('.vtx')[0] + '_01_Specular')
+            # Group point light
             pntLight = mc.listRelatives(pntLightShape, parent=True, fullPath=True)[0]
-            pntGrp = mc.group(pntLight, name= pntLight + '_GRP')
-            #Create point on poly constrain
-            vtxUVMap = mc.polyListComponentConversion(vertex, fv=True,tuv=True)
+            pntGrp = mc.group(pntLight, name=pntLight + '_GRP')
+            # Create point on poly constrain
+            vtxUVMap = mc.polyListComponentConversion(vertex, fv=True, tuv=True)
             vtxUVs = mc.polyEditUV(vtxUVMap, query=True)
-            thisPopC = mc.pointOnPolyConstraint(vertex, locator, offset=(0,0,0), weight=1)
+            thisPopC = mc.pointOnPolyConstraint(vertex, locator, offset=(0, 0, 0), weight=1)
             thisPopCAttrs = mc.listAttr(thisPopC, ud=True)
             mc.setAttr(thisPopC[0] + "." + thisPopCAttrs[1], vtxUVs[0])
             mc.setAttr(thisPopC[0] + "." + thisPopCAttrs[2], vtxUVs[1])
-            locWorld = mc.xform(locator, query=True, rotatePivot = True, ws= True)
+            locWorld = mc.xform(locator, query=True, rotatePivot=True, ws=True)
             mc.setAttr(pntGrp + '.tx', locWorld[0])
             mc.setAttr(pntGrp + '.ty', locWorld[1])
             mc.setAttr(pntGrp + '.tz', locWorld[2])
-            #Create parent constrain
+            # Create parent constrain
             mc.setAttr(pntGrp + '.tz', locWorld[2] + 5)
             mc.parentConstraint(locator, pntGrp, maintainOffset=True)
-            #Create organize group
-            organizeGroup = mc.group(pntGrp, locator, name= 'LGT_' +  vertex.rsplit('.vtx')[0] + '_GRP')
+            # Create organize group
+            organizeGroup = mc.group(pntGrp, locator, name='LGT_' + vertex.rsplit('.vtx')[0] + '_GRP')
             mc.setAttr(organizeGroup + '.tx', lock=True)
             mc.setAttr(organizeGroup + '.ty', lock=True)
             mc.setAttr(organizeGroup + '.tz', lock=True)
@@ -346,42 +347,53 @@ def specularConstrain (_fixed=True):
     logger.info('{} specular constrain setups created.'.format(i))
 
 
-def transformBake (items, sampleBy=1):
+def transformBake(items, sampleBy=1):
     for item in items:
         if ".vtx" in item:
-            vtxExp = mc.filterExpand(item , selectionMask = 31 , expand = True)
+            vtxExp = mc.filterExpand(item, selectionMask=31, expand=True)
             for vtx in vtxExp:
-                #THIS DOESN'T WORK IF UVS ARE OVERLAPED
-                cleanObjName = vtx[:vtx.index(".vtx")]
-                thisLoc = mc.spaceLocator(name= vtx + "__LOC_bkd", p=(0, 0, 0))
-                #Make constrain
-                vtxUVMap = mc.polyListComponentConversion(vtx, fv=True,tuv=True)
+                # ! THIS DOESN'T WORK IF UVS ARE OVERLAPED
+                thisLoc = mc.spaceLocator(name=vtx + "__LOC_bkd", p=(0, 0, 0))
+                # Make constrain
+                vtxUVMap = mc.polyListComponentConversion(vtx, fv=True, tuv=True)
                 vtxUVs = mc.polyEditUV(vtxUVMap, query=True)
-                thisPopC = mc.pointOnPolyConstraint(vtx, thisLoc, offset=(0,0,0), weight=1)
+                thisPopC = mc.pointOnPolyConstraint(vtx, thisLoc, offset=(0, 0, 0), weight=1)
                 thisPopCAttrs = mc.listAttr(thisPopC, ud=True)
                 mc.setAttr(thisPopC[0] + "." + thisPopCAttrs[1], vtxUVs[0])
                 mc.setAttr(thisPopC[0] + "." + thisPopCAttrs[2], vtxUVs[1])
-                #Bake animation
-                start = mc.playbackOptions(query= True, minTime = True)
-                end = mc.playbackOptions(query= True, maxTime = True)
-                mc.bakeResults(thisLoc, simulation= True, t=(int(start),int(end)), sampleBy= sampleBy, preserveOutsideKeys= True, sparseAnimCurveBake= False, removeBakedAttributeFromLayer= False, bakeOnOverrideLayer= False, minimizeRotation= True, at= ("tx","ty","tz","rx","ry","rz","sx","sy","sz"))
-                #Delete constrain
+                # Bake animation
+                start = mc.playbackOptions(query=True, minTime=True)
+                end = mc.playbackOptions(query=True, maxTime=True)
+                mc.bakeResults(
+                    thisLoc, simulation=True, t=(int(start), int(end)), sampleBy=sampleBy,
+                    preserveOutsideKeys=True, sparseAnimCurveBake=False,
+                    removeBakedAttributeFromLayer=False, bakeOnOverrideLayer=False,
+                    minimizeRotation=True,
+                    at=("tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz")
+                )
+                # Delete constrain
                 mc.delete(thisPopC[0])
-        else: 
+        else:
             if mc.nodeType(item) == "transform":
-                thisLoc = mc.spaceLocator(name= item + "__LOC_bkd", p=(0, 0, 0))
-                #Make constrains
-                pConstrain = mc.parentConstraint(item, thisLoc, maintainOffset = False)
-                sConstrain = mc.scaleConstraint(item, thisLoc, maintainOffset = False)
-                #Bake animation
-                start = mc.playbackOptions(query= True, minTime = True)
-                end = mc.playbackOptions(query= True, maxTime = True)
-                mc.bakeResults(thisLoc, simulation= True, t=(int(start),int(end)), sampleBy= sampleBy, preserveOutsideKeys= True, sparseAnimCurveBake= False, removeBakedAttributeFromLayer= False, bakeOnOverrideLayer= False, minimizeRotation= True, at= ("tx","ty","tz","rx","ry","rz","sx","sy","sz"))
-                #Delete constrain
-                mc.delete(pConstrain,sConstrain)
+                thisLoc = mc.spaceLocator(name=item + "__LOC_bkd", p=(0, 0, 0))
+                # Make constrains
+                pConstrain = mc.parentConstraint(item, thisLoc, maintainOffset=False)
+                sConstrain = mc.scaleConstraint(item, thisLoc, maintainOffset=False)
+                # Bake animation
+                start = mc.playbackOptions(query=True, minTime=True)
+                end = mc.playbackOptions(query=True, maxTime=True)
+                mc.bakeResults(
+                    thisLoc, simulation=True, t=(int(start), int(end)), sampleBy=sampleBy,
+                    preserveOutsideKeys=True, sparseAnimCurveBake=False,
+                    removeBakedAttributeFromLayer=False, bakeOnOverrideLayer=False,
+                    minimizeRotation=True,
+                    at=("tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz")
+                )
+                # Delete constrain
+                mc.delete(pConstrain, sConstrain)
             else:
                 logger.info('Only Vertex or Transforms accepted. Found {}'.format(item))
-    #Done Alert!!
+    # Done Alert!!
     logger.info('Done baking transforms.')
 
 
@@ -401,7 +413,7 @@ getLightNodes()
 #  Main
 # --------------------------------------------------------
 def main():
-    #print getLightsInScene()
+    # print getLightsInScene()
     pass
 
 
