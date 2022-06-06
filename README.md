@@ -1,6 +1,6 @@
 # LightingTools
 Collection of tools for lighting artists in Maya (WIP)
-Tested so far on Windows 10 - Maya 2018.6 - mtoa 3.2.0.2
+Tested so far on Windows 10 - Maya 2022.1 - mtoa 5.0.0.2
 
 # Installation:
 1. Copy and paste the cgxLightingTools folder to your favorite scripts folder.
