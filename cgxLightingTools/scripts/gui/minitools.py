@@ -778,7 +778,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         success = False
         for each in allSel:
             objTransform, objShape = tools.getTransformAndShape(each)
-            for name, factory in self.factories.iteritems():
+            for name, factory in self.factories.items():
                 if mc.nodeType(objShape) in factory.lightNodeTypes:
                     factory.deleteLight(objTransform, objShape)
                     success = True
