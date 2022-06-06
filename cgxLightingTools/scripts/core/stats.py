@@ -1,12 +1,15 @@
 '''
+Python 3 refactor, Jun 6, 2022
+
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
-from __future__ import absolute_import
-import os 
+
+import os
 import json
 
-_stats = dict()
+_stats = {}
+
 
 def collect(tool):
     if tool in _stats.keys():
@@ -16,11 +19,13 @@ def collect(tool):
     else:
         _stats[tool] = 1
 
+
 def save():
     repo = os.path.join(os.path.expanduser("~"), ".CGXTools")
     filepath = os.path.join(repo, "lightingTools.stats")
     with open(filepath, "w") as fp:
-        json.dump(_stats, fp, indent = 4)
+        json.dump(_stats, fp, indent=4)
+
 
 def load():
     repo = os.path.join(os.path.expanduser("~"), ".CGXTools")
@@ -33,8 +38,11 @@ def load():
 # --------------------------------------------------------
 #  Main
 # --------------------------------------------------------
+
+
 def main():
     pass
+
 
 if __name__ == '__main__' or 'eclipsePython' in __name__:
     main()
