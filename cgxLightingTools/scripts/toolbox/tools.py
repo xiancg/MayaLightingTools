@@ -77,7 +77,7 @@ def getRenderEngines():
 
 def getCurrentRenderPlugin():
     currentRenderer = mc.getAttr('defaultRenderGlobals.currentRenderer')
-    for plugin, renderers in getRenderEngines().iteritems():
+    for plugin, renderers in getRenderEngines().items():
         for each in renderers:
             if currentRenderer.lower() == str(each).lower():
                 return plugin
@@ -199,7 +199,7 @@ def lightsAttrsSnapshot():
                                      fullPath=True, type=lightNodes)[0]
         for key in getLightNodes().keys():
             if lightAttrs.get(key):
-                for attrName, attrDict in lightAttrs[key].iteritems():
+                for attrName, attrDict in lightAttrs[key].items():
                     objAttr = f"{shapeNode}.{attrName}"
                     if attrName in mc.listAttr(shapeNode) and not mc.connectionInfo(objAttr, isDestination=True):
                         if attrDict["uiControl"] in ['floatslider', 'intslider', 'combobox', 'booleancombobox']:
@@ -217,11 +217,11 @@ def lightsAttrsSnapshot():
 def loadLightsAttrsSnapshot(snapshot):
     try:
         lightNodes = getLightNodesList()
-        for light, finalAttrsDict in snapshot.iteritems():
+        for light, finalAttrsDict in snapshot.items():
             if mc.objExists(light):
                 shapeNode = mc.listRelatives(light, shapes=True, noIntermediate=True,
                                              fullPath=True, type=lightNodes)[0]
-                for attrName, attrDict in finalAttrsDict.iteritems():
+                for attrName, attrDict in finalAttrsDict.items():
                     objAttr = f"{shapeNode}.{attrName}"
                     if attrName in mc.listAttr(shapeNode) and not mc.connectionInfo(objAttr, isDestination=True):
                         if attrDict["uiControl"] in ["floatslider", "intslider"]:
@@ -242,7 +242,7 @@ def setDefaultAttrs(lightNode):
     '''TODO: Old implementation. Need to change to programatic listing of attrs and attr types'''
     for key in getLightNodes().keys():
         if lightAttrs.get(key):
-            for attrName, attrDict in lightAttrs[key].iteritems():
+            for attrName, attrDict in lightAttrs[key].items():
                 if attrName in mc.listAttr(lightNode):  # Check if attribute exists in the object
                     value = attrDict["default"]
                     if attrDict["uiControl"] in ["floatslider", "intslider"]:
