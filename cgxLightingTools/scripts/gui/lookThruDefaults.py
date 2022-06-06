@@ -12,8 +12,9 @@ import json
 from PySide2 import QtCore, QtWidgets
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 
+
 class LookThruDefaults_GUI(QtWidgets.QDialog):
-    def __init__(self, parent= mWin.getMayaWindow()):
+    def __init__(self, parent=mWin.getMayaWindow()):
         super(LookThruDefaults_GUI, self).__init__(parent)
         self._setupUi()
         self._setConnections()
@@ -41,18 +42,18 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
         mainLayout.addWidget(self.farClip_DBLSPINBOX, 3, 3, 1, 1, QtCore.Qt.AlignCenter)
         mainLayout.addWidget(self.save_BTN, 5, 1, 1, 2, QtCore.Qt.AlignCenter)
         mainLayout.addWidget(self.cancel_BTN, 5, 3, 1, 2, QtCore.Qt.AlignCenter)
-        mainLayout.setColumnMinimumWidth(2,10)
-        mainLayout.setColumnStretch(2,10)
-        mainLayout.setRowMinimumHeight(4,6)
-        mainLayout.setRowStretch(4,6)
+        mainLayout.setColumnMinimumWidth(2, 10)
+        mainLayout.setColumnStretch(2, 10)
+        mainLayout.setRowMinimumHeight(4, 6)
+        mainLayout.setRowStretch(4, 6)
 
         self.setLayout(mainLayout)
 
         QtCore.QMetaObject.connectSlotsByName(self)
-        
+
     def _createButtons(self):
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                            QtWidgets.QSizePolicy.Fixed)
+                                           QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         btnSize = QtCore.QSize(81, 23)
@@ -126,7 +127,7 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
     def _setConnections(self):
         self.save_BTN.clicked.connect(self._save)
         self.cancel_BTN.clicked.connect(self._cancel)
-    
+
     def _save(self):
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
@@ -145,17 +146,17 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
                 config['lookThru_winWidth'] = self.winWidth_SPINBOX.value()
                 config['lookThru_winHeight'] = self.winHeight_SPINBOX.value()
             with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
+                json.dump(config, fp, indent=4)
         else:
-            config = {'lookThru_nearClip':self.nearClip_DBLSPINBOX.value(),
-                    'lookThru_farClip':self.farClip_DBLSPINBOX.value(),
-                    'lookThru_winWidth':self.winWidth_SPINBOX.value(),
-                    'lookThru_winHeight':self.winHeight_SPINBOX.value()}
+            config = {'lookThru_nearClip': self.nearClip_DBLSPINBOX.value(),
+                      'lookThru_farClip': self.farClip_DBLSPINBOX.value(),
+                      'lookThru_winWidth': self.winWidth_SPINBOX.value(),
+                      'lookThru_winHeight': self.winHeight_SPINBOX.value()}
             with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
-        
+                json.dump(config, fp, indent=4)
+
         self.done(1)
-    
+
     def _initCtrls(self):
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
@@ -164,8 +165,8 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
-        valuesList = [config.get('lookThru_nearClip'),config.get('lookThru_farClip'),
-                    config.get('lookThru_winWidth'),config.get('lookThru_winHeight')]
+        valuesList = [config.get('lookThru_nearClip'), config.get('lookThru_farClip'),
+                      config.get('lookThru_winWidth'), config.get('lookThru_winHeight')]
         if None not in valuesList:
             self.nearClip_DBLSPINBOX.setValue(config.get('lookThru_nearClip'))
             self.farClip_DBLSPINBOX.setValue(config.get('lookThru_farClip'))
@@ -176,7 +177,7 @@ class LookThruDefaults_GUI(QtWidgets.QDialog):
             self.farClip_DBLSPINBOX.setValue(1000000)
             self.winWidth_SPINBOX.setValue(629)
             self.winHeight_SPINBOX.setValue(404)
-    
+
     def _cancel(self):
         self.done(0)
 
