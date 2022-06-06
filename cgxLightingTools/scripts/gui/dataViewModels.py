@@ -1,24 +1,18 @@
-# -*- coding: utf-8 -*-
 '''
 Data view models for data visualization.
 
 Modified on Mar 22, 2016
+Python 3 Refactor Jun 6, 2022
 
-NOTE: Remove rows for tables works by passing both a list of ints or QModelIndex, for trees by passing only a list of QModelIndex
+NOTE: Remove rows for tables works by passing both a list of ints or QModelIndex,
+for trees by passing only a list of QModelIndex
 
 @author: Chris Granados - Xian chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
 
-
-# ------------------------------------------------------------------------------------
-# imports
-# ------------------------------------------------------------------------------------
 from PySide2 import QtCore
 
 
-# ------------------------------------------------------------------------------------
-# Metadata
-# ------------------------------------------------------------------------------------
 __author__ = "Chris Granados"
 __copyright__ = "Copyright 2016, Chris Granados"
 __credits__ = ["Chris Granados"]
@@ -27,9 +21,7 @@ __email__ = "chris.granados@xiancg.com"
 
 
 class DataTableModel(QtCore.QAbstractTableModel):
-    # ------------------------------------------------------------------------------------
-    # Constructor
-    # ------------------------------------------------------------------------------------
+
     def __init__(self, dataList=None, headers=None, parent=None):
         '''
         DataTableModel for Model/View programming.
@@ -60,13 +52,10 @@ class DataTableModel(QtCore.QAbstractTableModel):
         :return: dataList len
         :rtype: int
         '''
-        if len(self.dataList) == 1:
-            if self.dataList[0] == []:
-                return 0
-            else:
-                return len(self.dataList)
-        else:
-            return len(self.dataList)
+        if len(self.dataList) == 1 and self.dataList[0] == []:
+            return 0
+
+        return len(self.dataList)
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         '''
@@ -151,7 +140,7 @@ class DataTableModel(QtCore.QAbstractTableModel):
         :type orientation: QtCore.Qt.Orientation
         :param role: Qt role requested for the item
         :type role: QtCore.Qt.Role
-        :return: If item was edited successfully return True. 
+        :return: If item was edited successfully return True.
         :rtype: boolean
         '''
         row = index.row()
@@ -219,19 +208,16 @@ class DataTableModel(QtCore.QAbstractTableModel):
         :return: True if insert was successful. False if a number of conditions are not matched.
         :rtype: boolean
         '''
-        if position < 0:
-            return False
+        if position >= 0 and type(columns) is list:
+            self.beginInsertColumns(parent, position, position + len(columns) - 1)
+            for i in columns[::-1]:
+                self.headers.insert(position, i)
+                for row in self.dataList:
+                    row.insert(position, "Type here")
+            self.endInsertColumns()
+            return True
         else:
-            if type(columns) is list:
-                self.beginInsertColumns(parent, position, position + len(columns) - 1)
-                for i in columns[::-1]:
-                    self.headers.insert(position, i)
-                    for row in self.dataList:
-                        row.insert(position, "Type here")
-                self.endInsertColumns()
-                return True
-            else:
-                return False
+            return False
 
     def removeRows(self, indexList, count, parent=QtCore.QModelIndex()):
         '''
@@ -258,13 +244,13 @@ class DataTableModel(QtCore.QAbstractTableModel):
 
         if len(indexList) != count:
             return False
-        else:
-            position = indexList[0]
-            self.beginRemoveRows(parent, position, position + (count - 1))
-            for i in sorted(indexList, reverse=True):
-                del(self.dataList[i])
-            self.endRemoveRows()
-            return True
+
+        position = indexList[0]
+        self.beginRemoveRows(parent, position, position + (count - 1))
+        for i in sorted(indexList, reverse=True):
+            del(self.dataList[i])
+        self.endRemoveRows()
+        return True
 
     def removeColumns(self, indexList, count, parent=QtCore.QModelIndex()):
         '''
@@ -380,8 +366,8 @@ class ObjectsListModel(QtCore.QAbstractListModel):
         '''
         if not index.isValid():
             return QtCore.Qt.NoItemFlags
-        else:
-            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def data(self, index, role=QtCore.Qt.DisplayRole):
         '''
@@ -525,9 +511,11 @@ class TreeNode(object):
     def __init__(self, dataList, headers, parent=None):
         '''
         TreeNode to be used by DataTreeModel.
-        :param dataList: List of objects to be displayed by DataTreeModel for this node. IT'S MANDATORY TO HAVE THE NAME AS THE FIRST ITEM IN THIS LIST.
+        :param dataList: List of objects to be displayed by DataTreeModel for this node.
+            IT'S MANDATORY TO HAVE THE NAME AS THE FIRST ITEM IN THIS LIST.
         :type dataList: list
-        :param parent: TreeNode to be the parent of this node. None only if node is root of tree structure.
+        :param parent: TreeNode to be the parent of this node.
+                        None only if node is root of tree structure.
         :type parent: TreeNode or None
         '''
         self.__parent = parent
@@ -625,11 +613,12 @@ class TreeNode(object):
         '''
         if position < 0 or position > self.columnCount():
             return False
-        else:
-            for column in sorted(columns):
-                self.data.insert(position, column)
-                self.headers.insert(position, column)
-            return True
+
+        for column in sorted(columns):
+            self.data.insert(position, column)
+            self.headers.insert(position, column)
+
+        return True
 
     def removeChildren(self, indexList):
         '''
@@ -686,10 +675,7 @@ class TreeNode(object):
         :return: data value
         :rtype: object
         '''
-        if column >= len(self.data):
-            return None
-        else:
-            return self.data[column]
+        return None if column >= len(self.data) else self.data[column]
 
     def setData(self, column, value):
         '''
@@ -703,9 +689,9 @@ class TreeNode(object):
         '''
         if column < 0 or column >= len(self.data):
             return False
-        else:
-            self.data[column] = value
-            return True
+
+        self.data[column] = value
+        return True
 
     def asDict(self):
         '''
@@ -713,11 +699,7 @@ class TreeNode(object):
         :return: Dict with header:value pairs
         :rtype: dict
         '''
-        newDict = {}
-        i = 0
-        for each in self.headers:
-            newDict[each] = self.data[i]
-            i += 1
+        newDict = {each: self.data[i] for i, each in enumerate(self.headers)}
         return newDict
 
     def log(self, tabLevel=-1):
@@ -907,10 +889,9 @@ class DataTreeModel(QtCore.QAbstractItemModel):
             node = index.internalPointer()
             if node:
                 return node
-            else:
-                return None
-        else:
-            return self.dataList
+            return None
+
+        return self.dataList
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         '''
