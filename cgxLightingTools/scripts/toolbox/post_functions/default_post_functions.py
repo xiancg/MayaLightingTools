@@ -1,10 +1,12 @@
 '''
 @author: Chris Granados - Xian
+Python 3 refactor, Jun 6, 2022
+
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
-from __future__ import absolute_import
 
 import maya.cmds as mc
+
 
 class PostFunctions_default(object):
     def __init__(self):
@@ -25,12 +27,3 @@ class PostFunctions_default(object):
     def postLightDelete(self, transformNode, shapeNode, *args, **kwargs):
         '''Place here all custom stuff you want to do with the deleted light node'''
         pass
-
-# --------------------------------------------------------
-#  Main
-# --------------------------------------------------------
-def main():
-    pass
-
-if __name__ == '__main__' or 'eclipsePython' in __name__:
-    main()
