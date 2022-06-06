@@ -10,15 +10,15 @@ NOTE: Remove rows for tables works by passing both a list of ints or QModelIndex
 '''
 
 
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 # imports
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 from PySide2 import QtCore
 
 
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 # Metadata
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 __author__ = "Chris Granados"
 __copyright__ = "Copyright 2016, Chris Granados"
 __credits__ = ["Chris Granados"]
@@ -26,14 +26,11 @@ __version__ = "3.0.0"
 __email__ = "chris.granados@xiancg.com"
 
 
-# --------------------------------------------------------------------------------------------
-# Class: Data Table Model
-# --------------------------------------------------------------------------------------------
 class DataTableModel(QtCore.QAbstractTableModel):
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Constructor
-    # --------------------------------------------------------------------------------------------
-    def __init__(self, dataList=[[]], headers=[], parent=None):
+    # ------------------------------------------------------------------------------------
+    def __init__(self, dataList=None, headers=None, parent=None):
         '''
         DataTableModel for Model/View programming.
         :param dataList: List of lists of object to be displayed. Each list inside the main list is a row.
@@ -45,16 +42,16 @@ class DataTableModel(QtCore.QAbstractTableModel):
         '''
         super(DataTableModel, self).__init__(parent)
         self.__dataList = dataList
-        if dataList == None:
-            self.__dataList = []
+        if dataList is None:
+            self.__dataList = [[]]
 
         self.__headers = headers
-        if headers == None:
+        if headers is None:
             self.__headers = []
 
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Methods
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     def rowCount(self, parent=QtCore.QModelIndex()):
         '''
         Rows number for the table
@@ -166,15 +163,12 @@ class DataTableModel(QtCore.QAbstractTableModel):
         elif column >= len(self.headers) or column < 0:
             return False
 
-        if role == QtCore.Qt.EditRole:
-            if value != None:
-                self.dataList[row][column] = value
-                self.dataChanged.emit(index, index)
-                return True
-            else:
-                return False
-        else:
-            return False
+        if role is QtCore.Qt.EditRole and value is not None:
+            self.dataList[row][column] = value
+            self.dataChanged.emit(index, index)
+            return True
+
+        return False
 
     def insertRows(self, position, count, data, parent=QtCore.QModelIndex()):
         '''
@@ -327,9 +321,9 @@ class DataTableModel(QtCore.QAbstractTableModel):
         else:
             return QtCore.QModelIndex()
 
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Properties
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
 
     @property
     def dataList(self):
@@ -340,14 +334,14 @@ class DataTableModel(QtCore.QAbstractTableModel):
         return self.__headers
 
 
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 # Class: Objects lists model
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 class ObjectsListModel(QtCore.QAbstractListModel):
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Constructor
-    # --------------------------------------------------------------------------------------------
-    def __init__(self, dataList=[], parent=None):
+    # ------------------------------------------------------------------------------------
+    def __init__(self, dataList=None, parent=None):
         '''
         ObjectsListModel for Model/View programming.
         :param dataList: List of objects to be displayed.
@@ -356,13 +350,13 @@ class ObjectsListModel(QtCore.QAbstractListModel):
         :type parent: QWidget
         '''
         super(ObjectsListModel, self).__init__(parent)
-        self.__dataList = dataList
-        if dataList == None:
+        self.__dataList = list(dataList)
+        if dataList is None:
             self.__dataList = []
 
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Methods
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         '''
@@ -376,7 +370,9 @@ class ObjectsListModel(QtCore.QAbstractListModel):
 
     def flags(self, index):
         '''
-        Set flags of each item.  Re-implement if different flags are needed and use conditional chains if per-item flags are needed.
+        Set flags of each item.
+        Re-implement if different flags are needed and
+        use conditional chains if per-item flags are needed.
         :param index: Item to be filtered
         :type index: QModelIndex
         :return: Flags to be used
@@ -416,7 +412,7 @@ class ObjectsListModel(QtCore.QAbstractListModel):
         :type orientation: QtCore.Qt.Orientation
         :param role: Qt role requested for the item
         :type role: QtCore.Qt.Role
-        :return: If item was edited successfully return True. 
+        :return: If item was edited successfully return True.
         :rtype: boolean
         '''
         row = index.row()
@@ -425,15 +421,12 @@ class ObjectsListModel(QtCore.QAbstractListModel):
         elif row >= len(self.dataList) or row < 0:
             return False
 
-        if role == QtCore.Qt.EditRole:
-            if value != None:
-                self.dataList[row] = value
-                self.dataChanged.emit(index, index)
-                return True
-            else:
-                return False
-        else:
-            return False
+        if role is QtCore.Qt.EditRole and value is not None:
+            self.dataList[row] = value
+            self.dataChanged.emit(index, index)
+            return True
+
+        return False
 
     def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
         '''
@@ -513,22 +506,22 @@ class ObjectsListModel(QtCore.QAbstractListModel):
         else:
             return QtCore.QModelIndex()
 
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Properties
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
 
     @property
     def dataList(self):
         return self.__dataList
 
 
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 # Class: Tree Node
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 class TreeNode(object):
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Constructor
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     def __init__(self, dataList, headers, parent=None):
         '''
         TreeNode to be used by DataTreeModel.
@@ -544,9 +537,9 @@ class TreeNode(object):
         self.__depth = 0
         self.initDepth()
 
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Methods
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
 
     def child(self, row):
         '''
@@ -574,10 +567,7 @@ class TreeNode(object):
         :return: Child index
         :rtype: int
         '''
-        if self.parent != None:
-            return self.parent.children.index(self)
-        else:
-            return 0
+        return self.parent.children.index(self) if self.parent is not None else 0
 
     def columnCount(self):
         '''
@@ -760,18 +750,14 @@ class TreeNode(object):
         '''
         Initialize tree depth for this node. If root, depth is 0
         '''
-        if self.parent == None:
-            self.depth = 0
-        else:
-            parentDepth = self.parent.depth
-            self.depth = parentDepth + 1
+        self.depth = 0 if self.parent is None else self.parent.depth + 1
 
     def __repr__(self):
         return self.log()
 
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Properties
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
 
     @property
     def depth(self):
@@ -810,14 +796,14 @@ class TreeNode(object):
         self.__headers = d
 
 
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 # Class: Tree Data Model
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 class DataTreeModel(QtCore.QAbstractItemModel):
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Constructor
-    # --------------------------------------------------------------------------------------------
-    def __init__(self, root=TreeNode(['name', 'itemType', 'internalName'], ['name', 'itemType', 'internalName']), headers=[], parent=None):
+    # ------------------------------------------------------------------------------------
+    def __init__(self, root=TreeNode(['name', 'itemType', 'internalName'], ['name', 'itemType', 'internalName']), headers=None, parent=None):
         '''
         DataTreeModel for Model/View programming.
         :param root: root TreeNode for this model.
@@ -828,14 +814,12 @@ class DataTreeModel(QtCore.QAbstractItemModel):
         :type parent: QWidget
         '''
         super(DataTreeModel, self).__init__(parent)
+        self.__headers = headers or []
         self.__rootNode = root
-        self.__headers = headers
-        if headers == None:
-            self.__headers = []
 
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     # Methods
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
     def columnCount(self, parent=QtCore.QModelIndex()):
         '''
         Number of columns
@@ -1114,20 +1098,18 @@ class DataTreeModel(QtCore.QAbstractItemModel):
 
         if len(indexList) != count:
             return False
-        else:
-            if not parent.isValid():
-                position = indexList[0]
-                self.beginRemoveColumns(parent, position, position + (count - 1))
-                for i in sorted(indexList, reverse=True):
-                    del(self.headers[i])
-                self.removeColumns_recursive(self.dataList, indexList)
-                self.endRemoveColumns()
-                return True
-            else:
-                return False
 
-            if self.dataList.columnCount() == 0:
-                self.removeRows([0], self.rowCount())
+        if parent.isValid():
+            return False
+
+        position = indexList[0]
+        self.beginRemoveColumns(parent, position, position + (count - 1))
+        for i in sorted(indexList, reverse=True):
+            del(self.headers[i])
+        self.removeColumns_recursive(self.dataList, indexList)
+        self.endRemoveColumns()
+
+        return True
 
     def removeColumns_recursive(self, node, indexList):
         '''
@@ -1157,7 +1139,7 @@ class DataTreeModel(QtCore.QAbstractItemModel):
             # Group selected items by tree depth
             depthDict = {}
             for index in modelIndexList:
-                if self.getNode(index).depth in depthDict.keys():
+                if self.getNode(index).depth in depthDict:
                     depthDict[self.getNode(index).depth].append(index)
                 else:
                     depthDict[self.getNode(index).depth] = [index]
@@ -1167,7 +1149,7 @@ class DataTreeModel(QtCore.QAbstractItemModel):
                 # Group by index level
                 indexesDict = {}
                 for item in depthDict[depthLevel]:
-                    if item.row() in indexesDict.keys():
+                    if item.row() in indexesDict:
                         indexesDict[item.row()].append(item)
                     else:
                         indexesDict[item.row()] = [item]
@@ -1182,12 +1164,12 @@ class DataTreeModel(QtCore.QAbstractItemModel):
                         parentNode.removeChildren([index.row()])
                         self.endRemoveRows()
             return True
-        else:
-            return False
 
-    # --------------------------------------------------------------------------------------------
+        return False
+
+    # ------------------------------------------------------------------------------------
     # Properties
-    # --------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
 
     @property
     def dataList(self):
@@ -1196,14 +1178,3 @@ class DataTreeModel(QtCore.QAbstractItemModel):
     @property
     def headers(self):
         return self.__headers
-
-
-# --------------------------------------------------------------------------------------------
-# Main
-# --------------------------------------------------------------------------------------------
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    main()
