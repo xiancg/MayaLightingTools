@@ -4,7 +4,8 @@ Created on July 10, 2019
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
-import os
+
+import contextlib
 import maya.cmds as mc
 from PySide2 import QtCore, QtWidgets
 
@@ -22,7 +23,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
         self._setConnections()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
-    def _setupUi(self):
+    def _setupUi(self):  # sourcery skip: low-code-quality
         self.setObjectName('LightCreator_DIALOG')
         self.setWindowTitle('Light Creator')
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
@@ -50,7 +51,7 @@ class LightCreator_GUI(QtWidgets.QDialog):
         # Create controls for each token type and adjust window size accordingly
         defaultFactory = self.factories['default']
         activeRule = defaultFactory.naming.getActiveRule()
-        self.tokens = dict()
+        self.tokens = {}
         i = 0
         if activeRule:
             for field in activeRule.fields:
@@ -59,14 +60,14 @@ class LightCreator_GUI(QtWidgets.QDialog):
                     self.tokens[token.name] = {'obj': token, 'index': i}
                     i += 1
         self._setSize(112 * len(self.tokens), 91)
-        for key, value in self.tokens.iteritems():
+        for key, value in self.tokens.items():
             tokenObj = self.tokens[key]['obj']
             labelSize = QtCore.QSize(60, 13)
             label = QtWidgets.QLabel(self)
             label.setSizePolicy(sizePolicy)
             label.setMinimumSize(labelSize)
             label.setMaximumSize(labelSize)
-            label.setObjectName(tokenObj.name + '_LABEL')
+            label.setObjectName(f'{tokenObj.name}_LABEL')
             label.setText(tokenObj.name.capitalize())
             if isinstance(tokenObj, defaultFactory.naming.TokenNumber):
                 # Create spinbox
@@ -75,11 +76,10 @@ class LightCreator_GUI(QtWidgets.QDialog):
                 ctrlSpin.setSizePolicy(sizePolicy)
                 ctrlSpin.setMinimumSize(ctrlSpinSize)
                 ctrlSpin.setMaximumSize(ctrlSpinSize)
-                ctrlSpin.setObjectName(tokenObj.name + '_SPINBOX')
+                ctrlSpin.setObjectName(f'{tokenObj.name}_SPINBOX')
                 ctrlSpin.setValue(tokenObj.default)
                 ctrlSpin.setRange(0, 1000000)
                 self.tokens[key]['ctrl'] = ctrlSpin
-                self.tokens[key]['label'] = label
             else:
                 if tokenObj.required:
                     # Create line edit
@@ -88,13 +88,9 @@ class LightCreator_GUI(QtWidgets.QDialog):
                     ctrlLine.setSizePolicy(sizePolicy)
                     ctrlLine.setMinimumSize(ctrlLineSize)
                     ctrlLine.setMaximumSize(ctrlLineSize)
-                    ctrlLine.setObjectName(tokenObj.name + '_LINEEDIT')
+                    ctrlLine.setObjectName(f'{tokenObj.name}_LINEEDIT')
                     ctrlLine.setFocus(QtCore.Qt.PopupFocusReason)
                     self.tokens[key]['ctrl'] = ctrlLine
-                    labelSize = QtCore.QSize(110, 13)
-                    label.setMinimumSize(labelSize)
-                    label.setMaximumSize(labelSize)
-                    self.tokens[key]['label'] = label
                 else:
                     # Create combobox with options
                     ctrlComboSize = QtCore.QSize(111, 22)
@@ -102,21 +98,26 @@ class LightCreator_GUI(QtWidgets.QDialog):
                     ctrlCombo.setSizePolicy(sizePolicy)
                     ctrlCombo.setMinimumSize(ctrlComboSize)
                     ctrlCombo.setMaximumSize(ctrlComboSize)
-                    ctrlCombo.setObjectName(tokenObj.name + '_COMBOBOX')
+                    ctrlCombo.setObjectName(f'{tokenObj.name}_COMBOBOX')
                     model = dvm.ObjectsListModel(tokenObj.options.keys(), ctrlCombo)
                     ctrlCombo.setModel(model)
                     if tokenObj.default:
                         dataList = ctrlCombo.model().dataList
                         for x in range(len(dataList)):
+
+                            # debug check if this dict-keys class instead of a list
+                            print(dataList, type(dataList))
+
                             if dataList[x] == tokenObj.default:
                                 ctrlCombo.setCurrentIndex(x)
                                 break
                     self.tokens[key]['ctrl'] = ctrlCombo
-                    labelSize = QtCore.QSize(110, 13)
-                    label.setMinimumSize(labelSize)
-                    label.setMaximumSize(labelSize)
-                    self.tokens[key]['label'] = label
-        for key, value in self.tokens.iteritems():
+                labelSize = QtCore.QSize(110, 13)
+                label.setMinimumSize(labelSize)
+                label.setMaximumSize(labelSize)
+            self.tokens[key]['label'] = label
+
+        for key, value in self.tokens.items():
             for item in self.tokens[key].keys():
                 tokenCtrl = self.tokens[key]['ctrl']
                 tokenLabel = self.tokens[key]['label']
@@ -162,26 +163,25 @@ class LightCreator_GUI(QtWidgets.QDialog):
             if key == QtCore.Qt.Key_Escape:
                 self._cancel()
                 return True
-            elif key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter:
+            elif key in [QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter]:
                 self._create()
                 return True
         return QtWidgets.QWidget.eventFilter(self, widget, event)
 
     def _create(self):
         result = False
-        for name, factory in self.factories.iteritems():
+        for name, factory in self.factories.items():
             if self._lightNodeType in factory.lightNodeTypes:
-                kwargs = dict()
-                for key, value in self.tokens.iteritems():
+                kwargs = {}
+                for key, value in self.tokens.items():
                     tokenObj = self.tokens[key]['obj']
                     tokenCtrl = self.tokens[key]['ctrl']
                     if tokenObj.isNumber:
                         kwargs[tokenObj.name] = tokenCtrl.value()
+                    elif tokenObj.required:
+                        kwargs[tokenObj.name] = tokenCtrl.text().replace(" ", "")
                     else:
-                        if tokenObj.required:
-                            kwargs[tokenObj.name] = tokenCtrl.text().replace(" ", "")
-                        else:
-                            kwargs[tokenObj.name] = tokenCtrl.currentText()
+                        kwargs[tokenObj.name] = tokenCtrl.currentText()
                 lightName = factory.buildName(**kwargs)
                 result = factory.createLight(self._lightNodeType, lightName)
                 break
@@ -202,10 +202,8 @@ class LightRenamer_GUI(LightCreator_GUI):
         self._setConnections()
 
     def _setConnections(self):
-        try:
+        with contextlib.suppress(Exception):
             self.create_BTN.clicked.disconnect()
-        except:
-            pass
         self.create_BTN.clicked.connect(self._rename)
 
         self.installEventFilter(self)
@@ -216,16 +214,16 @@ class LightRenamer_GUI(LightCreator_GUI):
             if key == QtCore.Qt.Key_Escape:
                 self._cancel()
                 return True
-            elif key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter:
+            elif key in [QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter]:
                 self._rename()
                 return True
         return QtWidgets.QWidget.eventFilter(self, widget, event)
 
-    def _initUi(self):
+    def _initUi(self):  # sourcery skip: merge-else-if-into-elif
         self.create_BTN.setText('Rename')
         tokensParse = self.factories['default'].parseOldNameByTokens(self._lightNode)
         if tokensParse is not None:
-            for key, value in self.tokens.iteritems():
+            for key, value in self.tokens.items():
                 tokenObj = self.tokens[key]['obj']
                 tokenCtrl = self.tokens[key]['ctrl']
                 if tokenObj.name in tokensParse.keys():
@@ -242,8 +240,8 @@ class LightRenamer_GUI(LightCreator_GUI):
                                     break
         else:
             oldNameStr, oldNameNum = self._parseOldNameParts(self._lightNode)
-            kwargs = dict()
-            for key, value in self.tokens.iteritems():
+            kwargs = {}
+            for key, value in self.tokens.items():
                 tokenObj = self.tokens[key]['obj']
                 tokenCtrl = self.tokens[key]['ctrl']
                 if tokenObj.isNumber:
@@ -252,6 +250,7 @@ class LightRenamer_GUI(LightCreator_GUI):
                     tokenCtrl.setText(oldNameStr)
 
     def _parseOldNameParts(self, lightNode):
+        # sourcery skip: merge-else-if-into-elif, remove-redundant-continue, remove-unnecessary-else, swap-if-else-branches
         '''TODO: This could be moved to the factories so the tools enforce good naming when duplicating'''
         objTransform, objShape = tools.getTransformAndShape(lightNode)
         if mc.nodeType(objShape) in tools.getLightNodesList():
@@ -266,17 +265,17 @@ class LightRenamer_GUI(LightCreator_GUI):
                     else:
                         if len(part) > len(longestPart):
                             longestPart = part
-                else:
-                    return longestPart, number
-            else:
-                return objTransform, 1
 
-    def _rename(self):
+                return longestPart, number
+
+            return objTransform, 1
+
+    def _rename(self):  # sourcery skip: merge-else-if-into-elif
         result = False
-        for name, factory in self.factories.iteritems():
+        for name, factory in self.factories.items():
             if self._lightNodeType in factory.lightNodeTypes:
-                kwargs = dict()
-                for key, value in self.tokens.iteritems():
+                kwargs = {}
+                for key, value in self.tokens.items():
                     tokenObj = self.tokens[key]['obj']
                     tokenCtrl = self.tokens[key]['ctrl']
                     if tokenObj.isNumber:
