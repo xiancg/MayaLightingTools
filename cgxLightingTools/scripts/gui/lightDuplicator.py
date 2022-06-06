@@ -5,15 +5,15 @@ Created on July 30, 2019
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 '''
 
-from __future__ import absolute_import
-
 import maya.cmds as mc
 from PySide2 import QtCore, QtWidgets
+
 from cgxLightingTools.scripts.toolbox import tools
 import cgxLightingTools.scripts.gui.mayaWindow as mWin
 
+
 class LightDuplicator_GUI(QtWidgets.QDialog):
-    def __init__(self, withInputs, withNodes, factories, parent= mWin.getMayaWindow()):
+    def __init__(self, withInputs, withNodes, factories, parent=mWin.getMayaWindow()):
         super(LightDuplicator_GUI, self).__init__(parent)
         self.withInputs = withInputs
         self.withNodes = withNodes
@@ -21,7 +21,7 @@ class LightDuplicator_GUI(QtWidgets.QDialog):
         self._setupUi()
         self._setConnections()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
-    
+
     def _setupUi(self):
         self.setObjectName('LightDuplicator_DIALOG')
         self.setWindowTitle('Light Duplicator')
@@ -30,7 +30,7 @@ class LightDuplicator_GUI(QtWidgets.QDialog):
         self.setMinimumSize(dialogSize)
         self.setMaximumSize(dialogSize)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                            QtWidgets.QSizePolicy.Fixed)
+                                           QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         vert_VERTLAY = QtWidgets.QVBoxLayout(self)
@@ -53,7 +53,7 @@ class LightDuplicator_GUI(QtWidgets.QDialog):
         self.howMany_SPINBOX.setMaximumSize(ctrlSpinSize)
         self.howMany_SPINBOX.setObjectName('howMany_SPINBOX')
         self.howMany_SPINBOX.setValue(1)
-        self.howMany_SPINBOX.setRange(1,10000)
+        self.howMany_SPINBOX.setRange(1, 10000)
         self.howMany_SPINBOX.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.keepSetup_CHKBOX = QtWidgets.QCheckBox(self)
         self.keepSetup_CHKBOX.setSizePolicy(sizePolicy)
@@ -88,18 +88,18 @@ class LightDuplicator_GUI(QtWidgets.QDialog):
         self.cancel_BTN.clicked.connect(self._cancel)
 
         self.installEventFilter(self)
-    
+
     def eventFilter(self, widget, event):
         if event.type() == QtCore.QEvent.KeyPress:
             key = event.key()
             if key == QtCore.Qt.Key_Escape:
                 self._cancel()
                 return True
-            elif key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter: 
+            elif key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter:
                 self._duplicate()
                 return True
         return QtWidgets.QWidget.eventFilter(self, widget, event)
-    
+
     def _duplicate(self):
         allSel = mc.ls(sl=True)
         if len(allSel) < 1:
@@ -110,15 +110,15 @@ class LightDuplicator_GUI(QtWidgets.QDialog):
             tools.logger.info('Please select at least one light to duplicate.')
         else:
             for each in allSel:
-                objTransform, objShape= tools.getTransformAndShape(each)
+                objTransform, objShape = tools.getTransformAndShape(each)
                 for name, factory in self.factories.iteritems():
                     if mc.nodeType(objShape) in factory.lightNodeTypes:
                         for i in range(self.howMany_SPINBOX.value()):
                             factory.duplicateLight(objTransform, self.withInputs, self.withNodes,
-                                                keepAOVSetup=self.keepSetup_CHKBOX.isChecked())
+                                                   keepAOVSetup=self.keepSetup_CHKBOX.isChecked())
 
             self.done(1)
-    
+
     def _cancel(self):
         self.done(0)
 
