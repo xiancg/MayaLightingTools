@@ -1,4 +1,6 @@
 '''
+Python 3 refactor, Jun 6, 2022
+
 @author: Chris Granados - Xian
 @contact: chris.granados@xiancg.com http://www.chrisgranados.com/
 TODO: Add separators to naming library
@@ -12,7 +14,8 @@ TODO: All alerts should be changed to something without the need for confirmatio
 Check QGraphicsOpacityEffect and QPropertyAnimation
 TODO: Rewrite lights manager and enable it here
 '''
-from __future__ import absolute_import
+
+import contextlib
 import os
 import json
 from functools import partial
@@ -33,6 +36,8 @@ from cgxLightingTools.scripts.gui import minitools_icons
 # --------------------------------------------------------
 # Mini Tools window
 # --------------------------------------------------------
+
+
 class MiniTools_GUI(QtWidgets.QMainWindow):
     def __init__(self, parent=mWin.getMayaWindow()):
         super(MiniTools_GUI, self).__init__(parent)
@@ -43,15 +48,15 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self._loadStatsPrefs()
         self._loadGeoPrefs()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
-    
-    def _setupUi(self):
+
+    def _setupUi(self):  # sourcery skip: hoist-statement-from-if
         self.setObjectName('miniTools_MW')
         self.setWindowTitle('Mini Tools')
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         if self._prefOrientation == 'horizontal':
             self.resize(440, 90)
-            self.setMinimumSize(QtCore.QSize(440,90))
+            self.setMinimumSize(QtCore.QSize(440, 90))
             self.setMaximumSize(QtCore.QSize(10000, 90))
             mainLayout = self._loadHorizontal()
         else:
@@ -85,9 +90,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             mainLayout.addLayout(tools_GRIDLAY)
             spacerWidth = 16
             spacerHeight = 20
-            spacerItem1 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
-                          QtWidgets.QSizePolicy.Expanding,
-                          QtWidgets.QSizePolicy.Minimum)
+            spacerItem1 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
+                                                QtWidgets.QSizePolicy.Expanding,
+                                                QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot01_BTN, 1, 0, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot02_BTN, 1, 1, 1, 1)
@@ -95,23 +100,23 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtVis_GRIDLAY.addWidget(self.visSnapshot04_BTN, 2, 0, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot05_BTN, 2, 1, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot06_BTN, 2, 2, 1, 1)
-            lgtVis_GRIDLAY.setRowMinimumHeight(0,10)
-            lgtVis_GRIDLAY.setRowStretch(0,10)
-            lgtVis_GRIDLAY.setRowMinimumHeight(3,10)
-            lgtVis_GRIDLAY.setRowStretch(3,10)
+            lgtVis_GRIDLAY.setRowMinimumHeight(0, 10)
+            lgtVis_GRIDLAY.setRowStretch(0, 10)
+            lgtVis_GRIDLAY.setRowMinimumHeight(3, 10)
+            lgtVis_GRIDLAY.setRowStretch(3, 10)
             mainLayout.addLayout(lgtVis_GRIDLAY)
-            spacerItem2 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
-                          QtWidgets.QSizePolicy.Expanding,
-                          QtWidgets.QSizePolicy.Minimum)
+            spacerItem2 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
+                                                QtWidgets.QSizePolicy.Expanding,
+                                                QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem2)
 
             lgtDRD_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
             lgtDRD_GRIDLAY.addWidget(self.renameLight_BTN, 1, 0, 1, 1, QtCore.Qt.AlignCenter)
             lgtDRD_GRIDLAY.addWidget(self.deleteLight_BTN, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(lgtDRD_GRIDLAY)
-            spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
-                          QtWidgets.QSizePolicy.Expanding,
-                          QtWidgets.QSizePolicy.Minimum)
+            spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
+                                                QtWidgets.QSizePolicy.Expanding,
+                                                QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem3)
 
             lgtCreate_GRIDLAY.addWidget(self.spotLight_BTN, 1, 0, 1, 1)
@@ -126,16 +131,16 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtCreate_GRIDLAY.addWidget(self.aiPhotometricLight_BTN, 3, 3, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.aiLightPortal_BTN, 3, 4, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.aiPhysicalSky_BTN, 3, 5, 1, 1)
-            lgtCreate_GRIDLAY.setRowMinimumHeight(0,1)
-            lgtCreate_GRIDLAY.setRowStretch(0,1)
-            lgtCreate_GRIDLAY.setRowMinimumHeight(2,1)
-            lgtCreate_GRIDLAY.setRowStretch(2,1)
-            lgtCreate_GRIDLAY.setRowMinimumHeight(4,1)
-            lgtCreate_GRIDLAY.setRowStretch(4,1)
+            lgtCreate_GRIDLAY.setRowMinimumHeight(0, 1)
+            lgtCreate_GRIDLAY.setRowStretch(0, 1)
+            lgtCreate_GRIDLAY.setRowMinimumHeight(2, 1)
+            lgtCreate_GRIDLAY.setRowStretch(2, 1)
+            lgtCreate_GRIDLAY.setRowMinimumHeight(4, 1)
+            lgtCreate_GRIDLAY.setRowStretch(4, 1)
             mainLayout.addLayout(lgtCreate_GRIDLAY)
-            spacerItem4 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight, 
-                          QtWidgets.QSizePolicy.Expanding,
-                          QtWidgets.QSizePolicy.Minimum)
+            spacerItem4 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
+                                                QtWidgets.QSizePolicy.Expanding,
+                                                QtWidgets.QSizePolicy.Minimum)
             mainLayout.addItem(spacerItem4)
         else:
             tools_GRIDLAY.addWidget(self.simpleIsolate_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
@@ -153,8 +158,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             spacerWidth = 20
             spacerHeight = 16
             spacerItem1 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
-                          QtWidgets.QSizePolicy.Minimum,
-                          QtWidgets.QSizePolicy.Expanding)
+                                                QtWidgets.QSizePolicy.Minimum,
+                                                QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot01_BTN, 0, 1, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot02_BTN, 0, 2, 1, 1)
@@ -162,26 +167,24 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtVis_GRIDLAY.addWidget(self.visSnapshot04_BTN, 1, 2, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot05_BTN, 2, 1, 1, 1)
             lgtVis_GRIDLAY.addWidget(self.visSnapshot06_BTN, 2, 2, 1, 1)
-            lgtVis_GRIDLAY.setColumnMinimumWidth(0,10)
-            lgtVis_GRIDLAY.setColumnStretch(0,10)
-            lgtVis_GRIDLAY.setColumnMinimumWidth(3,10)
-            lgtVis_GRIDLAY.setColumnStretch(3,10)
+            lgtVis_GRIDLAY.setColumnMinimumWidth(0, 10)
+            lgtVis_GRIDLAY.setColumnStretch(0, 10)
+            lgtVis_GRIDLAY.setColumnMinimumWidth(3, 10)
+            lgtVis_GRIDLAY.setColumnStretch(3, 10)
             mainLayout.addLayout(lgtVis_GRIDLAY)
             spacerItem2 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
-                          QtWidgets.QSizePolicy.Minimum,
-                          QtWidgets.QSizePolicy.Expanding)
+                                                QtWidgets.QSizePolicy.Minimum,
+                                                QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem2)
-
 
             lgtDRD_GRIDLAY.addWidget(self.duplicateLight_BTN, 0, 0, 1, 1, QtCore.Qt.AlignCenter)
             lgtDRD_GRIDLAY.addWidget(self.renameLight_BTN, 0, 1, 1, 1, QtCore.Qt.AlignCenter)
             lgtDRD_GRIDLAY.addWidget(self.deleteLight_BTN, 0, 2, 1, 1, QtCore.Qt.AlignCenter)
             mainLayout.addLayout(lgtDRD_GRIDLAY)
             spacerItem3 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
-                          QtWidgets.QSizePolicy.Minimum,
-                          QtWidgets.QSizePolicy.Expanding)
+                                                QtWidgets.QSizePolicy.Minimum,
+                                                QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem3)
-
 
             lgtCreate_GRIDLAY.addWidget(self.spotLight_BTN, 0, 0, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.pointLight_BTN, 0, 1, 1, 1)
@@ -195,21 +198,21 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             lgtCreate_GRIDLAY.addWidget(self.aiPhotometricLight_BTN, 4, 0, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.aiLightPortal_BTN, 4, 1, 1, 1)
             lgtCreate_GRIDLAY.addWidget(self.aiPhysicalSky_BTN, 4, 2, 1, 1)
-            lgtCreate_GRIDLAY.setRowMinimumHeight(2,3)
-            lgtCreate_GRIDLAY.setRowStretch(2,3)
+            lgtCreate_GRIDLAY.setRowMinimumHeight(2, 3)
+            lgtCreate_GRIDLAY.setRowStretch(2, 3)
             mainLayout.addLayout(lgtCreate_GRIDLAY)
             spacerItem4 = QtWidgets.QSpacerItem(spacerWidth, spacerHeight,
-                          QtWidgets.QSizePolicy.Minimum,
-                          QtWidgets.QSizePolicy.Expanding)
+                                                QtWidgets.QSizePolicy.Minimum,
+                                                QtWidgets.QSizePolicy.Expanding)
             mainLayout.addItem(spacerItem4)
 
         mainLayout.addWidget(self.config_BTN)
         mainLayout.setAlignment(self.config_BTN, QtCore.Qt.AlignCenter)
         self.setLayout(mainLayout)
         self.setCentralWidget(self.centralwidget)
-        
+
         QtCore.QMetaObject.connectSlotsByName(self)
-    
+
     def _createButtons(self):
         toolsBtnSize = QtCore.QSize(32, 32)
         visBtnSize = QtCore.QSize(14, 14)
@@ -251,7 +254,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.specularConstrain_BTN.setMinimumSize(toolsBtnSize)
         self.specularConstrain_BTN.setMaximumSize(toolsBtnSize)
         self.specularConstrain_BTN.setObjectName("specularConstrain_BTN")
-        self.specularConstrain_BTN.setToolTip('Specular: Select vertex. Right click for more options.')
+        self.specularConstrain_BTN.setToolTip(
+            'Specular: Select vertex. Right click for more options.')
         self.cleanUpCams_BTN.setSizePolicy(sizePolicy)
         self.cleanUpCams_BTN.setMinimumSize(toolsBtnSize)
         self.cleanUpCams_BTN.setMaximumSize(toolsBtnSize)
@@ -294,7 +298,8 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.deleteLight_BTN.setText('Del')
         self.deleteLight_BTN.setStyleSheet("font-size: 10px;")
         delLight = QtWidgets.QAction("Delete Light", self.deleteLight_BTN,
-                                     shortcut=QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Delete),
+                                     shortcut=QtGui.QKeySequence(
+                                         QtCore.Qt.CTRL + QtCore.Qt.Key_Delete),
                                      triggered=self._deleteLight)
         self.deleteLight_BTN.addAction(delLight)
         self.toolsBtns = [self.simpleIsolate_BTN, self.lookThru_BTN,
@@ -341,7 +346,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot06_BTN.setMinimumSize(visBtnSize)
         self.visSnapshot06_BTN.setMaximumSize(visBtnSize)
         self.visSnapshot06_BTN.setText("6")
-        self.visSnapBtns = [self.visSnapshot01_BTN, self.visSnapshot02_BTN, 
+        self.visSnapBtns = [self.visSnapshot01_BTN, self.visSnapshot02_BTN,
                             self.visSnapshot03_BTN, self.visSnapshot04_BTN,
                             self.visSnapshot05_BTN, self.visSnapshot06_BTN]
 
@@ -427,29 +432,29 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                           self.aiMeshLight_BTN, self.aiPhotometricLight_BTN,
                           self.aiLightPortal_BTN, self.aiPhysicalSky_BTN]
 
-        #CONFIG
+        # CONFIG
         self.config_BTN = btns.MiniTools_BTN(self.centralwidget)
         self.config_BTN.setSizePolicy(sizePolicy)
         self.config_BTN.setMaximumSize(configBtnSize)
         self.config_BTN.setMinimumSize(configBtnSize)
         self.config_BTN.setObjectName("config_BTN")
         self.config_BTN.setToolTip('Config Options')
-        
+
         # * Enable this when lights manager gets reworked
         self.lightsManager_BTN.setEnabled(False)
-        
+
     def _loadHorizontal(self):
         horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         horizontalLayout.setObjectName("horizontalLayout")
 
         return horizontalLayout
-    
+
     def _loadVertical(self):
         verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         verticalLayout.setObjectName("verticalLayout")
 
         return verticalLayout
-    
+
     def _setConnections(self):
         # BUTTONS
         self.lookThru_BTN.clicked.connect(self._lookThruLight)
@@ -462,27 +467,34 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.duplicateLight_BTN.clicked.connect(self._duplicateLight)
         self.renameLight_BTN.clicked.connect(self._renameLight)
         self.deleteLight_BTN.clicked.connect(self._deleteLight)
-        self.visSnapshot01_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot01_BTN))
-        self.visSnapshot02_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot02_BTN))
-        self.visSnapshot03_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot03_BTN))
-        self.visSnapshot04_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot04_BTN))
-        self.visSnapshot05_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot05_BTN))
-        self.visSnapshot06_BTN.clicked.connect(partial(self._lightAttrsSnapshotOpt,self.visSnapshot06_BTN))
+        self.visSnapshot01_BTN.clicked.connect(
+            partial(self._lightAttrsSnapshotOpt, self.visSnapshot01_BTN))
+        self.visSnapshot02_BTN.clicked.connect(
+            partial(self._lightAttrsSnapshotOpt, self.visSnapshot02_BTN))
+        self.visSnapshot03_BTN.clicked.connect(
+            partial(self._lightAttrsSnapshotOpt, self.visSnapshot03_BTN))
+        self.visSnapshot04_BTN.clicked.connect(
+            partial(self._lightAttrsSnapshotOpt, self.visSnapshot04_BTN))
+        self.visSnapshot05_BTN.clicked.connect(
+            partial(self._lightAttrsSnapshotOpt, self.visSnapshot05_BTN))
+        self.visSnapshot06_BTN.clicked.connect(
+            partial(self._lightAttrsSnapshotOpt, self.visSnapshot06_BTN))
         # LIGHTS
-        self.spotLight_BTN.clicked.connect(partial(self._createLight,'spotLight'))
-        self.pointLight_BTN.clicked.connect(partial(self._createLight,'pointLight'))
-        self.areaLight_BTN.clicked.connect(partial(self._createLight,'areaLight'))
-        self.directionalLight_BTN.clicked.connect(partial(self._createLight,'directionalLight'))
-        self.ambientLight_BTN.clicked.connect(partial(self._createLight,'ambientLight'))
-        self.volumeLight_BTN.clicked.connect(partial(self._createLight,'volumeLight'))
-        self.aiAreaLight_BTN.clicked.connect(partial(self._createLight,'aiAreaLight'))
-        self.aiSkyDomeLight_BTN.clicked.connect(partial(self._createLight,'aiSkyDomeLight'))
-        self.aiMeshLight_BTN.clicked.connect(partial(self._createLight,'aiMeshLight'))
-        self.aiPhotometricLight_BTN.clicked.connect(partial(self._createLight,'aiPhotometricLight'))
-        self.aiLightPortal_BTN.clicked.connect(partial(self._createLight,'aiLightPortal'))
-        self.aiPhysicalSky_BTN.clicked.connect(partial(self._createLight,'aiSky'))
+        self.spotLight_BTN.clicked.connect(partial(self._createLight, 'spotLight'))
+        self.pointLight_BTN.clicked.connect(partial(self._createLight, 'pointLight'))
+        self.areaLight_BTN.clicked.connect(partial(self._createLight, 'areaLight'))
+        self.directionalLight_BTN.clicked.connect(partial(self._createLight, 'directionalLight'))
+        self.ambientLight_BTN.clicked.connect(partial(self._createLight, 'ambientLight'))
+        self.volumeLight_BTN.clicked.connect(partial(self._createLight, 'volumeLight'))
+        self.aiAreaLight_BTN.clicked.connect(partial(self._createLight, 'aiAreaLight'))
+        self.aiSkyDomeLight_BTN.clicked.connect(partial(self._createLight, 'aiSkyDomeLight'))
+        self.aiMeshLight_BTN.clicked.connect(partial(self._createLight, 'aiMeshLight'))
+        self.aiPhotometricLight_BTN.clicked.connect(
+            partial(self._createLight, 'aiPhotometricLight'))
+        self.aiLightPortal_BTN.clicked.connect(partial(self._createLight, 'aiLightPortal'))
+        self.aiPhysicalSky_BTN.clicked.connect(partial(self._createLight, 'aiSky'))
         # ICONS TOOLS
-        toolsIconSize = QtCore.QSize(32,32)
+        toolsIconSize = QtCore.QSize(32, 32)
         self.lookThru_BTN.setIcon(QtGui.QIcon(":/lookThru.png"))
         self.lookThru_BTN.setIconSize(toolsIconSize)
         self.cleanUpCams_BTN.setIcon(QtGui.QIcon(":/cleanUpCams.png"))
@@ -500,7 +512,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.transformBake_BTN.setIcon(QtGui.QIcon(":/transformBake.png"))
         self.transformBake_BTN.setIconSize(toolsIconSize)
         # ICONS LIGHTS
-        lightsIconSize = QtCore.QSize(16,16)
+        lightsIconSize = QtCore.QSize(16, 16)
         self.spotLight_BTN.setIcon(QtGui.QIcon(":/create_spotLight.png"))
         self.spotLight_BTN.setIconSize(lightsIconSize)
         self.pointLight_BTN.setIcon(QtGui.QIcon(":/create_pointLight.png"))
@@ -527,7 +539,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.aiPhysicalSky_BTN.setIconSize(lightsIconSize)
 
         # CONFIG ICON
-        configIconSize = QtCore.QSize(20,20)
+        configIconSize = QtCore.QSize(20, 20)
         self.config_BTN.setIcon(QtGui.QIcon(":/config.png"))
         self.config_BTN.setIconSize(configIconSize)
 
@@ -551,53 +563,51 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         self.visSnapshot05_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
         self.visSnapshot06_BTN.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.visSnapshot06_BTN.rightClick.connect(self.lightAttrsSnapshotOptions)
-    
+
     def _prefs_path(self):
         userPath = os.path.expanduser("~")
         finalDir = os.path.join(userPath, ".CGXTools")
-        try:
+        with contextlib.suppress(Exception):
             if not os.path.exists(finalDir):
                 os.mkdir(finalDir)
-        except:
-            pass
         filepath = os.path.join(finalDir, "MiniTools.pref")
         return filepath
 
     def _saveOrientationPref(self, prefOrientation):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
                 config['orientation'] = prefOrientation
             with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
+                json.dump(config, fp, indent=4)
         else:
             config = {'orientation': prefOrientation}
             with open(filepath, "w") as fp:
-                json.dump(config, fp, indent = 4)
+                json.dump(config, fp, indent=4)
         # Open a new instance with the new orientation
         load()
         self.close()
-    
+
     def _loadOrientationPref(self):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
         if config.get('orientation') is not None and \
-           config.get('orientation') in ['horizontal','vertical']:
+           config.get('orientation') in ['horizontal', 'vertical']:
             return config.get('orientation')
-        else:
-            config = {'orientation': 'horizontal'}
-            with open(filepath, "w") as fp:
-                json.dump(config, fp, indent = 4)
-            return 'horizontal'
-    
+
+        config = {'orientation': 'horizontal'}
+        with open(filepath, "w") as fp:
+            json.dump(config, fp, indent=4)
+        return 'horizontal'
+
     def _saveLookThruPrefs(self, winWidth, winHeight, nearClip, farClip):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
@@ -605,50 +615,46 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
                 config['lookThru_farClip'] = farClip
                 config['lookThru_winWidth'] = winWidth
                 config['lookThru_winHeight'] = winHeight
-            with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
         else:
-            config = {'lookThru_nearClip':nearClip,'lookThru_farClip':farClip,
-                      'lookThru_winWidth':winWidth,'lookThru_winHeight':winHeight}
-            with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
-    
+            config = {'lookThru_nearClip': nearClip, 'lookThru_farClip': farClip,
+                      'lookThru_winWidth': winWidth, 'lookThru_winHeight': winHeight}
+        with open(filepath, 'w') as fp:
+            json.dump(config, fp, indent=4)
+
     def _loadLookThruPrefs(self):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
-        valuesList = [config.get('lookThru_nearClip'),config.get('lookThru_farClip'),
-                    config.get('lookThru_winWidth'),config.get('lookThru_winHeight')]
-        if None not in valuesList:
-            return config
-        else:
+        valuesList = [config.get('lookThru_nearClip'), config.get('lookThru_farClip'),
+                      config.get('lookThru_winWidth'), config.get('lookThru_winHeight')]
+        if None in valuesList:
             self._saveLookThruPrefs(629, 404, 1.0, 1000000)
-            config = {'lookThru_nearClip':1.0, 'lookThru_farClip':1000000,
-                      'lookThru_winWidth': 629, 'lookThru_winHeight':404}
-            return config
+            config = {'lookThru_nearClip': 1.0, 'lookThru_farClip': 1000000,
+                      'lookThru_winWidth': 629, 'lookThru_winHeight': 404}
+        return config
 
     def _saveStatsPrefs(self, statsBool):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
                 config['stats'] = statsBool
-            with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
         else:
-            config = {'stats':statsBool}
-            with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
+            config = {'stats': statsBool}
+
+        with open(filepath, 'w') as fp:
+            json.dump(config, fp, indent=4)
+
         if statsBool:
             for btn in self.toolsBtns:
                 btn.collect_stats = True
-        
+
     def _loadStatsPrefs(self):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
@@ -660,26 +666,24 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         else:
             self._saveStatsPrefs(False)
             return False
-    
+
     def _saveDebugPrefs(self, debugBool):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
                 config['debug'] = debugBool
-            with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
         else:
-            config = {'debug':debugBool}
-            with open(filepath, 'w') as fp:
-                json.dump(config, fp, indent = 4)
+            config = {'debug': debugBool}
+        with open(filepath, 'w') as fp:
+            json.dump(config, fp, indent=4)
         if debugBool:
             tools.initFileLogger()
-    
+
     def _loadDebugPrefs(self):
         filepath = self._prefs_path()
-        config = dict()
+        config = {}
         if os.path.exists(filepath):
             with open(filepath) as fp:
                 config = json.load(fp)
@@ -689,7 +693,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         else:
             self._saveStatsPrefs(False)
             return False
-    
+
     def _saveGeoPrefs(self):
         prefsFilePath = self._prefs_path()
         baseDir = os.path.dirname(prefsFilePath)
@@ -703,9 +707,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         baseDir = os.path.dirname(prefsFilePath)
         iniFile = os.path.join(baseDir, "MiniTools.ini")
         if os.path.exists(iniFile):
-            settings= QtCore.QSettings(iniFile, QtCore.QSettings.IniFormat)
+            settings = QtCore.QSettings(iniFile, QtCore.QSettings.IniFormat)
             self.restoreGeometry(settings.value("geometry"))
-    
+
     def _transformBake(self):
         allSel = mc.ls(sl=True)
         if len(allSel) < 1:
@@ -723,30 +727,30 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             if ok:
                 try:
                     mc.refresh(suspend=True)
-                    tools.transformBake(allSel,value)
-                except:
+                    tools.transformBake(allSel, value)
+                except Exception:
                     pass
                 finally:
                     mc.refresh(suspend=False)
-        #Done!
+        # Done!
         msgBox = QtWidgets.QMessageBox(self)
         msgBox.setWindowTitle("Done!")
         msgBox.setText("Done baking transforms.")
         msgBox.exec_()
-    
+
     def _lookThruLight(self):
         config = self._loadLookThruPrefs()
         tools.lookThruLight(config['lookThru_winWidth'],
                             config['lookThru_winHeight'],
                             config['lookThru_nearClip'],
                             config['lookThru_farClip'])
-    
+
     def _createLight(self, lightNodeType):
         dialog = LightCreator_GUI(lightNodeType, self.factories, self)
         dialog.show()
         if dialog == 1:
             tools.resetGlobals()
-    
+
     def _renameLight(self):
         allSel = mc.ls(sl=True)
         if len(allSel) > 1:
@@ -757,23 +761,23 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
             tools.logger.info('Please select one light only.')
         else:
             lightNode = allSel[0]
-            objTransform, objShape= tools.getTransformAndShape(lightNode)
+            objTransform, objShape = tools.getTransformAndShape(lightNode)
             dialog = LightRenamer_GUI(objShape, self.factories, self)
             dialog.show()
             if dialog == 1:
                 tools.resetGlobals()
-    
-    def _duplicateLight(self, withInputs=False, withNodes= False):
+
+    def _duplicateLight(self, withInputs=False, withNodes=False):
         dialog = LightDuplicator_GUI(withInputs, withNodes, self.factories, self)
         dialog.exec_()
         if dialog == 1:
             tools.resetGlobals()
-    
+
     def _deleteLight(self):
         allSel = mc.ls(sl=True)
         success = False
         for each in allSel:
-            objTransform, objShape= tools.getTransformAndShape(each)
+            objTransform, objShape = tools.getTransformAndShape(each)
             for name, factory in self.factories.iteritems():
                 if mc.nodeType(objShape) in factory.lightNodeTypes:
                     factory.deleteLight(objTransform, objShape)
@@ -787,7 +791,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         dialog.exec_()
         if dialog == 1:
             tools.resetGlobals()
-    
+
     def closeEvent(self, event):
         if self._loadStatsPrefs():
             stats.save()
@@ -795,9 +799,9 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         super(MiniTools_GUI, self).closeEvent(event)
 
     # --------------------------------------------------------
-	# Method for right-click menus
-	# --------------------------------------------------------
-    def configOptions (self):
+        # Method for right-click menus
+        # --------------------------------------------------------
+    def configOptions(self):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.config_BTN)
         prefOrientationQ = menu.addAction("Toggle tools orientation")
@@ -822,14 +826,15 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         else:
             self._prefOrientation = 'horizontal'
 
-        prefOrientationQ.triggered.connect(partial(self._saveOrientationPref, self._prefOrientation))
+        prefOrientationQ.triggered.connect(
+            partial(self._saveOrientationPref, self._prefOrientation))
         prefLookThruQ.triggered.connect(self._lookThruDefaults)
         usageStatsQ.triggered[bool].connect(self._saveStatsPrefs)
         debugModeQ.triggered[bool].connect(self._saveDebugPrefs)
 
         self.config_BTN.showMenu()
 
-    def specConstrainOptions (self, pos):
+    def specConstrainOptions(self, pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.specularConstrain_BTN)
         notFixedQ = menu.addAction("Not fixed specular (no rotation)")
@@ -837,15 +842,15 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
 
         notFixedQ.triggered.connect(partial(tools.specularConstrain, False))
 
-    def isolateOptions (self, pos):
+    def isolateOptions(self, pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.simpleIsolate_BTN)
         resetVisSnapshotQ = menu.addAction("Reset visibility snapshot for this tool")
         menu.popup(self.simpleIsolate_BTN.mapToGlobal(pos))
 
         resetVisSnapshotQ.triggered.connect(partial(tools.lightsVisibilitySnapshot))
-    
-    def duplicateLightOptions (self, pos):
+
+    def duplicateLightOptions(self, pos):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(self.duplicateLight_BTN)
         duplicateWithInputsQ = menu.addAction("Duplicate with inputs")
@@ -855,7 +860,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
         duplicateWithInputsQ.triggered.connect(partial(self._duplicateLight, True))
         duplicateWithAllQ.triggered.connect(partial(self._duplicateLight, True, True))
 
-    def lightAttrsSnapshotOptions (self, pos, btn):
+    def lightAttrsSnapshotOptions(self, pos, btn):
         """Method that creates the popupmenu"""
         menu = QtWidgets.QMenu(btn)
         menu.setStyleSheet("background-color: grey")
@@ -865,7 +870,7 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
 
         clearSnapshotQ.triggered.connect(partial(self._clearAttrsSnapshotOpt, btn))
         clearAllSnapshotQ.triggered.connect(self._clearAllSnapshotsOpt)
-    
+
     def _lightAttrsSnapshotOpt(self, btn):
         if not btn.snap:
             btn.snap = tools.lightsAttrsSnapshot()
@@ -880,11 +885,11 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
     def _clearAttrsSnapshotOpt(self, btn):
         btn.snap.clear()
         btn.is_active = False
-    
+
     def _clearAllSnapshotsOpt(self):
         msgBox = QtWidgets.QMessageBox()
         result = msgBox.question(self, "Warning!",
-                 "Are you sure you want to clear all attribute snapshots?")
+                                 "Are you sure you want to clear all attribute snapshots?")
         if result == msgBox.StandardButton.Yes:
             for btn in self.visSnapBtns:
                 self._clearAttrsSnapshotOpt(btn)
@@ -895,13 +900,11 @@ class MiniTools_GUI(QtWidgets.QMainWindow):
 # --------------------------------------------------------
 def load():
     for qt in QtWidgets.QApplication.topLevelWidgets():
-        try:
+        with contextlib.suppress(Exception):
             qtname = qt.objectName()
             if qtname in ['miniTools_MW']:
                 qt.close()
                 break
-        except:
-            pass
     tools.resetGlobals()
     miniTools = MiniTools_GUI()
     miniTools.show()
